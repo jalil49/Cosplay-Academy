@@ -15,11 +15,9 @@ namespace Cosplay_Academy
         private string Path_Amateur;
         private string Path_Pro;
         private string Path_Lewd;
-        private bool Anger;
+        public bool Anger;
 
 
-        public void Set_Anger(bool set_anger)
-        { Anger = set_anger; }
         public OutfitData()
         {
             Path_FirstTime = Path_Amateur = Path_Pro = Path_Lewd = "Default";

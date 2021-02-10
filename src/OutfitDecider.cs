@@ -110,11 +110,12 @@ namespace Cosplay_Academy
             {
                 for (int i = 0; i < 12; i++)
                 {
+                    outfitData[i].Anger = person.isAnger;
                     outfitData[i].Coordinate();
                 }
                 OutfitCoordination = true;
+                Anger = person.isAnger;
             }
-            Anger = person.isAnger;
             //Set up Normal uniform
             ExpandedOutfit.Logger.LogDebug("Uniform");
             UniformOutfit();
