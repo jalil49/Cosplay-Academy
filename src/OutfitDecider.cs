@@ -25,8 +25,6 @@ namespace Cosplay_Academy
         private static List<SaveData.Heroine> heroines;
         private static SaveData.Heroine person;
         public static bool Reset; //
-        private static bool OutfitCoordination = false;
-
 
         private static int HExperience //Get copied from in-game file but modified into int and anger
         {
@@ -75,7 +73,6 @@ namespace Cosplay_Academy
             {
                 ProcessedNames.Clear(); //reset list
                 Reset = false;
-                OutfitCoordination = false;
                 if (IsInitialized)
                 {
                     for (int i = 0; i < 12; i++)
@@ -105,15 +102,11 @@ namespace Cosplay_Academy
                 GrabUniform();
                 GrabSwimsuits();
                 IsInitialized = true;
-            }
-            if (!OutfitCoordination)
-            {
                 for (int i = 0; i < 12; i++)
                 {
                     outfitData[i].Anger = person.isAnger;
                     outfitData[i].Coordinate();
                 }
-                OutfitCoordination = true;
                 Anger = person.isAnger;
             }
             //Set up Normal uniform
