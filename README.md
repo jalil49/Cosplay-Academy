@@ -3,7 +3,7 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 
 ## How to use 
 1. Make sure [BepInEx](https://github.com/BepInEx/BepInEx) is installed and your game is updated.
-2. Download the latest release from [here]().
+2. Download the latest release from [here](https://github.com/jalil49/Cosplay-Academy).
 3. Extract the plugin into your game directory. The dll file(s) should end up inside the folder `BepInEx\plugins`.
 4. Running the game's story mode and starting the day will create all the required folders
 
