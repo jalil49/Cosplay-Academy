@@ -180,14 +180,14 @@ namespace Cosplay_Academy
 
                     if (!result.Contains(@"\Sets\"))
                     {
-                        outfitData[i].Path_set(j, coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j]);
+                        //outfitData[i].Path_set(j, coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j]);
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j]);
-                        outfitData[i].Insert(j, temp2.ToArray(), false);//store the data not set
+                        outfitData[i].Insert(j, temp2.ToArray(), false);//Assign "not" set and store data
                     }
                     else
                     {
                         string[] split = result.Split('\\');
-                        outfitData[i].Path_set(j, coordinatepath + InputStrings[i] + InputStrings2[j] + @"\" + split[split.Length - 2] + @"\" + split[split.Length - 1]);
+                        //outfitData[i].Path_set(j, coordinatepath + InputStrings[i] + InputStrings2[j] + @"\" + split[split.Length - 2] + @"\" + split[split.Length - 1]);
                         temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
                         if (ExpandedOutfit.FullSet.Value)
                         {
@@ -195,7 +195,7 @@ namespace Cosplay_Academy
                             Setsfunction(array);
                         }
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(result);
-                        outfitData[i].Insert(j, temp2.ToArray(), true);//assign set and store data
+                        outfitData[i].Insert(j, temp2.ToArray(), true);//assign "is" set and store data
                     }
                 }
             }
@@ -219,7 +219,7 @@ namespace Cosplay_Academy
                         {
                             break;
                         }
-                        outfitData[j].Path_set(exp, result[i]);
+                        //outfitData[j].Path_set(exp, result[i]);
                         List<string> temp = DirectoryFinder.Get_Outfits_From_Path(result[i]);
                         outfitData[j].Insert(exp, temp.ToArray(), true);
                         break;
