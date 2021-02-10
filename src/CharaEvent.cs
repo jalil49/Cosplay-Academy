@@ -22,7 +22,7 @@ namespace Cosplay_Academy
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
-            throw new NotImplementedException();
-        }//unused mandatory
+            //unused mandatory function 
+        }
     }
 }
