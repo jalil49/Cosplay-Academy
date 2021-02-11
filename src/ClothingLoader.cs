@@ -2,7 +2,7 @@
 {
     public static class ClothingLoader
     {
-        public static ChaControl chaControl;
+        private static ChaControl chaControl;
         public static void FullLoad(ChaControl input)
         {
             chaControl = input;
