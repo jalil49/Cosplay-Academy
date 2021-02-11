@@ -174,10 +174,19 @@ namespace Cosplay_Academy
                 foreach (var folder in split.Reverse())//reverse cause it's probably faster to start at rear, but rear can be longer than forward; for loop might be faster tho
                 {
                     HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
-                    if (Enum.IsDefined(typeof(HStates), temp))
+                    try
                     {
-                        exp = (int)temp;
-                        break;
+                        HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
+                        if (Enum.IsDefined(typeof(HStates), temp))
+                        {
+                            exp = (int)temp;
+                            break;
+                        }
+
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
                     }
                 }
                 for (int j = 0; j < outfitData.Length; j++)
@@ -287,11 +296,8 @@ namespace Cosplay_Academy
         }
         private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
-            if (uniform_type)
-            {
                 Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
             }
-            else
             {
                 Constants.outfitpath[Path_Num] = outfitData[Data_Num].Random(UnityEngine.Random.Range(0, HExperience) + 1);
             }
