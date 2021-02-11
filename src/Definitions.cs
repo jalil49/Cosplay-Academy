@@ -12,7 +12,9 @@ namespace Cosplay_Academy
     }
     static class Constants 
     {
-        public static readonly string[] InputStrings = { 
+        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
+        //I'd imagine it's possible to scale clubs easily
+        public static readonly string[] InputStrings = {
             @"\School Uniform" , //0
             @"\AfterSchool", //1
             @"\Gym" ,//2
@@ -31,7 +33,7 @@ namespace Cosplay_Academy
             @"\Amateur", //1
             @"\Pro", //2
             @"\Lewd" //3
-        };//Experience States, increasing 
+        };//Experience States; easy to make scale with size
         public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
     }
     public enum HStates
@@ -41,6 +43,7 @@ namespace Cosplay_Academy
         Pro, //2
         Lewd //3
     }
+    //public enum Personailty //Will probably be a main folder that just gets appended onto available options if this ever becomes a feature rather than going into folder hell mode
     //{
     //    FirstTime,
     //    Amateur,

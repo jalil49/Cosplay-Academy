@@ -16,7 +16,9 @@ namespace Cosplay_Academy
         private string Path_Pro;
         private string Path_Lewd;
         public bool Anger;
-
+        //private bool[] ScaleableBool ; //All Scale with Constants.inputstrings2
+        //private string[] ScaleableString []; 
+        //private string[] ScaleablePaths; 
 
         public OutfitData()
         {
@@ -164,7 +166,7 @@ namespace Cosplay_Academy
                 return Amateur;
             return FirstTime;
         }
-        public void Coordinate()//set a random outfit to coordinate for non-set items
+        public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
             Path_Lewd = Random(3);
             Path_Pro = Random(2);
