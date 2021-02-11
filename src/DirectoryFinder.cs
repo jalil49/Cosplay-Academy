@@ -26,16 +26,16 @@ namespace Cosplay_Academy
             string[] InputStrings2 = { @"\FirstTime", @"\Amateur", @"\Pro", @"\Lewd" };
             string[] InputStrings3 = { @"\Sets", "" };
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
-            for (int i = 0; i < 12; i++)
+            foreach (string input in InputStrings)
             {
-                for (int j = 0; j < 4; j++)
+                foreach (string input2 in InputStrings2)
                 {
-                    for (int k = 0; k < 2; k++)
+                    foreach (string input3 in InputStrings3)
                     {
-                        if (!Directory.Exists(coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j] + InputStrings3[k]))
+                        if (!Directory.Exists(coordinatepath + "coordinate" + input + input2 + input3))
                         {
-                            ExpandedOutfit.Logger.LogWarning("File not found, creating directory at " + "coordinate" + InputStrings[i] + InputStrings2[j] + InputStrings3[k]);
-                            Directory.CreateDirectory(coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j] + InputStrings3[k]);
+                            ExpandedOutfit.Logger.LogWarning("File not found, creating directory at " + "coordinate" + input + input2 + input3);
+                            Directory.CreateDirectory(coordinatepath + "coordinate" + input + input2 + input3);
                         }
                     }
                 }
