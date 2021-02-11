@@ -34,7 +34,13 @@ namespace Cosplay_Academy
         };//Experience States, increasing 
         public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
     }
-    //public enum LewdState
+    public enum HStates
+    {
+        FirstTime, //0
+        Amateur, //1
+        Pro, //2
+        Lewd //3
+    }
     //{
     //    FirstTime,
     //    Amateur,

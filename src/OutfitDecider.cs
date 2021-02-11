@@ -168,13 +168,17 @@ namespace Cosplay_Academy
         {
             foreach (string item in result)
             {
+                string[] split = item.Split('\\');
                 int exp = 0;
-                if (item.Contains("Amateur"))
-                { exp = 1; }
-                else if (item.Contains("Pro"))
-                { exp = 2; }
-                else if (item.Contains("Lewd"))
-                { exp = 3; }
+                foreach (var folder in split.Reverse())//reverse cause it's probably faster to start at rear, but rear can be longer than forward; for loop might be faster tho
+                {
+                    HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
+                    if (Enum.IsDefined(typeof(HStates), temp))
+                    {
+                        exp = (int)temp;
+                        break;
+                    }
+                }
                 for (int j = 0; j < outfitData.Length; j++)
                 {
                     if (item.Contains(Constants.InputStrings[j]))
