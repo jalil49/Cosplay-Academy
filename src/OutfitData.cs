@@ -98,7 +98,7 @@ namespace Cosplay_Academy
                 Set_FirstTime = IsSet;
             }
         }
-        public string Random(int level)//get any random outfit according to experience
+        private string Random(int level)//get any random outfit according to experience
         {
             if (ExpandedOutfit.SumRandom.Value)
             {
