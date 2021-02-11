@@ -11,8 +11,8 @@ namespace Cosplay_Academy
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class ExpandedOutfit : BaseUnityPlugin
     {
-        public const string Guid = Constants.Guid;
-        public const string Version = Constants.Version;
+        public const string Guid = Versions.Guid;
+        public const string Version = Versions.Version;
 
         internal static new ManualLogSource Logger { get; private set; }
 

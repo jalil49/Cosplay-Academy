@@ -75,7 +75,7 @@
     <Compile Include="DirectoryFinder.cs" />
     <Compile Include="ClothingLoader.cs" />
     <Compile Include="Definitions.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Versions.cs" />
     <Compile Include="CharaEvent.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="OutfitDecider.cs" />
