@@ -10,6 +10,30 @@ namespace Cosplay_Academy
         //[Description("Update everytime character reloads")]
         //EveryReload
     }
+    static class Constants 
+    {
+        public static readonly string[] InputStrings = { 
+            @"\School Uniform" , //0
+            @"\AfterSchool", //1
+            @"\Gym" ,//2
+            @"\Swimsuit" , //3
+            @"\Club\Swim" , //4
+            @"\Club\Manga", //5
+            @"\Club\Cheer", //6
+            @"\Club\Tea", //7
+            @"\Club\Track", //8
+            @"\Casual" , //9
+            @"\Nightwear", //10
+            @"\Club\Koi" //11
+        };//Folders
+        public static readonly string[] InputStrings2 = {
+            @"\FirstTime", //0
+            @"\Amateur", //1
+            @"\Pro", //2
+            @"\Lewd" //3
+        };//Experience States, increasing 
+        public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
+    }
     //public enum LewdState
     //{
     //    FirstTime,

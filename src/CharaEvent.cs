@@ -11,10 +11,10 @@ namespace Cosplay_Academy
             //{ return; }//if disabled don't run
             //base.OnReload(currentGameMode);
             if (ChaControl.sex == 1 && (!OutfitDecider.ProcessedNames.Contains(ChaControl.fileParam.fullname) || OutfitDecider.Reset))//run the following if female and unprocessed
-            {
+            {                
                 OutfitDecider.Decision(ChaControl.fileParam.fullname);//Generate outfits
-                ClothingLoader.chaControl = ChaControl;//pass controller as is to load outfits
-                ClothingLoader.FullLoad();//Load outfits
+                //ClothingLoader.chaControl = ChaControl;//pass controller as is to load outfits
+                ClothingLoader.FullLoad(ChaControl);//Load outfits
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }

@@ -21,14 +21,11 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            string[] InputStrings = { @"\School Uniform" , @"\AfterSchool", @"\Gym" , @"\Swimsuit" , @"\Club\Swim" ,
-            @"\Club\Manga", @"\Club\Cheer", @"\Club\Tea", @"\Club\Track", @"\Casual" , @"\Nightwear", @"\Club\Koi" };
-            string[] InputStrings2 = { @"\FirstTime", @"\Amateur", @"\Pro", @"\Lewd" };
             string[] InputStrings3 = { @"\Sets", "" };
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
-            foreach (string input in InputStrings)
+            foreach (string input in Constants.InputStrings)
             {
-                foreach (string input2 in InputStrings2)
+                foreach (string input2 in Constants.InputStrings2)
                 {
                     foreach (string input3 in InputStrings3)
                     {

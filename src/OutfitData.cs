@@ -96,9 +96,9 @@ namespace Cosplay_Academy
         }
         public string Random(int level)//get any random outfit according to experience
         {
-            string result;
             if (ExpandedOutfit.SumRandom.Value)
             {
+                string result;
                 List<string> temp = Sum(level);
                 result = temp[UnityEngine.Random.Range(0, temp.Count)];
                 return result;
@@ -114,61 +114,44 @@ namespace Cosplay_Academy
             }
             return FirstTime[UnityEngine.Random.Range(0, FirstTime.Length)];
         }
-        public bool SetExists(int level)//Does a set exist for this outfit and lewd state
-        {
-            if (!Anger)
-            {
-                if (level == 3)
-                    return (Set_FirstTime || Set_Amateur || Set_Pro || Set_Lewd);
-                if (level == 2)
-                    return (Set_FirstTime || Set_Amateur || Set_Pro);
-                if (level == 1)
-                    return (Set_FirstTime || Set_Amateur);
-            }
-            return (Set_FirstTime);
-        }
-        public string RandomSet(int level)//if set exists add its items to pool along with any coordinated outfit
+        //public bool SetExists(int level)//Does a set exist for this outfit and lewd state
+        //{
+        //    if (!Anger)
+        //    {
+        //        if (level == 3)
+        //            return (Set_FirstTime || Set_Amateur || Set_Pro || Set_Lewd);
+        //        if (level == 2)
+        //            return (Set_FirstTime || Set_Amateur || Set_Pro);
+        //        if (level == 1)
+        //            return (Set_FirstTime || Set_Amateur);
+        //    }
+        //    return (Set_FirstTime);
+        //}
+        public string RandomSet(int level, bool Match)//if set exists add its items to pool along with any coordinated outfit and other choices
         {
             List<string> temp = new List<string>();
             if (!Anger)
             {
-                if (level == 3 && Set_Lewd)
+                if (level >= 3 && (Set_Lewd || !Match))
                     temp.AddRange(Lewd);
-                else if (level == 3)
+                else if (level >= 3)
                     temp.Add(Path_Lewd);
 
-                if (level >= 2 && Set_Pro)
+                if (level >= 2 && (Set_Pro || !Match))
                     temp.AddRange(Pro);
                 else if (level >= 2)
                     temp.Add(Path_Pro);
 
-                if (level >= 1 && Set_Amateur)
+                if (level >= 1 && (Set_Amateur || !Match))
                     temp.AddRange(Amateur);
                 else if (level >= 1)
                     temp.Add(Path_Amateur);
             }
-            if (Set_FirstTime)
+            if (Set_FirstTime || !Match)
                 temp.AddRange(FirstTime);
             else
                 temp.Add(Path_FirstTime);
 
-            return temp[UnityEngine.Random.Range(0, temp.Count)];
-        }
-        public string RandomPath(int level)//Contains path of file to coordinate matching outfit; example ...\swimsuit\FirstTime\swimsuit.png
-        {
-            List<string> temp = new List<string>();
-            if (!Anger)
-            {
-                if (level == 3)
-                    temp.Add(Path_Lewd);
-
-                if (level >= 2)
-                    temp.Add(Path_Pro);
-
-                if (level >= 1)
-                    temp.Add(Path_Amateur);
-            }
-            temp.Add(Path_FirstTime);
             return temp[UnityEngine.Random.Range(0, temp.Count)];
         }
         public string[] Exportarray(int level)
