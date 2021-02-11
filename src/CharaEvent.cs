@@ -7,8 +7,8 @@ namespace Cosplay_Academy
     {
         protected override void OnReload(GameMode currentGameMode) //from KKAPI.Chara when characters enter reload state
         {
-            //if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode)
-            //{ return; }//if disabled don't run
+            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+            { return; }//if disabled don't run
             //base.OnReload(currentGameMode);
             if (ChaControl.sex == 1 && (!OutfitDecider.ProcessedNames.Contains(ChaControl.fileParam.fullname) || OutfitDecider.Reset))//run the following if female and unprocessed
             {                

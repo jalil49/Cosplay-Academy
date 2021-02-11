@@ -82,7 +82,7 @@ namespace Cosplay_Academy
             AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");
             SundayDate = Config.Bind("Additional Outfit", "Sunday Date Special", true, "Date will wear something different on Sunday");
             //Coordination helper
-            //Makerview = Config.Bind("Compatibility Check", "Enable maker view", false, "Enable to view in maker");
+            Makerview = Config.Bind("Compatibility Check", "Enable maker view", false, "Only seems to work with default characters");
         }
     }
 }
