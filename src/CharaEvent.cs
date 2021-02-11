@@ -1,6 +1,5 @@
 ﻿using KKAPI;
 using KKAPI.Chara;
-using System;
 
 namespace Cosplay_Academy
 {
