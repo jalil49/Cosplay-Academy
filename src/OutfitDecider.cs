@@ -1,4 +1,5 @@
 ﻿using Manager;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -114,7 +115,7 @@ namespace Cosplay_Academy
             //If Characters can use casual outfits after school
             if (ExpandedOutfit.AfterSchoolCasual.Value)
             {
-                if (Random.Range(0, 2) == 1)//%50 chance
+                if (UnityEngine.Random.Range(0, 2) == 1)//%50 chance
                 {
                     Constants.outfitpath[1] = Constants.outfitpath[5];//assign casual outfit to afterschool
                 }
@@ -140,7 +141,7 @@ namespace Cosplay_Academy
                         continue;
                     }
                     temp2 = DirectoryFinder.Grab_All_Files(coordinatepath + "coordinate" + Input1 + Input2);
-                    string result = temp2[Random.Range(0, temp2.Count)];
+                    string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
 
                     if (!result.Contains(@"\Sets\") || !ExpandedOutfit.EnableSets.Value)
                     {
@@ -209,11 +210,11 @@ namespace Cosplay_Academy
         }
         private static void GymOutfit()
         {
-            Generalized_Assignment( ExpandedOutfit.MatchGym.Value, 2, 2);
+            Generalized_Assignment(ExpandedOutfit.MatchGym.Value, 2, 2);
         }
         private static void SwimOutfit()
         {
-            Generalized_Assignment( ExpandedOutfit.MatchSwim.Value, 3, 3);
+            Generalized_Assignment(ExpandedOutfit.MatchSwim.Value, 3, 3);
         }
         private static void ClubOutfit(int club)
         {
@@ -224,19 +225,19 @@ namespace Cosplay_Academy
                     break;
 
                 case 2:
-                    Generalized_Assignment( ExpandedOutfit.MatchMangaClub.Value, 4, 5);
+                    Generalized_Assignment(ExpandedOutfit.MatchMangaClub.Value, 4, 5);
                     break;
 
                 case 3:
-                    Generalized_Assignment( ExpandedOutfit.MatchCheerClub.Value, 4, 6);
+                    Generalized_Assignment(ExpandedOutfit.MatchCheerClub.Value, 4, 6);
                     break;
 
                 case 4:
-                    Generalized_Assignment( ExpandedOutfit.MatchTeaClub.Value, 4, 7);
+                    Generalized_Assignment(ExpandedOutfit.MatchTeaClub.Value, 4, 7);
                     break;
 
                 case 5:
-                    Generalized_Assignment( ExpandedOutfit.MatchTrackClub.Value, 4, 8);
+                    Generalized_Assignment(ExpandedOutfit.MatchTrackClub.Value, 4, 8);
                     break;
                 default:
                     Constants.outfitpath[4] = Constants.outfitpath[0];
@@ -252,7 +253,7 @@ namespace Cosplay_Academy
         }
         private static void CasualOutfit()
         {
-            Generalized_Assignment( ExpandedOutfit.MatchCasual.Value, 5, 9);
+            Generalized_Assignment(ExpandedOutfit.MatchCasual.Value, 5, 9);
         }
         private static void NightOutfit()
         {
@@ -284,7 +285,7 @@ namespace Cosplay_Academy
                 }
             }
         }
-        private static void Generalized_Assignment( bool uniform_type, int Path_Num, int Data_Num)
+        private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
             if (uniform_type)
             {
@@ -292,7 +293,7 @@ namespace Cosplay_Academy
             }
             else
             {
-                Constants.outfitpath[Path_Num] = outfitData[Data_Num].Random(Random.Range(0, HExperience) + 1);
+                Constants.outfitpath[Path_Num] = outfitData[Data_Num].Random(UnityEngine.Random.Range(0, HExperience) + 1);
             }
         }
     }

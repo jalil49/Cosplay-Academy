@@ -3,6 +3,7 @@ namespace Cosplay_Academy
 {
     public class OutfitData
     {
+        //can be made to be scaleable at a sacrifice of readability will need to make scaleable settings tho.
         private bool Set_FirstTime;
         private bool Set_Amateur;
         private bool Set_Pro;
@@ -22,6 +23,7 @@ namespace Cosplay_Academy
 
         public OutfitData()
         {
+
             Path_FirstTime = Path_Amateur = Path_Pro = Path_Lewd = "Default";
             FirstTime = new string[0];
             Amateur = new string[0];
