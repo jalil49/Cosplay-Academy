@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace Cosplay_Academy
 {
@@ -297,7 +296,7 @@ namespace Cosplay_Academy
         {
             //if (uniform_type)
             //{
-                Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+            Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
             //}
             //else
             //{
