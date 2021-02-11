@@ -10,13 +10,13 @@ namespace Cosplay_Academy
         //[Description("Update everytime character reloads")]
         //EveryReload
     }
-    public enum LewdState
-    {
-        FirstTime,
-        Amateur,
-        Pro,
-        Lewd
-    }
+    //public enum LewdState
+    //{
+    //    FirstTime,
+    //    Amateur,
+    //    Pro,
+    //    Lewd
+    //}
     //    public enum Personailty
     //    {
     //        Airhead,
