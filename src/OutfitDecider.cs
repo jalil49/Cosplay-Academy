@@ -26,7 +26,7 @@ namespace Cosplay_Academy
             IsInitialized = false;
             Reset = true;
             outfitData = new OutfitData[Constants.InputStrings.Length];
-            for (int i = 0; i < outfitData.Length; i++)
+            for (int i = 0, n = outfitData.Length; i < n; i++)
             {
                 outfitData[i] = new OutfitData();
             }
@@ -43,39 +43,41 @@ namespace Cosplay_Academy
                 Reset = false;
                 if (IsInitialized)
                 {
-                    for (int i = 0; i < outfitData.Length; i++)
+                    foreach (OutfitData data in outfitData)
                     {
-                        outfitData[i].Clear();
+                        data.Clear();
                     }
                 }
                 IsInitialized = false;
 
                 ExpandedOutfit.Logger.LogInfo("Reset has occured");
             }
-
+            person = null;
             heroines = _gameMgr.HeroineList;
-            for (int i = 0; i < heroines.Count; i++)
+            foreach (SaveData.Heroine heroine in heroines)
             {
-                if (name == heroines[i].Name)
+                if (name == heroine.Name)
                 {
-                    person = heroines[i];
+                    person = heroine;
                     break;
                 }
-                else if (i == heroines.Count - 1)
-                { return; }
             }
-
+            if (person==null)
+            {
+                return;
+            }
             if (!IsInitialized)
             {
                 Get_Outfits();
                 GrabUniform();
                 GrabSwimsuits();
                 IsInitialized = true;
-                for (int i = 0; i < outfitData.Length; i++)
+                foreach (OutfitData data in outfitData)
                 {
-                    outfitData[i].Anger = person.isAnger;
-                    outfitData[i].Coordinate();
+                    data.Anger = person.isAnger;
+                    data.Coordinate();
                 }
+
                 HExperience = (int)person.HExperience;
             }
             //Set up Normal uniform
@@ -187,7 +189,7 @@ namespace Cosplay_Academy
                         return;
                     }
                 }
-                for (int j = 0; j < outfitData.Length; j++)
+                for (int j = 0, n = outfitData.Length; j < n; j++)
                 {
                     if (item.Contains(Constants.InputStrings[j]))
                     {
@@ -270,7 +272,7 @@ namespace Cosplay_Academy
         {
             if (ExpandedOutfit.GrabUniform.Value)
             {
-                for (int i = 0; i < Constants.InputStrings2.Length; i++) //0 is FirstTime to 3 which is lewd
+                for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
                 {
                     if (outfitData[0].IsSet(i))
                     {
@@ -283,7 +285,7 @@ namespace Cosplay_Academy
         {
             if (ExpandedOutfit.GrabSwimsuits.Value)
             {
-                for (int i = 0; i < Constants.InputStrings2.Length; i++) //0 is FirstTime to 3 which is lewd
+                for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
                 {
                     if (outfitData[5].IsSet(i))
                     {

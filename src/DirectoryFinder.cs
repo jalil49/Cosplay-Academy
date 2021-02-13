@@ -53,10 +53,11 @@ namespace Cosplay_Academy
             Choosen.Clear();
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
             string[] folders = System.IO.Directory.GetDirectories(coordinatepath + "coordinate", "*", System.IO.SearchOption.AllDirectories); //grab child folders
-            for (int i = 0; i < folders.Length; i++)
+            foreach (string folder in folders)
             {
-                if (folders[i].Contains(Narrow))
-                { Choosen.Add(folders[i]); }
+                if (folder.Contains(Narrow))
+                { Choosen.Add(folder); }
+
             }
             return Choosen;
         }
@@ -73,10 +74,11 @@ namespace Cosplay_Academy
                 Paths.AddRange(folders);
             }
             //step through each folder and grab files
-            for (int i = 0; i < Paths.Count; i++)
+            foreach (string path in Paths)
             {
-                string[] files = System.IO.Directory.GetFiles(Paths[i]);
+                string[] files = System.IO.Directory.GetFiles(path);
                 Choosen.AddRange(files);
+
             }
             if (Choosen.Count == 0)
             {
