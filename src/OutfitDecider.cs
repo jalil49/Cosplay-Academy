@@ -124,7 +124,7 @@ namespace Cosplay_Academy
             //If Characters can use casual outfits after school
             if (ExpandedOutfit.AfterSchoolCasual.Value)
             {
-                if (UnityEngine.Random.Range(0, 101) >= 100 - ExpandedOutfit.AfterSchoolcasualchance.Value)
+                if (UnityEngine.Random.Range(1, 101) >= ExpandedOutfit.AfterSchoolcasualchance.Value)
                 {
                     Constants.outfitpath[1] = Constants.outfitpath[5];//assign casual outfit to afterschool
                 }
@@ -261,7 +261,7 @@ namespace Cosplay_Academy
             }
             if (person == null ? ExpandedOutfit.KoiClub.Value : person.isStaff)
             {
-                if (UnityEngine.Random.Range(0, 101) >= 100 - ExpandedOutfit.KoiChance.Value)
+                if (UnityEngine.Random.Range(1, 101) >= ExpandedOutfit.KoiChance.Value)
                 {
                     Generalized_Assignment(ExpandedOutfit.MatchKoiClub.Value, 4, 11);
                 }
@@ -303,14 +303,7 @@ namespace Cosplay_Academy
         }
         private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
-            //if (uniform_type)
-            //{
             Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
-            //}
-            //else
-            //{
-            //    Constants.outfitpath[Path_Num] = outfitData[Data_Num].Random(UnityEngine.Random.Range(0, HExperience) + 1);
-            //}
         }
     }
 }
