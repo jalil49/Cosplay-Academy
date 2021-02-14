@@ -20,7 +20,7 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 
 5.The Sets folder is used for folders of outfits that have similar asthetics such as "Beezys School Uniforms" and want people to follow a theme if choosen and hopefully don't conflict with each other.
 
-	5A. Beware of simple color varients in sets such as NekoMaids as they will conflict with each other.
+	5A. Beware of simple color varients in sets such as NekoMaids (the skirts in particular), for example (hope it gets patched), as they will conflict with each other.
 	
 6.anything that is in the parent folder of \Sets will be coordinating with itself rather than with those that share the folder unlike the Sets folder.
 
