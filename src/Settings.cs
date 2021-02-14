@@ -40,11 +40,20 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> SundayDate { get; private set; }
         public static ConfigEntry<bool> Makerview { get; private set; }
         public static ConfigEntry<bool> FullSet { get; private set; }
+        public static ConfigEntry<bool> KoiClub { get; private set; }
+        public static ConfigEntry<bool> ResetMaker { get; set; }
+        public static ConfigEntry<bool> PermReset { get; set; }
+        public static ConfigEntry<bool> ChangeOutfit { get; set; }
+        public static ConfigEntry<bool> PermChangeOutfit { get; set; }
+        public static ConfigEntry<int> KoiChance { get; private set; }
+        public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
+        public static ConfigEntry<HStates> MakerHstate { get; private set; }
+        public static ConfigEntry<Club> ClubChoice { get; private set; }
 
         public void Awake()
         {
@@ -57,10 +66,11 @@ namespace Cosplay_Academy
             }
 
             UpdateFrequency = Config.Bind("Main game", "Update Frequency", OutfitUpdate.Daily);
-            EnableSets = Config.Bind("Main game", "Enable Outfit Sets", true, "Choose from same set when available");
             EnableDefaults = Config.Bind("Main game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
-            FullSet = Config.Bind("Main game", "Assign available sets", false, "Example:if uniforms and swimsuit share sets apply same set to swimsuit (one way write).");
+            //Sets
+            EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Choose from same set when available");
+            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Priortize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priorty reversed: example Nightwear set will overwrite all clothes if same folder is found");
 
             //match uniforms
             MatchUniform = Config.Bind("Match Outfit", "Coordinated Uniforms", true, "Everyone wears same uniform");
@@ -77,12 +87,21 @@ namespace Cosplay_Academy
             MatchCasual = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, "It's an option");
             MatchNightwear = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
             GrabSwimsuits = Config.Bind("Additional Outfit", "Grab Swimsuits for Swimclub", true);
-
-            //
+            //Probability
+            KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
+            AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
+            //Additional Outfits
             AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");
             SundayDate = Config.Bind("Additional Outfit", "Sunday Date Special", true, "Date will wear something different on Sunday");
-            //Coordination helper
-            Makerview = Config.Bind("Compatibility Check", "Enable maker view", false, "Only seems to work with default characters");
+            //Maker
+            Makerview = Config.Bind("Maker", "Enable maker view", false, "View in creator mode\ndoesn't load School Uniform upon entering maker from Main Menu swap uniform type to view");
+            KoiClub = Config.Bind("Maker", "Is member of Koikatsu club", false, "Adds possibilty of choosing Koi outfit");
+            MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
+            ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub);
+            ResetMaker = Config.Bind("Maker", "Randomize Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
+            PermReset = Config.Bind("Maker", "Keep Randomize Sets on", false, "Reset randomize Sets to disable once called");
+            ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false);
+            PermChangeOutfit = Config.Bind("Maker", "Keep change generated outit on", false, "Reset change generated outfit to disable once called");
         }
     }
 }

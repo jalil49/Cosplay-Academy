@@ -43,6 +43,15 @@ namespace Cosplay_Academy
         Pro, //2
         Lewd //3
     }
+    public enum Club
+    {
+        HomeClub, //0
+        SwimClub, //1
+        MangaClub, //2
+        CheerClub, //3
+        TeaClub, //4
+        TrackClub //5
+    }
     //public enum Personailty //Will probably be a main folder that just gets appended onto available options if this ever becomes a feature rather than going into folder hell mode
     //{
     //    Airhead,

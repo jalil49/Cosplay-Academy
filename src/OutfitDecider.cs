@@ -62,23 +62,31 @@ namespace Cosplay_Academy
                     break;
                 }
             }
-            if (person==null)
-            {
-                return;
-            }
             if (!IsInitialized)
             {
                 Get_Outfits();
                 GrabUniform();
                 GrabSwimsuits();
                 IsInitialized = true;
-                foreach (OutfitData data in outfitData)
+                if (person == null)
                 {
-                    data.Anger = person.isAnger;
-                    data.Coordinate();
+                    foreach (OutfitData data in outfitData)
+                    {
+                        data.Anger = false;
+                        data.Coordinate();
+                    }
+                    HExperience = (int)ExpandedOutfit.MakerHstate.Value;
                 }
+                else
+                {
+                    foreach (OutfitData data in outfitData)
+                    {
+                        data.Anger = person.isAnger;
+                        data.Coordinate();
+                    }
 
-                HExperience = (int)person.HExperience;
+                    HExperience = (int)person.HExperience;
+                }
             }
             //Set up Normal uniform
             ExpandedOutfit.Logger.LogDebug("Uniform");
@@ -102,7 +110,7 @@ namespace Cosplay_Academy
 
             //set up Club outfits
             ExpandedOutfit.Logger.LogDebug("Clubs");
-            ClubOutfit(person.clubActivities);
+            ClubOutfit(person == null ? (int)ExpandedOutfit.ClubChoice.Value : person.clubActivities);
             ExpandedOutfit.Logger.LogDebug("Clubs completed");
 
             ExpandedOutfit.Logger.LogDebug("Casual");
@@ -116,14 +124,16 @@ namespace Cosplay_Academy
             //If Characters can use casual outfits after school
             if (ExpandedOutfit.AfterSchoolCasual.Value)
             {
-                if (UnityEngine.Random.Range(0, 2) == 1)//%50 chance
+                if (UnityEngine.Random.Range(0, 101) >= 100 - ExpandedOutfit.AfterSchoolcasualchance.Value)
                 {
                     Constants.outfitpath[1] = Constants.outfitpath[5];//assign casual outfit to afterschool
                 }
             }
-
-            ExpandedOutfit.Logger.LogDebug(name + " is processed.");
-            ProcessedNames.Add(name);//character is processed
+            if (person != null)
+            {
+                ExpandedOutfit.Logger.LogDebug(name + " is processed.");
+                ProcessedNames.Add(name);//character is processed
+            }
         }
         private static void Get_Outfits()
         {
@@ -155,11 +165,8 @@ namespace Cosplay_Academy
                         string[] split = result.Split('\\');
                         //outfitData[i].Path_set(j, coordinatepath + InputStrings[i] + InputStrings2[j] + @"\" + split[split.Length - 2] + @"\" + split[split.Length - 1]);
                         temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
-                        if (ExpandedOutfit.FullSet.Value)
-                        {
-                            string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
-                            Setsfunction(array);
-                        }
+                        string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
+                        Setsfunction(array);
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(result);
                         outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
                     }
@@ -193,7 +200,7 @@ namespace Cosplay_Academy
                 {
                     if (item.Contains(Constants.InputStrings[j]))
                     {
-                        if (outfitData[j].IsSet(exp))
+                        if (ExpandedOutfit.FullSet.Value && outfitData[j].IsSet(exp))
                         {
                             break;
                         }
@@ -252,9 +259,9 @@ namespace Cosplay_Academy
                     Constants.outfitpath[4] = Constants.outfitpath[0];
                     break;
             }
-            if (person.isStaff)
+            if (person == null ? ExpandedOutfit.KoiClub.Value : person.isStaff)
             {
-                if (UnityEngine.Random.Range(0, 2) == 1)
+                if (UnityEngine.Random.Range(0, 101) >= 100 - ExpandedOutfit.KoiChance.Value)
                 {
                     Generalized_Assignment(ExpandedOutfit.MatchKoiClub.Value, 4, 11);
                 }
