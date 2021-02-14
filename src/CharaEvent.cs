@@ -18,7 +18,7 @@ namespace Cosplay_Academy
                     ExpandedOutfit.ResetMaker.Value = false;
                 }
             }
-            if (ChaControl.sex == 1 && (GameMode.Maker == currentGameMode || !OutfitDecider.ProcessedNames.Contains(ChaControl.fileParam.fullname)))//run the following if female and unprocessed
+            if (ChaControl.sex == 1 && (GameMode.Maker == currentGameMode || !OutfitDecider.ProcessedNames.Contains(ChaControl.fileParam.fullname) || OutfitDecider.Reset))//run the following if female and unprocessed
             {
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
