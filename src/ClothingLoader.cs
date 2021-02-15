@@ -59,7 +59,7 @@ namespace Cosplay_Academy
             {
                 if (!Inclusion.Contains(part.parentKey))
                 {
-                    part.type = 0;
+                    part.id = part.type = 0;
                 }
             }
             byte[] bytes2 = MessagePackSerializer.Serialize<ChaFileAccessory>(chaControl.chaFile.coordinate[outfitnum].accessory);
