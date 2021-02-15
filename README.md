@@ -24,7 +24,6 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 	
 6. Anything that is in the parent folder of \Sets will be coordinating with itself rather than with those that share the folder unlike the Sets folder.
 
-
 ## Known issues
 1. Reloading a Save will cause this to break for characters already loaded. Going back to Title will fix this.
 	
@@ -50,13 +49,22 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 
 	Cause: ...
 
-	Potential solution: look-a-like hair with nothing head acessory; classroom menu overrride on loading without accessories hence potentially breaking some outfits instead.
+	Potential solution: look-a-like hair with nothing head acessory; potentially making a classroom menu overrride on loading without accessories hence potentially breaking some outfits instead.;
 
 5. Outfits not loading on starting Freeplay or Maker; can be swapped to with custom preset.
 	
 	Cause: Probably character loading first
 
 	Potential solution: Forced reload
+
+6. Expanded outfit isn't supported atm so accessories above 20 won't probably load nor be replaced
+
+
+7. Main NPC's in post intial cutscenes don't wear the clothing generated.
+
+	Cause: character already loaded; allowing to run as is will mismatch the outfit between both cutscene and in-game model.
+
+	potential solution: none without creating another array to store existing character outfits; Possible to do using just ints to avoid a significantly larger memory footprint.
 
 ## Kplug fix
 
