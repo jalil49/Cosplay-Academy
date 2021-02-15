@@ -1,4 +1,4 @@
-﻿using MessagePack;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Cosplay_Academy
@@ -6,7 +6,7 @@ namespace Cosplay_Academy
     public static class ClothingLoader
     {
         private static ChaControl chaControl;
-        private static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth" };
+        private static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth", "a_n_hair_pin", "a_n_hair_pin_R" };
         public static void FullLoad(ChaControl input)
         {
             chaControl = input;
@@ -55,16 +55,29 @@ namespace Cosplay_Academy
         }
         private static void Generalized(int outfitnum)
         {
+            //queue Accessorys to keep
+            Queue<ChaFileAccessory.PartsInfo> import = new Queue<ChaFileAccessory.PartsInfo>();
             foreach (ChaFileAccessory.PartsInfo part in chaControl.chaFile.coordinate[outfitnum].accessory.parts)
             {
-                if (!Inclusion.Contains(part.parentKey))
+                if (Inclusion.Contains(part.parentKey))
                 {
-                    part.id = part.type = 0;
+                    import.Enqueue(part);
                 }
             }
-            byte[] bytes2 = MessagePackSerializer.Serialize<ChaFileAccessory>(chaControl.chaFile.coordinate[outfitnum].accessory);
+            //Load new outfit
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
-            chaControl.chaFile.coordinate[outfitnum].accessory = MessagePackSerializer.Deserialize<ChaFileAccessory>(bytes2);
+            //Apply pre-existing Accessories in any open slot or final slots.
+            for (int i = 0, n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; i < n; i++)
+            {
+                if (import.Count == 0)//if queue empty break
+                {
+                    break;
+                }
+                if (chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].type == 120 || import.Count + i == n) //120 is empty/default
+                {
+                    chaControl.chaFile.coordinate[outfitnum].accessory.parts[i] = import.Dequeue();
+                }
+            }
         }
     }
 }
