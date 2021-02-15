@@ -281,9 +281,9 @@ namespace Cosplay_Academy
             {
                 for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
                 {
-                    if (outfitData[0].IsSet(i))
+                    if (!outfitData[1].IsSet(i))
                     {
-                        outfitData[1].Insert(i, outfitData[0].Exportarray(i), true);
+                        outfitData[1].Insert(i, outfitData[0].Exportarray(i), false);
                     }
                 }
             }
@@ -294,9 +294,9 @@ namespace Cosplay_Academy
             {
                 for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
                 {
-                    if (outfitData[5].IsSet(i))
+                    if (!outfitData[5].IsSet(i))
                     {
-                        outfitData[5].Insert(i, outfitData[3].Exportarray(i), true);
+                        outfitData[5].Insert(i, outfitData[3].Exportarray(i), false);
                     }
                 }
             }
