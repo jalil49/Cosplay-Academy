@@ -1,4 +1,6 @@
-﻿namespace Cosplay_Academy
+﻿using MessagePack;
+
+namespace Cosplay_Academy
 {
     public static class ClothingLoader
     {
@@ -52,7 +54,16 @@
         }
         private static void Generalized(int outfitnum)
         {
+            foreach (ChaFileAccessory.PartsInfo part in chaControl.chaFile.coordinate[outfitnum].accessory.parts)
+            {
+                if (part.parentKey != "a_n_headside")
+                {
+                    part.type = 0;
+                }
+            }
+            byte[] bytes2 = MessagePackSerializer.Serialize<ChaFileAccessory>(chaControl.chaFile.coordinate[outfitnum].accessory);
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
+            chaControl.chaFile.coordinate[outfitnum].accessory = MessagePackSerializer.Deserialize<ChaFileAccessory>(bytes2);
         }
     }
 }
