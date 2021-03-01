@@ -28,7 +28,9 @@ namespace Cosplay_Academy
                         ExpandedOutfit.ChangeOutfit.Value = false;
                     }
                 }
+                int HoldOutfit = ChaControl.fileStatus.coordinateType;
                 ClothingLoader.FullLoad(ChaControl);//Load outfits
+                ChaControl.fileStatus.coordinateType = HoldOutfit;
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }

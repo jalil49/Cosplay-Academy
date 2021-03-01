@@ -65,6 +65,7 @@ namespace Cosplay_Academy
                 }
             }
             //Load new outfit
+            chaControl.fileStatus.coordinateType = outfitnum;
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
             //Apply pre-existing Accessories in any open slot or final slots.
             bool Force;
