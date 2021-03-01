@@ -18,11 +18,13 @@ namespace Cosplay_Academy
                     ExpandedOutfit.ResetMaker.Value = false;
                 }
             }
-            if (ChaControl.sex == 1 && (GameMode.Maker == currentGameMode || !OutfitDecider.ProcessedNames.Contains(ChaControl.fileParam.fullname) || OutfitDecider.Reset))//run the following if female and unprocessed
+            //use Chacontrol.name instead of ChaControl.fileParam.fullname to probably avoid same name conflicts
+            if (ChaControl.sex == 1 && (GameMode.Maker == currentGameMode || OutfitDecider.Reset || !OutfitDecider.ProcessedNames.Contains(ChaControl.name)))//run the following if female and unprocessed
             {
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
                     OutfitDecider.Decision(ChaControl.fileParam.fullname);//Generate outfits
+                    OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
                     if (!ExpandedOutfit.PermChangeOutfit.Value)
                     {
                         ExpandedOutfit.ChangeOutfit.Value = false;

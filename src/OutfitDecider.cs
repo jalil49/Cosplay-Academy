@@ -132,7 +132,6 @@ namespace Cosplay_Academy
             if (person != null)
             {
                 ExpandedOutfit.Logger.LogDebug(name + " is processed.");
-                ProcessedNames.Add(name);//character is processed
             }
         }
         private static void Get_Outfits()
