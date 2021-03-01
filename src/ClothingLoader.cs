@@ -67,14 +67,22 @@ namespace Cosplay_Academy
             //Load new outfit
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
             //Apply pre-existing Accessories in any open slot or final slots.
+            bool Force;
+            bool Empty;
             for (int i = 0, n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; i < n; i++)
             {
                 if (import.Count == 0)//if queue empty break
                 {
                     break;
                 }
-                if (chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].type == 120 || import.Count + i == n) //120 is empty/default
+                Force = (import.Count + i == n);
+                Empty = chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].type == 120;
+                if (Empty || Force) //120 is empty/default
                 {
+                    if (!Empty && Force)
+                    {
+                        ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
+                    }
                     chaControl.chaFile.coordinate[outfitnum].accessory.parts[i] = import.Dequeue();
                 }
             }
