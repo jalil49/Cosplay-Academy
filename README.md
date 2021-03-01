@@ -38,27 +38,16 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 
 	Potential solution: Unavailable without further modifying Kplug code
 
-3. Weird accessories load with characters, I think i've seen 3 consistent types
-	
-	Cause: Unknown
 
-	Potential solution: Unknown
-
-
-4. Outfits not loading on starting Freeplay or Maker; can be swapped to with custom preset.
+3. Outfits not loading on starting Freeplay or Maker; can be swapped to with custom preset.
 	
 	Cause: Probably character loading first
 
 	Potential solution: Forced reload
 
-5. Expanded outfit isn't supported atm so accessories above 20 won't probably load nor be replaced
+4. Expanded accessories isn't fully supported as required for this mod will probably have to speak with developer to retain all items. 
+I override up to the first 20 accessories to keep so characters who require more than 20 accessories on their head will be missing parts of it upon loading a new outfit
 
-
-6. Main NPC's in post intial cutscenes don't wear the clothing generated.
-
-	Cause: character already loaded; allowing to run as is will mismatch the outfit between both cutscene and in-game model.
-
-	potential solution: none without creating another array to store existing character outfits; Possible to do using just ints to avoid a significantly larger memory footprint.
 
 ## Kplug fix
 
