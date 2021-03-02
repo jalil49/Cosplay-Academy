@@ -1,5 +1,8 @@
-﻿using KKAPI;
+﻿using ExtensibleSaveFormat;
+using KKAPI;
 using KKAPI.Chara;
+using Manager;
+using System.Collections.Generic;
 
 namespace Cosplay_Academy
 {
@@ -9,7 +12,6 @@ namespace Cosplay_Academy
         {
             if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
             { return; }//if disabled don't run
-            //base.OnReload(currentGameMode);
             if (GameMode.Maker == currentGameMode && ExpandedOutfit.ResetMaker.Value)
             {
                 OutfitDecider.Reset = true;
@@ -36,6 +38,20 @@ namespace Cosplay_Academy
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
+            KoiClothesOverlayX.KoiClothesOverlayController test = ChaControl.gameObject.GetComponent<KoiClothesOverlayX.KoiClothesOverlayController>();
+            PluginData save;
+            PluginData[] Export = new PluginData[ChaControl.chaFile.coordinate.Length];
+            for (int i = 0; i < ChaControl.chaFile.coordinate.Length; i++)
+            {
+                save = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KCOX");
+                if (save == null || save.data == null || save.data.Count == 0)
+                {
+                    continue;
+                }
+                Export[i] = save;
+            }
+            test.RePack(Export);
+            test.ManualReload(/*ExtendedSave.GetExtendedDataById(ChaControl.chaFile,"KCOX")*/);
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
