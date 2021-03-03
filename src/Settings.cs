@@ -57,8 +57,8 @@ namespace Cosplay_Academy
 
         public void Awake()
         {
-            //Hooks.Init();
             Logger = base.Logger;
+            Hooks.HarmonyInit();
             EnableSetting = Config.Bind("Main game", "Enable Cosplay Academy", true, "unknown");
             if (EnableSetting != null && EnableSetting.Value)
             {
