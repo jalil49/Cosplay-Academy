@@ -24,5 +24,10 @@ namespace Cosplay_Academy
             OutfitDecider.Reset = true;
             ExpandedOutfit.Logger.LogInfo("Reset has applied");
         }
+        protected override void OnNewGame()
+        {
+            OutfitDecider.Reset = true;
+            ExpandedOutfit.Logger.LogInfo("Reset has applied");
+        }
     }
 }
