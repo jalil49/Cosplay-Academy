@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
+using MoreAccessoriesKOI;
+using System.Collections.Generic;
 using System.Linq;
-
+using ToolBox;
+using UnityEngine;
 namespace Cosplay_Academy
 {
     public static class ClothingLoader
@@ -57,35 +60,68 @@ namespace Cosplay_Academy
         {
             //queue Accessorys to keep
             Queue<ChaFileAccessory.PartsInfo> import = new Queue<ChaFileAccessory.PartsInfo>();
-            foreach (ChaFileAccessory.PartsInfo part in chaControl.chaFile.coordinate[outfitnum].accessory.parts)
+            WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+            if (_accessoriesByChar.TryGetValue(chaControl.chaFile, out MoreAccessories.CharAdditionalData data) == false)
             {
+                data = new MoreAccessories.CharAdditionalData();
+                _accessoriesByChar.Add(chaControl.chaFile, data);
+            }
+            if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out data.nowAccessories) == false)
+            {
+                data.nowAccessories = new List<ChaFileAccessory.PartsInfo>();
+                data.rawAccessoriesInfos.Add(outfitnum, data.nowAccessories);
+            }
+            data.nowAccessories.AddRange(chaControl.chaFile.coordinate[outfitnum].accessory.parts);
+            foreach (ChaFileAccessory.PartsInfo part in data.nowAccessories)
+            {
+                //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                 if (Inclusion.Contains(part.parentKey))
                 {
                     import.Enqueue(part);
                 }
             }
+
             //Load new outfit
             chaControl.fileStatus.coordinateType = outfitnum;
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
             //Apply pre-existing Accessories in any open slot or final slots.
-            bool Force;
+            //bool Force;
             bool Empty;
-            for (int i = 0, n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; i < n; i++)
+            for (int i = 0, n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; import.Count != 0 && i < n; i++)
             {
-                if (import.Count == 0)//if queue empty break
-                {
-                    break;
-                }
-                Force = (import.Count + i == n);
+                //Force = (import.Count + i == n);
                 Empty = chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].type == 120;
-                if (Empty || Force) //120 is empty/default
+                if (Empty/* || Force*/) //120 is empty/default
                 {
-                    if (!Empty && Force)
-                    {
-                        ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
-                    }
+                    //if (!Empty && Force)
+                    //{
+                    //    ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
+                    //}
                     chaControl.chaFile.coordinate[outfitnum].accessory.parts[i] = import.Dequeue();
                 }
+                //var accessory = chaControl.GetAccessoryComponent(i);
+                //if (chaControl.chaFile.coordinate[outfitnum].accessory.parts[i])
+                //{
+
+                //}
+            }
+            for (int i = 0, n = data.nowAccessories.Count; import.Count != 0 && i < n; i++)
+            {
+                Empty = data.nowAccessories[i].type == 120;
+                if (Empty) //120 is empty/default
+                {
+                    data.nowAccessories[i] = import.Dequeue();
+                }
+            }
+            while (import.Count != 0)
+            {
+                ExpandedOutfit.Logger.LogWarning(chaControl.fileParam.fullname + " Ran out of space adding a space");
+                data.nowAccessories.Add(import.Dequeue());
+                data.infoAccessory.Add(null);
+                data.objAccessory.Add(null);
+                data.objAcsMove.Add(new GameObject[2]);
+                data.cusAcsCmp.Add(null);
+                data.showAccessories.Add(true);
             }
         }
     }

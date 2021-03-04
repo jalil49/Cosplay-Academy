@@ -3,6 +3,7 @@
 //using KK_Plugins.MaterialEditor;
 using KKAPI;
 using KKAPI.Chara;
+using MoreAccessoriesKOI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Cosplay_Academy
         {
             //_instance = Harmony.CreateAndPatchAll(typeof(Hooks));
             //TryPatchClothesOverlayX(_instance);
-            //ShowTypeInfo(typeof(MaterialEditorCharaController.MaterialColorProperty));
+            ShowTypeInfo(typeof(MoreAccessories.CharAdditionalData));
             //ShowTypeInfo(typeof(MaterialEditorCharaController.MaterialFloatProperty));
             //ShowTypeInfo(typeof(MaterialEditorCharaController.MaterialShader));
             //ShowTypeInfo(typeof(MaterialEditorCharaController.MaterialTextureProperty));
