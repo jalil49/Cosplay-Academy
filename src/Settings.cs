@@ -58,7 +58,8 @@ namespace Cosplay_Academy
         public void Awake()
         {
             Logger = base.Logger;
-            Hooks.HarmonyInit();
+            //Hooks.Init();
+            //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
             EnableSetting = Config.Bind("Main game", "Enable Cosplay Academy", true, "unknown");
             if (EnableSetting != null && EnableSetting.Value)
             {
