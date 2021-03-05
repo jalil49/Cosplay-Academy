@@ -85,7 +85,7 @@ namespace Cosplay_Academy
                 Choosen.Add("Default");
                 ExpandedOutfit.Logger.LogWarning("No files found in :" + FilePath);
             }
-            ExpandedOutfit.Logger.LogDebug("Files found in :" + FilePath + Choosen.Count);
+            ExpandedOutfit.Logger.LogDebug($"Files found in : {FilePath} + {Choosen.Count}");
             return Choosen;
         }
     }
