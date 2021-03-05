@@ -46,6 +46,8 @@ namespace Cosplay_Academy
             FoldersPath.Add(input);
             string[] folders = System.IO.Directory.GetDirectories(input, "*", System.IO.SearchOption.AllDirectories); //grab child folders
             FoldersPath.AddRange(folders);
+            int index = FoldersPath.FindIndex(a => a.EndsWith(@"\Sets"));
+            FoldersPath.RemoveAt(index);
             return FoldersPath;
         }
         public static List<string> Get_Set_Paths(string Narrow)
