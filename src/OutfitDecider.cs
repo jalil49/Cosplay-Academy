@@ -282,7 +282,6 @@ namespace Cosplay_Academy
         }
         private static string Grabber(string Input1, string result)
         {
-
             if (Input1 == @"\AfterSchool")
             {
                 string[] split = result.Split('\\');
