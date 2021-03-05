@@ -65,8 +65,6 @@ namespace Cosplay_Academy
             if (!IsInitialized)
             {
                 Get_Outfits();
-                GrabUniform();
-                GrabSwimsuits();
                 IsInitialized = true;
                 if (person == null)
                 {
@@ -138,7 +136,7 @@ namespace Cosplay_Academy
         {
             List<string> temp2;
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
-            int set = -1;//-1 so it can be on top of for each
+            int set = -1;//-1 so it can be on top of foreach
             foreach (string Input1 in Constants.InputStrings)
             {
                 set++;
@@ -151,18 +149,25 @@ namespace Cosplay_Academy
                         continue;
                     }
                     temp2 = DirectoryFinder.Grab_All_Files(coordinatepath + "coordinate" + Input1 + Input2);
+                    if (Input1 == @"\AfterSchool" && ExpandedOutfit.GrabUniform.Value)
+                    {
+                        temp2.AddRange(DirectoryFinder.Grab_All_Files(coordinatepath + @"coordinate\School Uniform" + Input2));
+                    }
+                    else if (Input1 == @"\Club\Swim" && ExpandedOutfit.GrabSwimsuits.Value)
+                    {
+                        temp2.AddRange(DirectoryFinder.Grab_All_Files(coordinatepath + @"coordinate\Swimsuit" + Input2));
+                    }
                     string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
 
                     if (!result.Contains(@"\Sets\") || !ExpandedOutfit.EnableSets.Value)
                     {
-                        //outfitData[i].Path_set(j, coordinatepath + "coordinate" + InputStrings[i] + InputStrings2[j]);
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + Input1 + Input2);
+                        string choosen = Grabber(Input1, result);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2);
                         outfitData[set].Insert(exp, temp2.ToArray(), false);//Assign "not" set and store data
                     }
                     else
                     {
                         string[] split = result.Split('\\');
-                        //outfitData[i].Path_set(j, coordinatepath + InputStrings[i] + InputStrings2[j] + @"\" + split[split.Length - 2] + @"\" + split[split.Length - 1]);
                         temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
                         string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
                         Setsfunction(array);
@@ -271,35 +276,45 @@ namespace Cosplay_Academy
         {
             Generalized_Assignment(ExpandedOutfit.MatchNightwear.Value, 6, 10);
         }
-        private static void GrabUniform()
-        {
-            if (ExpandedOutfit.GrabUniform.Value)
-            {
-                for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
-                {
-                    if (!outfitData[1].IsSet(i))
-                    {
-                        outfitData[1].Insert(i, outfitData[0].Exportarray(i), false);
-                    }
-                }
-            }
-        }
-        private static void GrabSwimsuits()
-        {
-            if (ExpandedOutfit.GrabSwimsuits.Value)
-            {
-                for (int i = 0, n = Constants.InputStrings2.Length; i < n; i++) //0 is FirstTime to 3 which is lewd
-                {
-                    if (!outfitData[5].IsSet(i))
-                    {
-                        outfitData[5].Insert(i, outfitData[3].Exportarray(i), false);
-                    }
-                }
-            }
-        }
         private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
             Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+        }
+        private static string Grabber(string Input1, string result)
+        {
+
+            if (Input1 == @"\AfterSchool")
+            {
+                string[] split = result.Split('\\');
+                for (int i = split.Length - 1; i >= 0; i--)
+                {
+                    if (split[i] == "AfterSchool")
+                    {
+                        break;
+                    }
+                    else if (split[i] == "School Uniform")
+                    {
+                        return @"\School Uniform";
+                    }
+                }
+            }
+            else if (Input1 == @"\Club\Swim")
+            {
+                string[] split = result.Split('\\');
+
+                for (int i = split.Length - 1; i >= 0; i--)
+                {
+                    if (split[i] == @"Swim")
+                    {
+                        break;
+                    }
+                    else if (split[i] == "Swimsuit")
+                    {
+                        return @"\Swimsuit";
+                    }
+                }
+            }
+            return Input1;
         }
     }
 }
