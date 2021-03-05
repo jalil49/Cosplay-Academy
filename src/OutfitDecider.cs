@@ -163,6 +163,10 @@ namespace Cosplay_Academy
                     {
                         string choosen = Grabber(Input1, result);
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2);
+                        if (ExpandedOutfit.EnableDefaults.Value)
+                        {
+                            temp2.Add("Defaults");
+                        }
                         outfitData[set].Insert(exp, temp2.ToArray(), false);//Assign "not" set and store data
                     }
                     else
