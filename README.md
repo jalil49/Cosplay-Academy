@@ -101,7 +101,8 @@ Go to line 339 and replace it with
 	
 	string text = ClothesCtrl.Finder(this.currentCostume);
 
-
+Compile
+File->Save module
 
 
 
