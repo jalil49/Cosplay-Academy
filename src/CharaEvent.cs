@@ -17,9 +17,11 @@ namespace Cosplay_Academy
 {
     public class CharaEvent : CharaCustomFunctionController
     {
+        public static CharaEvent self;
         bool Repeat_stoppper = false;
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
+            self = this;
             if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
             {
                 Repeat_stoppper = false;
@@ -75,15 +77,6 @@ namespace Cosplay_Academy
                 //Traverse.Create(test).Method("RePack").GetValue();
                 //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
             }
-            //var HairAccessory = Type.GetType("KK_Plugins.HairAccessoryCustomizer, KK_HairAccessoryCustomizer", false);
-            //if (HairAccessory != null)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning("Entered Hair");
-            //    //UnityEngine.Component test = ChaControl.gameObject.GetComponent(HairAccessory);
-            //    HairAccessory_RePack();
-            //    //Traverse.Create(test).Method("RePack").GetValue();
-            //    //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
-            //}
             Finish();
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -860,58 +853,33 @@ namespace Cosplay_Academy
 
         #endregion
 
-        public void HairAccessory_RePack()
-        {
-            Dictionary<int, object> PluginData = new Dictionary<int, object>();
-            Dictionary<int, Dictionary<int, HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
-            Dictionary<int, HairAccessoryInfo> Temp;
-            for (int i = 0; i < ChaControl.chaFile.coordinate.Length; i++)
-            {
-                PluginData plugin = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
-                if (plugin != null && plugin.data != null)
-                {
-                    ExpandedOutfit.Logger.LogWarning($"Hair is not null\t{plugin.data}");
-
-                    if (plugin.data.TryGetValue("HairAccessories", out var loadedHairAccessories2) && loadedHairAccessories2 != null)
-                        PluginData = MessagePackSerializer.Deserialize<Dictionary<int, object>>((byte[])loadedHairAccessories2);
-                    else
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Hair is supposedly empty");
-
-                    }
-                    for (int j = 0; j < PluginData.Count; j++)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Coordinate {i}: {PluginData.ElementAt(j).Key}\t\t\t{PluginData.ElementAt(j).Value}");
-                    }
-                }
-                else
-                {
-                    ExpandedOutfit.Logger.LogWarning($"Hair is null");
-
-                }
-
-
-
-                var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
-                Temp = new Dictionary<int, HairAccessoryInfo>();
-                if (Inputdata != null)
-                    if (Inputdata.data.TryGetValue("HairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                        Temp = MessagePackSerializer.Deserialize<Dictionary<int, HairAccessoryInfo>>((byte[])loadedHairAccessories);
-                for (int j = 0; j < Temp.Count; j++)
-                {
-                    ExpandedOutfit.Logger.LogWarning($"Coordinate {i}: {Temp.ElementAt(j).Key}\t\t\t{Temp.ElementAt(j).Value}");
-                }
-                HairAccessories.Add(i, Temp);
-            }
-            var data = new PluginData();
-            data.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
-            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", data);
-        }
+        //public void HairAccessory_RePack()//original
+        //{
+        //    Dictionary<int, HairAccessoryInfo> PluginData = new Dictionary<int, HairAccessoryInfo>();
+        //    Dictionary<int, Dictionary<int, HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
+        //    Dictionary<int, HairAccessoryInfo> Temp;
+        //    for (int i = 0; i < ChaControl.chaFile.coordinate.Length; i++)
+        //    {
+        //        var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
+        //        Temp = new Dictionary<int, HairAccessoryInfo>();
+        //        if (Inputdata != null)
+        //            if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+        //                Temp = MessagePackSerializer.Deserialize<Dictionary<int, HairAccessoryInfo>>((byte[])loadedHairAccessories);
+        //        for (int j = 0; j < Temp.Count; j++)
+        //        {
+        //            ExpandedOutfit.Logger.LogWarning($"Coordinate {i}: {Temp.ElementAt(j).Key}\t\t\t{Temp.ElementAt(j).Value}");
+        //        }
+        //        HairAccessories.Add(i, Temp);
+        //    }
+        //    var data = new PluginData();
+        //    data.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
+        //    SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", data);
+        //}
 
         #region Stuff Hair Accessories needs
         [Serializable]
         [MessagePackObject]
-        private class HairAccessoryInfo
+        public class HairAccessoryInfo
         {
             [Key("HairGloss")]
             public bool HairGloss = ColorMatchDefault;
@@ -934,7 +902,7 @@ namespace Cosplay_Academy
 
         SaveData.Heroine heroine;
 
-        private void SetExtendedData(string IDtoSET, PluginData data)
+        public void SetExtendedData(string IDtoSET, PluginData data)
         {
             ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
 

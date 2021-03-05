@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using ExtensibleSaveFormat;
+using HarmonyLib;
+using MessagePack;
 using MoreAccessoriesKOI;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +11,12 @@ namespace Cosplay_Academy
     public static class ClothingLoader
     {
         private static ChaControl chaControl;
+        private static Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>> HairAccessories;
         private static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth", "a_n_hair_pin", "a_n_hair_pin_R" };
         public static void FullLoad(ChaControl input)
         {
+            var data = new PluginData();
+            HairAccessories = new Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>>();
             chaControl = input;
             UniformLoad();
             AfterSchoolLoad();
@@ -20,6 +25,8 @@ namespace Cosplay_Academy
             ClubLoad();
             CasualLoad();
             NightwearLoad();
+            data.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
+            CharaEvent.self.SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", data);
         }
         private static void UniformLoad()
         {
@@ -59,8 +66,22 @@ namespace Cosplay_Academy
         private static void Generalized(int outfitnum)
         {
             //queue Accessorys to keep
+            #region Queue accessories to keep
+            //PartofHead doesn't work at this stage, I checked.... long after making inclusion
+            //Queue<ChaFileAccessory.PartsInfo> import = new Queue<ChaFileAccessory.PartsInfo>();
             Queue<ChaFileAccessory.PartsInfo> import = new Queue<ChaFileAccessory.PartsInfo>();
+            Queue<CharaEvent.HairAccessoryInfo> Subimport = new Queue<CharaEvent.HairAccessoryInfo>();
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+
+            Dictionary<int, CharaEvent.HairAccessoryInfo> Temp;
+
+            var Inputdata = ExtendedSave.GetExtendedDataById(chaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
+            Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
+            if (Inputdata != null)
+                if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+                    Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+
+
             if (_accessoriesByChar.TryGetValue(chaControl.chaFile, out MoreAccessories.CharAdditionalData data) == false)
             {
                 data = new MoreAccessories.CharAdditionalData();
@@ -72,57 +93,96 @@ namespace Cosplay_Academy
                 data.rawAccessoriesInfos.Add(outfitnum, data.nowAccessories);
             }
             data.nowAccessories.AddRange(chaControl.chaFile.coordinate[outfitnum].accessory.parts);
-            foreach (ChaFileAccessory.PartsInfo part in data.nowAccessories)
+
+            for (int i = 0; i < data.nowAccessories.Count; i++)
             {
                 //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                if (Inclusion.Contains(part.parentKey))
+                if (Inclusion.Contains(data.nowAccessories[i].parentKey))
                 {
-                    import.Enqueue(part);
+                    if (!Temp.TryGetValue(i, out CharaEvent.HairAccessoryInfo ACCdata))
+                    {
+                        ACCdata = null;
+                    }
+                    import.Enqueue(data.nowAccessories[i]);
+                    Subimport.Enqueue(ACCdata);
                 }
             }
-
+            #endregion
             //Load new outfit
             chaControl.fileStatus.coordinateType = outfitnum;
             chaControl.chaFile.coordinate[outfitnum].LoadFile(Constants.outfitpath[outfitnum]);
             //Apply pre-existing Accessories in any open slot or final slots.
             //bool Force;
+            #region Reassign Exisiting Accessories
+
+            Inputdata = ExtendedSave.GetExtendedDataById(chaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
+            Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
+            if (Inputdata != null)
+                if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+                    Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+
+
+            int ACCpostion = 0;
+
             bool Empty;
-            for (int i = 0, n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; import.Count != 0 && i < n; i++)
+            for (int n = chaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; import.Count != 0 && ACCpostion < n; ACCpostion++)
             {
                 //Force = (import.Count + i == n);
-                Empty = chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].type == 120;
+                Empty = chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
                 if (Empty/* || Force*/) //120 is empty/default
                 {
                     //if (!Empty && Force)
                     //{
                     //    ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
                     //}
-                    chaControl.chaFile.coordinate[outfitnum].accessory.parts[i] = import.Dequeue();
+                    chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = import.Dequeue();
+                    if (Subimport.Peek() != null)
+                    {
+                        Temp.Add(ACCpostion, Subimport.Dequeue());
+                    }
+                    else
+                    {
+                        Subimport.Dequeue();
+                    }
                 }
-                //var accessory = chaControl.GetAccessoryComponent(i);
-                //if (chaControl.chaFile.coordinate[outfitnum].accessory.parts[i])
-                //{
-
-                //}
             }
-            for (int i = 0, n = data.nowAccessories.Count; import.Count != 0 && i < n; i++)
+            for (int n = data.nowAccessories.Count; import.Count != 0 && ACCpostion < n; ACCpostion++)
             {
-                Empty = data.nowAccessories[i].type == 120;
+                Empty = data.nowAccessories[ACCpostion].type == 120;
                 if (Empty) //120 is empty/default
                 {
-                    data.nowAccessories[i] = import.Dequeue();
+                    data.nowAccessories[ACCpostion] = import.Dequeue();
+                    if (Subimport.Peek() != null)
+                    {
+                        Temp.Add(ACCpostion, Subimport.Dequeue());
+                    }
+                    else
+                    {
+                        Subimport.Dequeue();
+                    }
                 }
             }
             while (import.Count != 0)
             {
-                ExpandedOutfit.Logger.LogWarning(chaControl.fileParam.fullname + " Ran out of space adding a space");
+                //ExpandedOutfit.Logger.logdebug(chaControl.fileParam.fullname + " Ran out of space for accessory, adding a space");
                 data.nowAccessories.Add(import.Dequeue());
+                if (Subimport.Peek() != null)
+                {
+                    Temp.Add(ACCpostion, Subimport.Dequeue());
+                }
+                else
+                {
+                    Subimport.Dequeue();
+                }
                 data.infoAccessory.Add(null);
                 data.objAccessory.Add(null);
                 data.objAcsMove.Add(new GameObject[2]);
                 data.cusAcsCmp.Add(null);
                 data.showAccessories.Add(true);
+                ACCpostion++;
             }
+            HairAccessories.Add(outfitnum, Temp);
+            #endregion
         }
     }
 }
