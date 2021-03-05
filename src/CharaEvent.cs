@@ -22,7 +22,7 @@ namespace Cosplay_Academy
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
             self = this;
-            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper && GameMode.Maker != currentGameMode/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
             {
                 Repeat_stoppper = false;
                 return;
@@ -54,8 +54,9 @@ namespace Cosplay_Academy
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
 
-            if (GameMode.MainGame != currentGameMode)//stop any potential loops in maker since this isn't a maker mod
+            if (Repeat_stoppper)//stop any potential endless loops in maker
             {
+                Repeat_stoppper = false;
                 return;
             }
             object[] OnReloadArray = new object[2] { currentGameMode, false };
