@@ -135,14 +135,18 @@ namespace Cosplay_Academy
                     //{
                     //    ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
                     //}
-                    chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = import.Dequeue();
-                    if (Subimport.Peek() != null)
+                    if (!Temp.ContainsKey(ACCpostion))
                     {
-                        Temp.Add(ACCpostion, Subimport.Dequeue());
-                    }
-                    else
-                    {
-                        Subimport.Dequeue();
+                        chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = import.Dequeue();
+
+                        if (Subimport.Peek() != null)
+                        {
+                            Temp.Add(ACCpostion, Subimport.Dequeue());
+                        }
+                        else
+                        {
+                            Subimport.Dequeue();
+                        }
                     }
                 }
             }
@@ -151,7 +155,31 @@ namespace Cosplay_Academy
                 Empty = data.nowAccessories[ACCpostion].type == 120;
                 if (Empty) //120 is empty/default
                 {
-                    data.nowAccessories[ACCpostion] = import.Dequeue();
+                    if (!Temp.ContainsKey(ACCpostion))
+                    {
+                        data.nowAccessories[ACCpostion] = import.Dequeue();
+                        if (Subimport.Peek() != null)
+                        {
+                            Temp.Add(ACCpostion, Subimport.Dequeue());
+                        }
+                        else
+                        {
+                            Subimport.Dequeue();
+                        }
+                    }
+                }
+            }
+            bool print = true;
+            while (import.Count != 0)
+            {
+                if (print)
+                {
+                    print = false;
+                    ExpandedOutfit.Logger.LogDebug(chaControl.fileParam.fullname + $" Ran out of space for accessories, Making {import.Count} space(s) at least (due to potential keys already existing just in case)");
+                }
+                if (!Temp.ContainsKey(ACCpostion))
+                {
+                    data.nowAccessories.Add(import.Dequeue());
                     if (Subimport.Peek() != null)
                     {
                         Temp.Add(ACCpostion, Subimport.Dequeue());
@@ -161,18 +189,9 @@ namespace Cosplay_Academy
                         Subimport.Dequeue();
                     }
                 }
-            }
-            while (import.Count != 0)
-            {
-                //ExpandedOutfit.Logger.logdebug(chaControl.fileParam.fullname + " Ran out of space for accessory, adding a space");
-                data.nowAccessories.Add(import.Dequeue());
-                if (Subimport.Peek() != null)
-                {
-                    Temp.Add(ACCpostion, Subimport.Dequeue());
-                }
                 else
                 {
-                    Subimport.Dequeue();
+                    data.nowAccessories.Add(new ChaFileAccessory.PartsInfo());
                 }
                 data.infoAccessory.Add(null);
                 data.objAccessory.Add(null);
