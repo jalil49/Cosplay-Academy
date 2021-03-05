@@ -223,7 +223,14 @@ namespace Cosplay_Academy
         }
         private static void AfterSchoolOutfit()
         {
-            Generalized_Assignment(ExpandedOutfit.AfterUniform.Value, 1, 1);
+            if (ExpandedOutfit.AfterUniform.Value /*|| ExpandedOutfit.EnableSets.Value && Constants.outfitpath[1].Contains(@"\Sets\")*/)
+            {
+                Generalized_Assignment(ExpandedOutfit.AfterUniform.Value, 1, 1);
+            }
+            else
+            {
+                Constants.outfitpath[1] = Constants.outfitpath[0];
+            }
         }
         private static void GymOutfit()
         {
