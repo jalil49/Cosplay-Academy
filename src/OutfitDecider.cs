@@ -188,12 +188,9 @@ namespace Cosplay_Academy
                             exp = (int)temp;
                             break;
                         }
-
                     }
-                    catch (ArgumentException)
-                    {
-                        return;
-                    }
+                    catch
+                    { }
                 }
                 for (int j = 0, n = outfitData.Length; j < n; j++)
                 {
