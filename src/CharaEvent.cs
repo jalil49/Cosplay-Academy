@@ -925,7 +925,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            if (heroine != null && ChaControl.sex == 0)
+            if (heroine != null && ChaControl.sex == 1)
             {
                 ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
                 ExtendedSave.SetExtendedDataById(heroine.charFile, IDtoSET, data);
@@ -981,7 +981,7 @@ namespace Cosplay_Academy
             }
             object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
             Repeat_stoppper = true;
-            if (heroine != null && ChaControl.sex == 0)
+            if (heroine != null && ChaControl.sex == 1)
             {
                 if (ChaControl.name == heroine.chaCtrl.name)
                 {
