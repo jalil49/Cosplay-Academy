@@ -35,6 +35,7 @@ namespace Cosplay_Academy
             @"\Lewd" //3
         };//Experience States; easy to make scale with size
         public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
+        public static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth", "a_n_hair_pin", "a_n_hair_pin_R" };
     }
     public enum HStates
     {

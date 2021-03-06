@@ -12,7 +12,6 @@ namespace Cosplay_Academy
     {
         private static ChaControl chaControl;
         private static Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>> HairAccessories;
-        private static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth", "a_n_hair_pin", "a_n_hair_pin_R" };
         public static void FullLoad(ChaControl input)
         {
             var data = new PluginData();
@@ -90,14 +89,14 @@ namespace Cosplay_Academy
             if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out data.nowAccessories) == false)
             {
                 data.nowAccessories = new List<ChaFileAccessory.PartsInfo>();
-                data.rawAccessoriesInfos.Add(outfitnum, data.nowAccessories);
+                //data.rawAccessoriesInfos.Add(outfitnum, data.nowAccessories);
             }
             data.nowAccessories.AddRange(chaControl.chaFile.coordinate[outfitnum].accessory.parts);
 
             for (int i = 0; i < data.nowAccessories.Count; i++)
             {
                 //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                if (Inclusion.Contains(data.nowAccessories[i].parentKey))
+                if (Constants.Inclusion.Contains(data.nowAccessories[i].parentKey))
                 {
                     if (!Temp.TryGetValue(i, out CharaEvent.HairAccessoryInfo ACCdata))
                     {
@@ -107,6 +106,7 @@ namespace Cosplay_Academy
                     Subimport.Enqueue(ACCdata);
                 }
             }
+            data.nowAccessories.Clear();
             #endregion
             //Load new outfit
             chaControl.fileStatus.coordinateType = outfitnum;

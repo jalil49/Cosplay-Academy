@@ -29,5 +29,25 @@ namespace Cosplay_Academy
             OutfitDecider.Reset = true;
             ExpandedOutfit.Logger.LogInfo("Reset has applied");
         }
+        protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
+        {
+            ExpandedOutfit.Logger.LogWarning($"freeh is {freeH}");
+
+            if (freeH)
+            {
+                OutfitDecider.Reset = true;
+                ExpandedOutfit.Logger.LogInfo("Reset has applied");
+            }
+        }
+        protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
+        {
+            ExpandedOutfit.Logger.LogWarning($"freeh is {freeH}");
+
+            if (freeH)
+            {
+                OutfitDecider.Reset = true;
+                ExpandedOutfit.Logger.LogInfo("Reset has applied");
+            }
+        }
     }
 }

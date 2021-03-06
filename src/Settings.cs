@@ -49,6 +49,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
 
+        public static ConfigEntry<bool> PresetMenuLoad { get; private set; }
+
+
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
@@ -60,16 +63,16 @@ namespace Cosplay_Academy
             Logger = base.Logger;
             //Hooks.Init();
             //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
-            EnableSetting = Config.Bind("Main game", "Enable Cosplay Academy", true, "unknown");
-            if (EnableSetting != null && EnableSetting.Value)
-            {
-                GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
-                CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
-            }
+            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "unknown");
 
-            UpdateFrequency = Config.Bind("Main game", "Update Frequency", OutfitUpdate.Daily);
-            EnableDefaults = Config.Bind("Main game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
-            SumRandom = Config.Bind("Main game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
+            GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
+            CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
+
+            UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
+            EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
+            SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
+            PresetMenuLoad = Config.Bind("Main Game", "Keep head and tail accessories", true, "Used for characters who have accessory based hair and avoid them going bald");
+
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Choose from same set when available");
             FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Priortize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priorty reversed: example Nightwear set will overwrite all clothes if same folder is found");
