@@ -52,33 +52,32 @@ namespace Cosplay_Academy
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
+                if (Repeat_stoppper)//stop any potential endless loops in maker
+                {
+                    Repeat_stoppper = false;
+                    return;
+                }
+                object[] OnReloadArray = new object[2] { currentGameMode, false };
+                //Reassign materials for Clothes
+                var C_OverlayX = Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false);
+                if (C_OverlayX != null)
+                {
+                    //UnityEngine.Component test = ChaControl.gameObject.GetComponent(C_OverlayX);
+                    KCOX_RePack();
+                    //Traverse.Create(test).Method("RePack").GetValue();
+                    //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
+                }
+                //Reassign materials for accessories
+                var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+                if (ME_OverlayX != null)
+                {
+                    //UnityEngine.Component test = ChaControl.gameObject.GetComponent(ME_OverlayX);
+                    ME_RePack();
+                    //Traverse.Create(test).Method("RePack").GetValue();
+                    //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
+                }
+                Finish();
             }
-
-            if (Repeat_stoppper)//stop any potential endless loops in maker
-            {
-                Repeat_stoppper = false;
-                return;
-            }
-            object[] OnReloadArray = new object[2] { currentGameMode, false };
-            //Reassign materials for Clothes
-            var C_OverlayX = Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false);
-            if (C_OverlayX != null)
-            {
-                //UnityEngine.Component test = ChaControl.gameObject.GetComponent(C_OverlayX);
-                KCOX_RePack();
-                //Traverse.Create(test).Method("RePack").GetValue();
-                //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
-            }
-            //Reassign materials for accessories
-            var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
-            if (ME_OverlayX != null)
-            {
-                //UnityEngine.Component test = ChaControl.gameObject.GetComponent(ME_OverlayX);
-                ME_RePack();
-                //Traverse.Create(test).Method("RePack").GetValue();
-                //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
-            }
-            Finish();
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
