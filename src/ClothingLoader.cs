@@ -201,6 +201,7 @@ namespace Cosplay_Academy
                 ACCpostion++;
             }
             HairAccessories.Add(outfitnum, Temp);
+            Traverse.Create(_accessoriesByChar).Method("Purge").GetValue();
             #endregion
         }
     }

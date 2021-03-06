@@ -112,14 +112,6 @@ namespace Cosplay_Academy
                 int HoldOutfit = ChaControl.fileStatus.coordinateType;
                 ClothingLoader.FullLoad(ChaControl);//Load outfits
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
-                if (firstpass)
-                {
-                    firstpass = false;
-                    foreach (var coord in ChaControl.chaFile.coordinate)
-                    {
-                        OutfitList.Add(coord);
-                    }
-                }
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
                 if (Repeat_stoppper)//stop any potential endless loops in maker
@@ -148,6 +140,15 @@ namespace Cosplay_Academy
                 }
                 Finish();
             }
+            if (firstpass)
+            {
+                firstpass = false;
+                foreach (var coord in ChaControl.chaFile.coordinate)
+                {
+                    OutfitList.Add(coord);
+                }
+            }
+
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
@@ -1083,9 +1084,7 @@ namespace Cosplay_Academy
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
             //Apply pre-existing Accessories in any open slot or final slots.
-            //bool Force;
             #region Reassign Exisiting Accessories
-
             var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             Dictionary<int, CharaEvent.HairAccessoryInfo> Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
@@ -1097,15 +1096,22 @@ namespace Cosplay_Academy
                 data = new MoreAccessories.CharAdditionalData();
                 _accessoriesByChar.Add(ChaControl.chaFile, data);
             }
-            if (data.rawAccessoriesInfos.TryGetValue(ChaFileControl.status.coordinateType, out data.nowAccessories) == false)
-            {
-                data.nowAccessories = new List<ChaFileAccessory.PartsInfo>();
-                data.rawAccessoriesInfos.Add(ChaFileControl.status.coordinateType, data.nowAccessories);
-            }
+            //if (data.rawAccessoriesInfos.TryGetValue(ChaFileControl.status.coordinateType, out data.nowAccessories) == false)
+            //{
+            //    ExpandedOutfit.Logger.LogWarning($"RawNotFound");
+            //    data.nowAccessories = new List<ChaFileAccessory.PartsInfo>();
+            //    data.rawAccessoriesInfos.Add(ChaFileControl.status.coordinateType, data.nowAccessories);
+            //}
+            //else
+            //{
+            //    ExpandedOutfit.Logger.LogWarning($"RawFound");
 
+            //}
 
             var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(CoordinatePartsQueue[ChaFileControl.status.coordinateType]);
             var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(HairAccQueue[ChaFileControl.status.coordinateType]);
+            ExpandedOutfit.Logger.LogWarning($"CPQ: {CoordinatePartsQueue[ChaFileControl.status.coordinateType].Count}");
+            ExpandedOutfit.Logger.LogWarning($"HAQ: {HairAccQueue[ChaFileControl.status.coordinateType].Count}");
 
             int ACCpostion = 0;
 
@@ -1116,7 +1122,7 @@ namespace Cosplay_Academy
                     if (!Temp.ContainsKey(ACCpostion))
                     {
                         ChaControl.nowCoordinate.accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-
+                        ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque<20");
                         if (HairQueue.Peek() != null)
                         {
                             Temp.Add(ACCpostion, HairQueue.Dequeue());
@@ -1134,6 +1140,7 @@ namespace Cosplay_Academy
                 {
                     if (!Temp.ContainsKey(ACCpostion))
                     {
+                        ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque>20");
                         data.nowAccessories[ACCpostion] = PartsQueue.Dequeue();
                         if (HairQueue.Peek() != null)
                         {
@@ -1177,21 +1184,22 @@ namespace Cosplay_Academy
                 data.showAccessories.Add(true);
                 ACCpostion++;
             }
+
             //needed it to stop errors in FreeH when swapping
-            while (data.infoAccessory.Count < data.nowAccessories.Count)
-                data.infoAccessory.Add(null);
-            while (data.objAccessory.Count < data.nowAccessories.Count)
-                data.objAccessory.Add(null);
-            while (data.objAcsMove.Count < data.nowAccessories.Count)
-                data.objAcsMove.Add(new GameObject[2]);
-            while (data.cusAcsCmp.Count < data.nowAccessories.Count)
-                data.cusAcsCmp.Add(null);
-            while (data.showAccessories.Count < data.nowAccessories.Count)
-                data.showAccessories.Add(true);
-
+            //while (data.infoAccessory.Count < data.nowAccessories.Count)
+            //    data.infoAccessory.Add(null);
+            //while (data.objAccessory.Count < data.nowAccessories.Count)
+            //    data.objAccessory.Add(null);
+            //while (data.objAcsMove.Count < data.nowAccessories.Count)
+            //    data.objAcsMove.Add(new GameObject[2]);
+            //while (data.cusAcsCmp.Count < data.nowAccessories.Count)
+            //    data.cusAcsCmp.Add(null);
+            //while (data.showAccessories.Count < data.nowAccessories.Count)
+            //    data.showAccessories.Add(true);
+            Traverse.Create(_accessoriesByChar).Method("Purge").GetValue();
             #endregion
-
-            base.OnCoordinateBeingLoaded(coordinate);
+            Traverse.Create(MoreAccessories._self).Method("UpdateUI").GetValue();
+            //base.OnCoordinateBeingLoaded(coordinate);
         }
     }
 }
