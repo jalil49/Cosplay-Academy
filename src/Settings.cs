@@ -49,7 +49,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
 
-        public static ConfigEntry<bool> PresetMenuLoad { get; private set; }
+        public static ConfigEntry<bool> AccKeeper { get; private set; }
 
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
@@ -71,7 +71,7 @@ namespace Cosplay_Academy
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
-            PresetMenuLoad = Config.Bind("Main Game", "Keep head and tail accessories", true, "Used for characters who have accessory based hair and avoid them going bald");
+            AccKeeper = Config.Bind("Main Game", "Keep head and tail accessories", true, "Used for characters who have accessory based hair and avoid them going bald");
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Choose from same set when available");

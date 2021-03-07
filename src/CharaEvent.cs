@@ -1076,7 +1076,7 @@ namespace Cosplay_Academy
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
         {
-            if (!ExpandedOutfit.PresetMenuLoad.Value)
+            if (!ExpandedOutfit.AccKeeper.Value)
             {
                 return;
             }//if disabled don't run
