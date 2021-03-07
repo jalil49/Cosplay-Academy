@@ -206,4 +206,11 @@ namespace Cosplay_Academy
         //    return (Path_FirstTime);
         //}
     }
+    public class ChaDefault
+    {
+        public string ChaID;
+        public List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue;
+        public List<CharaEvent.HairAccessoryInfo>[] HairAccQueue;
+        public bool firstpass = true;
+    }
 }

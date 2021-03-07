@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 namespace Cosplay_Academy
 {
     public enum OutfitUpdate
@@ -35,7 +36,25 @@ namespace Cosplay_Academy
             @"\Lewd" //3
         };//Experience States; easy to make scale with size
         public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
-        public static readonly string[] Inclusion = { "a_n_headtop", "a_n_headflont", "a_n_head", "a_n_headside", "a_n_waist_b", "a_n_hair_pony", "a_n_hair_twin_L", "a_n_hair_twin_R", "a_n_earrings_R", "a_n_earrings_L", "a_n_megane", "a_n_nose", "a_n_mouth", "a_n_hair_pin", "a_n_hair_pin_R" };
+        public static readonly string[] Inclusion =
+        {
+            "a_n_headtop",//0
+            "a_n_headflont",//1
+            "a_n_head", //2
+            "a_n_headside", //3
+            "a_n_waist_b", //4
+            "a_n_hair_pony", //5
+            "a_n_hair_twin_L", //6
+            "a_n_hair_twin_R", //7
+            "a_n_earrings_R", //8
+            "a_n_earrings_L", //9
+            "a_n_megane", //10
+            "a_n_nose", //11
+            "a_n_mouth", //12
+            "a_n_hair_pin", //13
+            "a_n_hair_pin_R" //14
+        };
+        public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
     }
     public enum HStates
     {

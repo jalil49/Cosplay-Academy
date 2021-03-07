@@ -32,26 +32,24 @@ namespace Cosplay_Academy
             }
         }
 
+        public static void ResetDecider()
+        {
+            ProcessedNames.Clear(); //reset list
+            Reset = false;
+            if (IsInitialized)
+            {
+                foreach (OutfitData data in outfitData)
+                {
+                    data.Clear();
+                }
+            }
+            IsInitialized = false;
 
+            ExpandedOutfit.Logger.LogInfo("Reset has occured");
+        }
 
         public static void Decision(string name)
         {
-
-            if (Reset)//Initialize upon request first happens on load event
-            {
-                ProcessedNames.Clear(); //reset list
-                Reset = false;
-                if (IsInitialized)
-                {
-                    foreach (OutfitData data in outfitData)
-                    {
-                        data.Clear();
-                    }
-                }
-                IsInitialized = false;
-
-                ExpandedOutfit.Logger.LogInfo("Reset has occured");
-            }
             person = null;
             heroines = _gameMgr.HeroineList;
             foreach (SaveData.Heroine heroine in heroines)
