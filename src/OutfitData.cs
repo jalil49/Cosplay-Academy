@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using CoordinateType = ChaFileDefine.CoordinateType;
 namespace Cosplay_Academy
 {
     public class OutfitData
@@ -208,9 +210,93 @@ namespace Cosplay_Academy
     }
     public class ChaDefault
     {
-        public string ChaID;
-        public List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue;
-        public List<CharaEvent.HairAccessoryInfo>[] HairAccQueue;
         public bool firstpass = true;
+        public string ChaName;//not actual name but ChaControl.Name
+        public List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.outfitpath.Length];
+        public string[] outfitpath = new string[Constants.outfitpath.Length];
+        #region hair accessories
+        public List<CharaEvent.HairAccessoryInfo>[] HairAccQueue = new List<CharaEvent.HairAccessoryInfo>[Constants.outfitpath.Length];
+        #endregion
+#if ME_Support
+        #region Material Editor Save
+        public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.outfitpath.Length];
+        public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.outfitpath.Length];
+        public List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.outfitpath.Length];
+        public List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.outfitpath.Length];
+        public List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.outfitpath.Length];
+        public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.outfitpath.Length];
+        #endregion
+
+        #region Material Editor Return
+        public bool ME_Work = false;
+        public List<RendererProperty> ReturnRenderer = new List<RendererProperty>();
+        public List<MaterialFloatProperty> ReturnMaterialFloat = new List<MaterialFloatProperty>();
+        public List<MaterialColorProperty> ReturnMaterialColor = new List<MaterialColorProperty>();
+        public List<MaterialTextureProperty> ReturnMaterialTexture = new List<MaterialTextureProperty>();
+        public List<MaterialShader> ReturnMaterialShade = new List<MaterialShader>();
+        public Dictionary<int, int> ReturnimportDictionary = new Dictionary<int, int>();
+
+        #endregion
+
+#endif
+        public ChaDefault()
+        {
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
+            {
+#if ME_Support
+                RendererPropertyQueue[i] = new List<RendererProperty>();
+                MaterialFloatPropertyQueue[i] = new List<MaterialFloatProperty>();
+                MaterialColorPropertyQueue[i] = new List<MaterialColorProperty>();
+                MaterialTexturePropertyQueue[i] = new List<MaterialTextureProperty>();
+                MaterialShaderQueue[i] = new List<MaterialShader>();
+                importDictionaryQueue[i] = new Dictionary<int, byte[]>();
+#endif
+                HairAccQueue[i] = new List<CharaEvent.HairAccessoryInfo>();
+                CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
+                outfitpath[i] = " ";
+            }
+        }
+#if ME_Support
+        public void SortData()
+        {
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
+            {
+                RendererPropertyQueue[i] = RendererPropertyQueue[i].OrderBy(x => x.Slot).ToList();
+                MaterialColorPropertyQueue[i] = MaterialColorPropertyQueue[i].OrderBy(x => x.Slot).ToList();
+                MaterialFloatPropertyQueue[i] = MaterialFloatPropertyQueue[i].OrderBy(x => x.Slot).ToList();
+                MaterialShaderQueue[i] = MaterialShaderQueue[i].OrderBy(x => x.Slot).ToList();
+                MaterialTexturePropertyQueue[i] = MaterialTexturePropertyQueue[i].OrderBy(x => x.Slot).ToList();
+            }
+        }
+        
+        public void Print()
+        {
+
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
+            {
+                for (int j = 0; j < RendererPropertyQueue[i].Count; j++)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"Render {(CoordinateType)i} {j}:\t{RendererPropertyQueue[i][j].RendererName}\t\t\t{RendererPropertyQueue[i][j].Slot}");
+                }
+                for (int j = 0; j < MaterialFloatPropertyQueue[i].Count; j++)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"Float {(CoordinateType)i} {j}:\t{MaterialFloatPropertyQueue[i][j].MaterialName}\t\t\t{MaterialFloatPropertyQueue[i][j].Slot}");
+                }
+                for (int j = 0; j < MaterialColorPropertyQueue[i].Count; j++)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"Color {(CoordinateType)i} {j}:\t{MaterialColorPropertyQueue[i][j].MaterialName}\t\t\t{MaterialColorPropertyQueue[i][j].Slot}");
+                }
+                for (int j = 0; j < MaterialTexturePropertyQueue[i].Count; j++)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"Tex {(CoordinateType)i} {j}:\t{MaterialTexturePropertyQueue[i][j].MaterialName}\t\t\t{MaterialTexturePropertyQueue[i][j].Slot}");
+                }
+                for (int j = 0; j < MaterialShaderQueue[i].Count; j++)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"Shade {(CoordinateType)i} {j}:\t{MaterialShaderQueue[i][j].MaterialName}\t\t\t{MaterialShaderQueue[i][j].Slot}");
+                }
+            }
+            
+        }
+#endif
     }
 }

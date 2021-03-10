@@ -44,8 +44,7 @@ namespace Cosplay_Academy
         }
         protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
         {
-            ExpandedOutfit.Logger.LogWarning($"freeh is {freeH}");
-
+            //ExpandedOutfit.Logger.LogWarning($"freeh is {freeH}");
             if (freeH)
             {
                 Constants.ChaDefaults.Clear();

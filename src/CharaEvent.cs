@@ -8,9 +8,7 @@ using Manager;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
@@ -22,27 +20,27 @@ namespace Cosplay_Academy
         //private List<ChaFileCoordinate> OutfitList = new List<ChaFileCoordinate>();
         public static CharaEvent self;
         private bool Repeat_stoppper = false;
+        private ChaDefault ThisOutfitData;
+
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
-            ChaDefault setting = Constants.ChaDefaults.Find(x => x.ChaID == ChaControl.name);
-            if (setting == null)
+            if (ChaControl.fileParam.sex == 0)
             {
-                ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default");
-
-                setting = new ChaDefault();
-                Constants.ChaDefaults.Add(setting);
-                setting.ChaID = ChaControl.name;
-            }
-            ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} has id of {ChaControl.name}");
-            self = this;
-            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper && GameMode.Maker != currentGameMode/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
-            {
-                Repeat_stoppper = false;
                 return;
-            }//if disabled don't run
+            }
+            ThisOutfitData = Constants.ChaDefaults.Find(x => x.ChaName == ChaControl.name);
+            if (ThisOutfitData == null)
+            {
+                //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chaid {ChaControl.chaID} name {ChaControl.name}");
+
+                ThisOutfitData = new ChaDefault();
+                Constants.ChaDefaults.Add(ThisOutfitData);
+                ThisOutfitData.ChaName = ChaControl.name;
+            }
+            self = this;
             if (GameMode.Maker == currentGameMode)
             {
-                setting.firstpass = true;
+                ThisOutfitData.firstpass = true;
                 if (ExpandedOutfit.ResetMaker.Value)
                 {
                     OutfitDecider.Reset = true;
@@ -58,26 +56,144 @@ namespace Cosplay_Academy
                 //OutfitList.Clear();
                 OutfitDecider.ResetDecider();
             }
-            if (setting.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
+            if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
-                List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.outfitpath.Length];
-                List<CharaEvent.HairAccessoryInfo>[] HairAccQueue = new List<CharaEvent.HairAccessoryInfo>[Constants.outfitpath.Length];
 
                 WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-                Dictionary<int, CharaEvent.HairAccessoryInfo> temp2;
+
+                Dictionary<int, Dictionary<int, HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
+                PluginData HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFileControl, "com.deathweasel.bepinex.hairaccessorycustomizer");
+                if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
+                    CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairAccessoryInfo>>>((byte[])AllHairAccessories);
+#if ME_Support
+                PluginData MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaFileControl, "com.deathweasel.bepinex.materialeditor");
+
+                #region ME Acc Import
+
+                Dictionary<int, RendererProperty>[] RendererPropertyQueue = new Dictionary<int, RendererProperty>[Constants.outfitpath.Length];
+                Dictionary<int, MaterialFloatProperty>[] MaterialFloatPropertyQueue = new Dictionary<int, MaterialFloatProperty>[Constants.outfitpath.Length];
+                Dictionary<int, MaterialColorProperty>[] MaterialColorPropertyQueue = new Dictionary<int, MaterialColorProperty>[Constants.outfitpath.Length];
+                Dictionary<int, MaterialTextureProperty>[] MaterialTexturePropertyQueue = new Dictionary<int, MaterialTextureProperty>[Constants.outfitpath.Length];
+                Dictionary<int, MaterialShader>[] MaterialShaderQueue = new Dictionary<int, MaterialShader>[Constants.outfitpath.Length];
+                Dictionary<int, byte[]> importedTextDic = new Dictionary<int, byte[]>();
+
+                for (int i = 0; i < Constants.outfitpath.Length; i++)
+                {
+                    RendererPropertyQueue[i] = new Dictionary<int, RendererProperty>();
+                    MaterialFloatPropertyQueue[i] = new Dictionary<int, MaterialFloatProperty>();
+                    MaterialColorPropertyQueue[i] = new Dictionary<int, MaterialColorProperty>();
+                    MaterialTexturePropertyQueue[i] = new Dictionary<int, MaterialTextureProperty>();
+                    MaterialShaderQueue[i] = new Dictionary<int, MaterialShader>();
+                }
+
+                var ImportDictionary = new Dictionary<int, int>();
+
+                if (MaterialEditorData?.data != null)
+                {
+                    if (MaterialEditorData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
+                    {
+                        Dictionary<int, byte[]> Des = MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic);
+                        foreach (var x in Des)
+                        {
+                            importedTextDic.Add(x.Key, x.Value);
+                            ImportDictionary[x.Key] = ME_Support.SetAndGetTextureID(x.Value);
+                        }
+
+                    }
+                    if (MaterialEditorData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
+                    {
+                        var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
+                        for (var i = 0; i < properties.Count; i++)
+                        {
+                            var loadedProperty = properties[i];
+                            if (loadedProperty.ObjectType == ObjectType.Accessory)
+                            {
+                                MaterialShaderQueue[loadedProperty.CoordinateIndex].Add(loadedProperty.Slot, new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                            }
+                        }
+                    }
+
+                    if (MaterialEditorData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
+                    {
+                        var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
+                        for (var i = 0; i < properties.Count; i++)
+                        {
+                            var loadedProperty = properties[i];
+                            if (loadedProperty.ObjectType == ObjectType.Accessory)
+                            {
+                                RendererPropertyQueue[loadedProperty.CoordinateIndex].Add(loadedProperty.Slot, new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            }
+                        }
+                    }
+
+                    if (MaterialEditorData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
+                    {
+                        var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
+                        for (var i = 0; i < properties.Count; i++)
+                        {
+                            var loadedProperty = properties[i];
+                            if (loadedProperty.ObjectType == ObjectType.Accessory)
+                            {
+                                MaterialFloatPropertyQueue[loadedProperty.CoordinateIndex].Add(loadedProperty.Slot, new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            }
+                        }
+                    }
+
+                    if (MaterialEditorData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
+                    {
+                        var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
+                        for (var i = 0; i < properties.Count; i++)
+                        {
+                            var loadedProperty = properties[i];
+                            if (loadedProperty.ObjectType == ObjectType.Accessory)
+                            {
+                                MaterialColorPropertyQueue[loadedProperty.CoordinateIndex].Add(loadedProperty.Slot, new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            }
+                        }
+                    }
+
+                    if (MaterialEditorData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
+                    {
+                        var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
+                        for (var i = 0; i < properties.Count; i++)
+                        {
+                            var loadedProperty = properties[i];
+                            if (loadedProperty.ObjectType == ObjectType.Accessory)
+                            {
+                                int? texID = null;
+                                if (loadedProperty.TexID != null)
+                                    texID = /*ImportDictionary[*/(int)loadedProperty.TexID/*]*/;
+                                if (!ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].ContainsKey((int)loadedProperty.TexID))
+                                {
+                                    ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
+
+                                }
+                                ExpandedOutfit.Logger.LogWarning($"Loaded:\t{(int)loadedProperty.TexID}\tName: {loadedProperty.MaterialName}\tTexID:\t{texID}\tSlot:{loadedProperty.Slot}");
+
+                                MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
+                                MaterialTexturePropertyQueue[loadedProperty.CoordinateIndex].Add(loadedProperty.Slot, newTextureProperty);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ExpandedOutfit.Logger.LogError($"material editor null");
+                }
+                #endregion
+#endif
+
+                //Dictionary<int, HairAccessoryInfo> HairInfo;
                 #region Queue accessories to keep
                 for (int outfitnum = 0, n = Constants.outfitpath.Length; outfitnum < n; outfitnum++)
                 {
-                    List<ChaFileAccessory.PartsInfo> import = new List<ChaFileAccessory.PartsInfo>();
-                    List<HairAccessoryInfo> Subimport = new List<HairAccessoryInfo>();
+                    List<ChaFileAccessory.PartsInfo> AccImport = new List<ChaFileAccessory.PartsInfo>();
+                    List<HairAccessoryInfo> HairImport = new List<HairAccessoryInfo>();
 
-
-                    var InputToSave = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
-                    temp2 = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
-                    if (InputToSave != null)
-                        if (InputToSave.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                            temp2 = MessagePackSerializer.Deserialize<Dictionary<int, HairAccessoryInfo>>((byte[])loadedHairAccessories);
-
+                    if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairAccessoryInfo> HairInfo) == false)
+                    {
+                        HairInfo = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
+                    }
 
                     if (_accessoriesByChar.TryGetValue(ChaControl.chaFile, out var SaveAccessory) == false)
                     {
@@ -88,84 +204,109 @@ namespace Cosplay_Academy
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
                     }
-                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(acclist);
+
+                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(acclist);//create intermediate as it seems that acclist is a reference
                     Intermediate.AddRange(ChaControl.chaFile.coordinate[outfitnum].accessory.parts);
-                    for (int i = 0; i < 20; i++)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Coord {outfitnum}: {ChaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id} parent: {ChaControl.chaFile.coordinate[outfitnum].accessory.parts[i].parentKey}");
-                    }
 
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                         if (Constants.Inclusion.Contains(Intermediate[i].parentKey))
                         {
-                            if (!temp2.TryGetValue(i, out HairAccessoryInfo ACCdata))
+                            if (!HairInfo.TryGetValue(i, out HairAccessoryInfo ACCdata))
                             {
                                 ACCdata = null;
                             }
-                            import.Add(Intermediate[i]);
-                            Subimport.Add(ACCdata);
+#if ME_Support
+                            if (!MaterialColorPropertyQueue[outfitnum].TryGetValue(i, out MaterialColorProperty materialColor))
+                            {
+                                materialColor = null;
+                            }
+                            if (!MaterialFloatPropertyQueue[outfitnum].TryGetValue(i, out MaterialFloatProperty materialFloatProperty))
+                            {
+                                materialFloatProperty = null;
+                            }
+                            if (!MaterialShaderQueue[outfitnum].TryGetValue(i, out MaterialShader shader))
+                            {
+                                shader = null;
+                            }
+                            if (!MaterialTexturePropertyQueue[outfitnum].TryGetValue(i, out MaterialTextureProperty materialTexture))
+                            {
+                                materialTexture = null;
+                            }
+                            if (!RendererPropertyQueue[outfitnum].TryGetValue(i, out RendererProperty rendererProperty))
+                            {
+                                rendererProperty = null;
+                            }
+                            ThisOutfitData.MaterialColorPropertyQueue[outfitnum].Add(materialColor);
+                            ThisOutfitData.MaterialFloatPropertyQueue[outfitnum].Add(materialFloatProperty);
+                            ThisOutfitData.MaterialShaderQueue[outfitnum].Add(shader);
+                            ThisOutfitData.MaterialTexturePropertyQueue[outfitnum].Add(materialTexture);
+                            ThisOutfitData.RendererPropertyQueue[outfitnum].Add(rendererProperty);
+#endif
+                            ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
+                            ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
                         }
                     }
-                    CoordinatePartsQueue[outfitnum] = import;
-                    HairAccQueue[outfitnum] = Subimport;
-                    ExpandedOutfit.Logger.LogWarning($"import count {import.Count}\t subimport count {Subimport.Count} ");
-
                 }
-                setting.firstpass = false;
-                setting.CoordinatePartsQueue = CoordinatePartsQueue;
-                setting.HairAccQueue = HairAccQueue;
-                //foreach (var coord in ChaControl.chaFile.coordinate)
-                //{
-                //    OutfitList.Add(coord);
-                //}
+                ThisOutfitData.firstpass = false;
                 #endregion
+
+
             }
+            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper && GameMode.Maker != currentGameMode/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+            {
+                Repeat_stoppper = false;
+                return;
+            }//if disabled don't run
 
             //use Chacontrol.name instead of ChaControl.fileParam.fullname to probably avoid same name conflicts
-            if (ChaControl.sex == 1 && (GameMode.Maker == currentGameMode || !OutfitDecider.ProcessedNames.Contains(ChaControl.name)))//run the following if female and unprocessed
+            if (ChaControl.sex == 1)//run the following if female
             {
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
-                    OutfitDecider.Decision(ChaControl.fileParam.fullname);//Generate outfits
-                    OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
-                    if (!ExpandedOutfit.PermChangeOutfit.Value)
+                    if (!OutfitDecider.ProcessedNames.Contains(ChaControl.name))//run if unprocessed
                     {
-                        ExpandedOutfit.ChangeOutfit.Value = false;
+                        OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
+                        OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
+                        if (!ExpandedOutfit.PermChangeOutfit.Value)
+                        {
+                            ExpandedOutfit.ChangeOutfit.Value = false;
+                        }
                     }
+
                     int HoldOutfit = ChaControl.fileStatus.coordinateType;
-                    ClothingLoader.FullLoad(ChaControl, self, setting);//Load outfits
+                    ClothingLoader.FullLoad(ChaControl, ThisOutfitData);//Load outfits; has to run again for story mode les scene at least
                     ChaControl.fileStatus.coordinateType = HoldOutfit;
+
+                    ChaInfo temp = (ChaInfo)ChaControl;
+                    ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
+
+                    if (Repeat_stoppper)//stop any potential endless loops since I call a refresh
+                    {
+                        Repeat_stoppper = false;
+                        return;
+                    }
+
+                    //Reassign materials for Clothes
+                    var C_OverlayX = Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false);
+                    if (C_OverlayX != null)
+                    {
+                        KCOX_RePack();
+                    }
+                    //Reassign materials for accessories
+                    var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+                    if (ME_OverlayX != null)
+                    {
+                        ME_RePack();
+                    }
+                    Finish();
                 }
-                ChaInfo temp = (ChaInfo)ChaControl;
-                ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
-                if (Repeat_stoppper)//stop any potential endless loops in maker
-                {
-                    Repeat_stoppper = false;
-                    return;
-                }
-                //object[] OnReloadArray = new object[2] { currentGameMode, false };
-                //Reassign materials for Clothes
-                var C_OverlayX = Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false);
-                if (C_OverlayX != null)
-                {
-                    //UnityEngine.Component test = ChaControl.gameObject.GetComponent(C_OverlayX);
-                    KCOX_RePack();
-                    //Traverse.Create(test).Method("RePack").GetValue();
-                    //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
-                }
-                //Reassign materials for accessories
-                var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
-                if (ME_OverlayX != null)
-                {
-                    //UnityEngine.Component test = ChaControl.gameObject.GetComponent(ME_OverlayX);
-                    ME_RePack();
-                    //Traverse.Create(test).Method("RePack").GetValue();
-                    //Traverse.Create(test).Method("OnReload", OnReloadArray).GetValue();
-                }
-                Finish();
             }
+            //else
+            //{
+            //    ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} is already processed did this occur in H Les scene?");
+            //}
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
@@ -282,10 +423,13 @@ namespace Cosplay_Academy
             List<MaterialColorProperty> MaterialColorPropertyList = new List<MaterialColorProperty>();
             List<MaterialTextureProperty> MaterialTexturePropertyList = new List<MaterialTextureProperty>();
             List<MaterialShader> MaterialShaderList = new List<MaterialShader>();
-
-
+            Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
 
             #region UnPackCoordinates
+#if ME_Support
+            if (!ThisOutfitData.ME_Work)
+            {
+#endif
             for (int outfitnum = 0; outfitnum < ChaControl.chaFile.coordinate.Length; outfitnum++)
             {
                 var data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
@@ -331,6 +475,17 @@ namespace Cosplay_Academy
                     }
                 }
             }
+#if ME_Support
+        }
+            else
+            {
+                RendererPropertyList = ThisOutfitData.ReturnRenderer;
+                MaterialFloatPropertyList = ThisOutfitData.ReturnMaterialFloat;
+                MaterialColorPropertyList = ThisOutfitData.ReturnMaterialColor;
+                MaterialTexturePropertyList = ThisOutfitData.ReturnMaterialTexture;
+                MaterialShaderList = ThisOutfitData.ReturnMaterialShade;
+            }
+#endif
             #endregion
             #region Pack
             var SaveData = new PluginData();
@@ -539,12 +694,6 @@ namespace Cosplay_Academy
             {
                 return;
             }//if disabled don't run
-            ChaDefault setting = Constants.ChaDefaults.Find(x => x.ChaID == ChaControl.name);
-            if (setting == null)
-            {
-                ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} No ChaId Found");
-                return;
-            }
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
             //Apply pre-existing Accessories in any open slot or final slots.
             #region Reassign Exisiting Accessories
@@ -554,14 +703,17 @@ namespace Cosplay_Academy
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
-
             if (_accessoriesByChar.TryGetValue(ChaControl.chaFile, out MoreAccessories.CharAdditionalData data) == false)
             {
                 data = new MoreAccessories.CharAdditionalData();
                 _accessoriesByChar.Add(ChaControl.chaFile, data);
             }
-            ExpandedOutfit.Logger.LogWarning($"CPQ: {setting.CoordinatePartsQueue[ChaFileControl.status.coordinateType].Count}");
-            ExpandedOutfit.Logger.LogWarning($"HAQ: {setting.HairAccQueue[ChaFileControl.status.coordinateType].Count}");
+
+
+            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[ChaFileControl.status.coordinateType]);
+            var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[ChaFileControl.status.coordinateType]);
+            //ExpandedOutfit.Logger.LogWarning($"CPQ: {ThisOutfitData.CoordinatePartsQueue[ChaFileControl.status.coordinateType].Count}");
+            //ExpandedOutfit.Logger.LogWarning($"HAQ: {ThisOutfitData.HairAccQueue[ChaFileControl.status.coordinateType].Count}");
 
             int ACCpostion = 0;
 
@@ -665,57 +817,23 @@ namespace Cosplay_Academy
             Traverse.Create(_accessoriesByChar).Method("Purge").GetValue();
             #endregion
             Traverse.Create(MoreAccessories._self).Method("UpdateUI").GetValue();
-            //base.OnCoordinateBeingLoaded(coordinate);
-        }
-        private IEnumerator WaitForCoords()
-        {
-            int frames = 0;
-            for (int j = 0; j < Constants.outfitpath.Length - 1; j++)
-            {
-                var Parts = ChaControl.chaFile.coordinate[j].accessory.parts;
-                for (int i = 0, n = Parts.Length; i < n; i++)
-                {
-                    while (Parts[i].type != 120 && Parts[i].id == -1)
-                    {
-                        yield return 0;
-                        ExpandedOutfit.Logger.LogWarning($"Waited {++frames} frames");
-                    }
-                }
-            }
-            ExpandedOutfit.Logger.LogWarning($"Coroutine ended {frames} frames");
-        }
-        private void DangerLoop()
-        {
-            int frames = 0;
-            for (int j = 0; j < Constants.outfitpath.Length - 1; j++)
 
             var Plugdata = new PluginData();
 
             if (ExpandedOutfit.HairMatch.Value)
             {
-                var Parts = ChaControl.chaFile.coordinate[j].accessory.parts;
-                for (int i = 0, n = Parts.Length; i < n; i++)
                 Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
                 var HairAccessoryCustomizer = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
                 if (HairAccessoryCustomizer != null)
                 {
-                    while (Parts[i].type != 120 && Parts[i].id == 0)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Waited {++frames} Ticks");
-                        if (frames % 10 == 0)
-                        {
-                            ExpandedOutfit.Logger.LogWarning($"at {++frames} Ticks id: {Parts[i].id}");
-                        }
-                    }
                     //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
                     var temp = ChaControl.GetComponent(HairAccessoryCustomizer);
                     object[] HairInput = new object[2] { coordinate, false };
                     Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
                 }
             }
-            ExpandedOutfit.Logger.LogWarning($"Coroutine ended {frames} Ticks");
         }
     }
 }

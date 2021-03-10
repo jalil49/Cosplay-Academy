@@ -5,90 +5,104 @@
 //using System.Collections.Generic;
 //using System.Reflection;
 //using System.Reflection.Emit;
-
 //namespace Cosplay_Academy
 //{
-//    //internal static class Hooks
-//    //{
-//    //    //static Harmony _instance;
-//    //    public static void Init()
-//    //    {
-//    //        //_instance = new Harmony("Cosplay_Academy");
-//    //        //Harmony.CreateAndPatchAll(typeof(Hooks));
-//    //        //ShowTypeInfo(typeof(Cycle));
-//    //        //Harmony.CreateAndPatchAll(typeof(HairAccessoryPatch));
-//    //        // _instance.Patch(typeof(HairAccessoryPatch));
-//    //        // _instance.Patch(HairAccessoryPatch.TargetMethod, null, null, HairAccessoryPatch.Transpiler);
-//    //    }
-//    //    //private static void ShowTypeInfo(Type t)
-//    //    //{
-//    //    //    ExpandedOutfit.Logger.LogWarning($"Name: {t.Name}");
-//    //    //    ExpandedOutfit.Logger.LogWarning($"Full Name: {t.FullName}");
-//    //    //    ExpandedOutfit.Logger.LogWarning($"ToString:  {t}");
-//    //    //    ExpandedOutfit.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
-//    //    //    ExpandedOutfit.Logger.LogWarning("");
+//    internal static class Hooks
+//    {
+//        static bool HairACC_firstPass = false;
+//        //static Harmony _instance;
+//        public static void Init()
+//        {
+//            //Harmony _instance = new Harmony("Cosplay_Academy");
+//            //Harmony.CreateAndPatchAll(typeof(Hooks));
+//            //_instance.Patch(typeof(StopCustom()));
+//            //ShowTypeInfo(typeof(HairAccessoryCustomizer.HairAccessoryController));
+//            //Harmony.CreateAndPatchAll(typeof(HairAccessoryPatch));
+//            // _instance.Patch(typeof(HairAccessoryPatch));
+//            // _instance.Patch(HairAccessoryPatch.TargetMethod, null, null, HairAccessoryPatch.Transpiler);
+//        }
+//        private static void ShowTypeInfo(Type t)
+//        {
+//            ExpandedOutfit.Logger.LogWarning($"Name: {t.Name}");
+//            ExpandedOutfit.Logger.LogWarning($"Full Name: {t.FullName}");
+//            ExpandedOutfit.Logger.LogWarning($"ToString:  {t}");
+//            ExpandedOutfit.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
+//            ExpandedOutfit.Logger.LogWarning("");
+//        }
+//        //private static bool CheckEndFinally(CodeInstruction instruction) => instruction.opcode == OpCodes.Endfinally;
+//        //[HarmonyPatch]
+//        //static class HairAccessoryPatch
+//        //{
+//        //    public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.Cycle+<MapMove>c__Iterator4, Assembly-CSharp"), "MoveNext");//Assembly Name because it hates me now that I didn't want to use it
+//        //    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+//        //    {
+//        //        List<CodeInstruction> newInstructionSet = new List<CodeInstruction>(instructions);
 
+//        //        int searchInfoIndex = newInstructionSet.FindIndex(instruction => CheckEndFinally(instruction));
+//        //        newInstructionSet.Insert(searchInfoIndex, new CodeInstruction(OpCodes.Call, typeof(Hooks).GetMethod(nameof(CharaFinallyFinishedEvent), AccessTools.all)));
+//        //        //for (int i = searchInfoIndex; i < newInstructionSet.Count; i++)
+//        //        //{
+//        //        //    ExpandedOutfit.Logger.LogWarning(newInstructionSet[i].opcode);
+//        //        //}
+//        //        return newInstructionSet;
+//        //    }
 
-//    //    //}
-//    //    //private static bool CheckEndFinally(CodeInstruction instruction) => instruction.opcode == OpCodes.Endfinally;
-//    //    //[HarmonyPatch]
-//    //    //static class HairAccessoryPatch
-//    //    //{
-//    //    //    public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.Cycle+<MapMove>c__Iterator4, Assembly-CSharp"), "MoveNext");//Assembly Name because it hates me now that I didn't want to use it
-//    //    //    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-//    //    //    {
-//    //    //        List<CodeInstruction> newInstructionSet = new List<CodeInstruction>(instructions);
+//        //}
+//        //public delegate void FinishedLoadingHandler();
+//        //public static event FinishedLoadingHandler CharaFinallyFinished;
 
-//    //    //        int searchInfoIndex = newInstructionSet.FindIndex(instruction => CheckEndFinally(instruction));
-//    //    //        newInstructionSet.Insert(searchInfoIndex, new CodeInstruction(OpCodes.Call, typeof(Hooks).GetMethod(nameof(CharaFinallyFinishedEvent), AccessTools.all)));
-//    //    //        //for (int i = searchInfoIndex; i < newInstructionSet.Count; i++)
-//    //    //        //{
-//    //    //        //    ExpandedOutfit.Logger.LogWarning(newInstructionSet[i].opcode);
-//    //    //        //}
-//    //    //        return newInstructionSet;
-//    //    //    }
+//        //internal static void CharaFinallyFinishedEvent()
+//        //{
+//        //    if (CharaFinallyFinished == null || CharaFinallyFinished.GetInvocationList() == null || CharaFinallyFinished.GetInvocationList().Length == 0)
+//        //    {
+//        //        return;
+//        //    }
+//        //    foreach (var entry in CharaFinallyFinished.GetInvocationList())
+//        //    {
+//        //        var handler = (FinishedLoadingHandler)entry;
+//        //        try
+//        //        {
+//        //            handler.Invoke();
+//        //        }
+//        //        catch (Exception ex)
+//        //        {
+//        //            ExpandedOutfit.Logger.LogError($"Subscriber crash in {nameof(ExpandedOutfit)}.{nameof(CharaFinallyFinished)} - {ex}");
+//        //        }
+//        //    }
+//        //}
 
-//    //    //}
-//    //    //public delegate void FinishedLoadingHandler();
-//    //    //public static event FinishedLoadingHandler CharaFinallyFinished;
+//        //[HarmonyPrefix]
+//        //[HarmonyPatch(typeof(ChaFile), "CopyCoordinate")]
+//        //private static void CopyCoordHook(ref ChaFileCoordinate[] _coordinate) //ExtendedData doesn't transfer
+//        //{
+//        //    //ExpandedOutfit.Logger.LogWarning("Copycoord has activaed");
+//        //    //for (int i = 0; i < 7; i++)
+//        //    //{
+//        //    //    ExpandedOutfit.Logger.LogWarning(_coordinate[i].coordinateFileName);
+//        //    //}
 
-//    //    //internal static void CharaFinallyFinishedEvent()
-//    //    //{
-//    //    //    if (CharaFinallyFinished == null || CharaFinallyFinished.GetInvocationList() == null || CharaFinallyFinished.GetInvocationList().Length == 0)
-//    //    //    {
-//    //    //        return;
-//    //    //    }
-//    //    //    foreach (var entry in CharaFinallyFinished.GetInvocationList())
-//    //    //    {
-//    //    //        var handler = (FinishedLoadingHandler)entry;
-//    //    //        try
-//    //    //        {
-//    //    //            handler.Invoke();
-//    //    //        }
-//    //    //        catch (Exception ex)
-//    //    //        {
-//    //    //            ExpandedOutfit.Logger.LogError($"Subscriber crash in {nameof(ExpandedOutfit)}.{nameof(CharaFinallyFinished)} - {ex}");
-//    //    //        }
-//    //    //    }
-//    //    //}
+//        //    ChaFileCoordinate[] temp = new ChaFileCoordinate[7];
+//        //    for (int i = 0; i < 7; i++)
+//        //    {
+//        //        temp[i] = new ChaFileCoordinate();
+//        //        temp[i].LoadFile(@"F:\[ScrewThisNoise] Koikatsu BetterRepack R9.2\UserData\coordinate\BR-Chan KKP Outing.png");
+//        //    }
+//        //    _coordinate = temp;
+//        //}
+//        [HarmonyPrefix]
+//        [HarmonyPatch(typeof(KK_Plugins.HairAccessoryCustomizer.HairAccessoryController), "OnCoordinateBeingLoaded")]
+//        private static bool StopCustom()
+//        {
+//            ExpandedOutfit.Logger.LogWarning("Cosplay Academy Stop custom");
 
-//    //    //[HarmonyPrefix]
-//    //    //[HarmonyPatch(typeof(ChaFile), "CopyCoordinate")]
-//    //    //private static void CopyCoordHook(ref ChaFileCoordinate[] _coordinate) //ExtendedData doesn't transfer
-//    //    //{
-//    //    //    //ExpandedOutfit.Logger.LogWarning("Copycoord has activaed");
-//    //    //    //for (int i = 0; i < 7; i++)
-//    //    //    //{
-//    //    //    //    ExpandedOutfit.Logger.LogWarning(_coordinate[i].coordinateFileName);
-//    //    //    //}
-
-//    //    //    ChaFileCoordinate[] temp = new ChaFileCoordinate[7];
-//    //    //    for (int i = 0; i < 7; i++)
-//    //    //    {
-//    //    //        temp[i] = new ChaFileCoordinate();
-//    //    //        temp[i].LoadFile(@"F:\[ScrewThisNoise] Koikatsu BetterRepack R9.2\UserData\coordinate\BR-Chan KKP Outing.png");
-//    //    //    }
-//    //    //    _coordinate = temp;
-//    //    //}
-//    //}
+//            if (ExpandedOutfit.HairMatch.Value && ExpandedOutfit.AccKeeper.Value && !HairACC_firstPass)
+//            {
+//                ExpandedOutfit.Logger.LogWarning("Cosplay Academy stopped HairACC from loading");
+//                HairACC_firstPass = true;
+//                return true;
+//            }
+//            HairACC_firstPass = false;
+//            return false;
+//        }
+//    }
 //}

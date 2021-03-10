@@ -16,7 +16,7 @@ namespace Cosplay_Academy
         private static List<SaveData.Heroine> heroines;
         private static SaveData.Heroine person;
         public static bool Reset; //
-
+        private static ChaDefault ThisOutfitData;
         private static int HExperience;
 
         static OutfitDecider()
@@ -48,8 +48,9 @@ namespace Cosplay_Academy
             ExpandedOutfit.Logger.LogInfo("Reset has occured");
         }
 
-        public static void Decision(string name)
+        public static void Decision(string name, ChaDefault cha)
         {
+            ThisOutfitData = cha;
             person = null;
             heroines = _gameMgr.HeroineList;
             foreach (SaveData.Heroine heroine in heroines)
@@ -122,7 +123,7 @@ namespace Cosplay_Academy
             {
                 if (UnityEngine.Random.Range(1, 101) >= ExpandedOutfit.AfterSchoolcasualchance.Value)
                 {
-                    Constants.outfitpath[1] = Constants.outfitpath[5];//assign casual outfit to afterschool
+                    ThisOutfitData.outfitpath[1] = ThisOutfitData.outfitpath[5];//assign casual outfit to afterschool
                 }
             }
             if (person != null)
@@ -231,7 +232,7 @@ namespace Cosplay_Academy
             }
             else
             {
-                Constants.outfitpath[1] = Constants.outfitpath[0];
+                ThisOutfitData.outfitpath[1] = ThisOutfitData.outfitpath[0];
             }
         }
         private static void GymOutfit()
@@ -266,7 +267,7 @@ namespace Cosplay_Academy
                     Generalized_Assignment(ExpandedOutfit.MatchTrackClub.Value, 4, 8);
                     break;
                 default:
-                    Constants.outfitpath[4] = Constants.outfitpath[0];
+                    ThisOutfitData.outfitpath[4] = ThisOutfitData.outfitpath[0];
                     break;
             }
             if (person == null ? ExpandedOutfit.KoiClub.Value : person.isStaff)
@@ -287,7 +288,7 @@ namespace Cosplay_Academy
         }
         private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
-            Constants.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+            ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
         }
         private static string Grabber(string Input1, string result)
         {
