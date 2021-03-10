@@ -110,10 +110,6 @@ namespace Cosplay_Academy
                 Empty = chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
                 if (Empty/* || Force*/) //120 is empty/default
                 {
-                    //if (!Empty && Force)
-                    //{
-                    //    ExpandedOutfit.Logger.LogDebug($"Overwriting Accessory (ID:{chaControl.chaFile.coordinate[outfitnum].accessory.parts[i].id}) at {i + 1} with default head accessory");
-                    //}
                     if (!Temp.ContainsKey(ACCpostion))
                     {
                         chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
@@ -127,6 +123,10 @@ namespace Cosplay_Academy
                             HairQueue.Dequeue();
                         }
                     }
+                }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    info.ColorMatch = true;
                 }
             }
             for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
@@ -147,6 +147,10 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    info.ColorMatch = true;
+                }
             }
             bool print = true;
             while (PartsQueue.Count != 0)
@@ -161,7 +165,12 @@ namespace Cosplay_Academy
                     NewRAW.Add(PartsQueue.Dequeue());
                     if (HairQueue.Peek() != null)
                     {
-                        Temp.Add(ACCpostion, HairQueue.Dequeue());
+                        var HairInfo = HairQueue.Dequeue();
+                        if (ExpandedOutfit.HairMatch.Value)
+                        {
+                            HairInfo.ColorMatch = true;
+                        }
+                        Temp.Add(ACCpostion, HairInfo);
                     }
                     else
                     {

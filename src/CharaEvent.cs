@@ -546,10 +546,10 @@ namespace Cosplay_Academy
                 return;
             }
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-            ExpandedOutfit.Logger.LogWarning($"Status: {(CoordinateType)ChaFileControl.status.coordinateType} ");
             //Apply pre-existing Accessories in any open slot or final slots.
             #region Reassign Exisiting Accessories
-            var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+
+            var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             Dictionary<int, CharaEvent.HairAccessoryInfo> Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
@@ -560,8 +560,6 @@ namespace Cosplay_Academy
                 data = new MoreAccessories.CharAdditionalData();
                 _accessoriesByChar.Add(ChaControl.chaFile, data);
             }
-            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(setting.CoordinatePartsQueue[ChaFileControl.status.coordinateType]);
-            var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(setting.HairAccQueue[ChaFileControl.status.coordinateType]);
             ExpandedOutfit.Logger.LogWarning($"CPQ: {setting.CoordinatePartsQueue[ChaFileControl.status.coordinateType].Count}");
             ExpandedOutfit.Logger.LogWarning($"HAQ: {setting.HairAccQueue[ChaFileControl.status.coordinateType].Count}");
 
@@ -574,7 +572,7 @@ namespace Cosplay_Academy
                     if (!Temp.ContainsKey(ACCpostion))
                     {
                         ChaControl.nowCoordinate.accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-                        ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque<20");
+                        //ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque<20");
                         if (HairQueue.Peek() != null)
                         {
                             Temp.Add(ACCpostion, HairQueue.Dequeue());
@@ -585,6 +583,11 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    //ExpandedOutfit.Logger.LogWarning($"Coordinate Hair Force prev state:{info.ColorMatch}");
+                    info.ColorMatch = true;
+                }
             }
             for (int n = data.nowAccessories.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
             {
@@ -592,7 +595,7 @@ namespace Cosplay_Academy
                 {
                     if (!Temp.ContainsKey(ACCpostion))
                     {
-                        ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque>20");
+                        //ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque>20");
                         data.nowAccessories[ACCpostion] = PartsQueue.Dequeue();
                         if (HairQueue.Peek() != null)
                         {
@@ -603,6 +606,11 @@ namespace Cosplay_Academy
                             HairQueue.Dequeue();
                         }
                     }
+                }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    //ExpandedOutfit.Logger.LogWarning($"Coordinate Hair Force prev state:{info.ColorMatch}");
+                    info.ColorMatch = true;
                 }
             }
             bool print = true;
@@ -618,7 +626,13 @@ namespace Cosplay_Academy
                     data.nowAccessories.Add(PartsQueue.Dequeue());
                     if (HairQueue.Peek() != null)
                     {
-                        Temp.Add(ACCpostion, HairQueue.Dequeue());
+                        var HairTemp = HairQueue.Dequeue();
+                        if (ExpandedOutfit.HairMatch.Value)
+                        {
+                            //ExpandedOutfit.Logger.LogWarning("Coordinate Hair Force");
+                            HairTemp.ColorMatch = true;
+                        }
+                        Temp.Add(ACCpostion, HairTemp);
                     }
                     else
                     {
@@ -674,9 +688,18 @@ namespace Cosplay_Academy
         {
             int frames = 0;
             for (int j = 0; j < Constants.outfitpath.Length - 1; j++)
+
+            var Plugdata = new PluginData();
+
+            if (ExpandedOutfit.HairMatch.Value)
             {
                 var Parts = ChaControl.chaFile.coordinate[j].accessory.parts;
                 for (int i = 0, n = Parts.Length; i < n; i++)
+                Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
+                ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
+
+                var HairAccessoryCustomizer = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
+                if (HairAccessoryCustomizer != null)
                 {
                     while (Parts[i].type != 120 && Parts[i].id == 0)
                     {
@@ -686,6 +709,10 @@ namespace Cosplay_Academy
                             ExpandedOutfit.Logger.LogWarning($"at {++frames} Ticks id: {Parts[i].id}");
                         }
                     }
+                    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+                    var temp = ChaControl.GetComponent(HairAccessoryCustomizer);
+                    object[] HairInput = new object[2] { coordinate, false };
+                    Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
                 }
             }
             ExpandedOutfit.Logger.LogWarning($"Coroutine ended {frames} Ticks");

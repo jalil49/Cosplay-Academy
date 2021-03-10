@@ -35,6 +35,8 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> MatchCasual { get; private set; }
         public static ConfigEntry<bool> MatchNightwear { get; private set; }
 
+        public static ConfigEntry<bool> HairMatch { get; private set; }
+
         public static ConfigEntry<bool> GrabUniform { get; private set; }
         public static ConfigEntry<bool> GrabSwimsuits { get; private set; }
         public static ConfigEntry<bool> SundayDate { get; private set; }
@@ -72,6 +74,7 @@ namespace Cosplay_Academy
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
             AccKeeper = Config.Bind("Main Game", "Keep head and tail accessories", true, "Used for characters who have accessory based hair and avoid them going bald");
+            HairMatch = Config.Bind("Main Game", "Force Hair accessories match", false, "");
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Choose from same set when available");
