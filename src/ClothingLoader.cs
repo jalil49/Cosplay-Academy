@@ -91,7 +91,6 @@ namespace Cosplay_Academy
 
             var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
-            ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} has {ThisOutfitData.CoordinatePartsQueue[outfitnum].Count} part");
 
 #if ME_Support
             var RenderQueue = new Queue<RendererProperty>(ThisOutfitData.RendererPropertyQueue[outfitnum]);
@@ -437,7 +436,6 @@ namespace Cosplay_Academy
                 if (print)
                 {
                     print = false;
-                    ExpandedOutfit.Logger.LogDebug(chaControl.fileParam.fullname + $" Ran out of space for accessories, Making {PartsQueue.Count} space(s) at least (due to potential keys already existing just in case)");
                 }
                 if (!Temp.ContainsKey(ACCpostion))
                 {
@@ -535,7 +533,6 @@ namespace Cosplay_Academy
                 ACCpostion++;
             }
             data.rawAccessoriesInfos[outfitnum] = NewRAW;
-            ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} ends with {ThisOutfitData.CoordinatePartsQueue[outfitnum].Count} part");
 
             HairAccessories.Add(outfitnum, Temp);
             while (data.infoAccessory.Count < data.nowAccessories.Count)
