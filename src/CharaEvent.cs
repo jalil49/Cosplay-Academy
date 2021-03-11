@@ -44,7 +44,6 @@ namespace Cosplay_Academy
                     if (!ExpandedOutfit.PermReset.Value)
                     {
                         ExpandedOutfit.ResetMaker.Value = false;
-
                     }
                 }
             }
