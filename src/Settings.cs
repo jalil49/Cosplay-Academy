@@ -65,16 +65,16 @@ namespace Cosplay_Academy
             Logger = base.Logger;
             //Hooks.Init();
             //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
-            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "unknown");
+            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
 
             GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
             CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
 
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
-            SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \n Default based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
-            AccKeeper = Config.Bind("Main Game", "Keep head and tail accessories", true, "Used for characters who have accessory based hair and avoid them going bald");
-            HairMatch = Config.Bind("Main Game", "Force Hair accessories match", false, "");
+            SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
+            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, "Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald");
+            HairMatch = Config.Bind("Main Game", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Choose from same set when available");
