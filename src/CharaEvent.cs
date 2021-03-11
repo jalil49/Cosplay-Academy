@@ -24,10 +24,6 @@ namespace Cosplay_Academy
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
-            if (ChaControl.fileParam.sex == 0)
-            {
-                return;
-            }
             ThisOutfitData = Constants.ChaDefaults.Find(x => x.ChaName == ChaControl.name);
             if (ThisOutfitData == null)
             {
