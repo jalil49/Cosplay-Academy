@@ -538,6 +538,17 @@ namespace Cosplay_Academy
             ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} ends with {ThisOutfitData.CoordinatePartsQueue[outfitnum].Count} part");
 
             HairAccessories.Add(outfitnum, Temp);
+            while (data.infoAccessory.Count < data.nowAccessories.Count)
+                data.infoAccessory.Add(null);
+            while (data.objAccessory.Count < data.nowAccessories.Count)
+                data.objAccessory.Add(null);
+            while (data.objAcsMove.Count < data.nowAccessories.Count)
+                data.objAcsMove.Add(new GameObject[2]);
+            while (data.cusAcsCmp.Count < data.nowAccessories.Count)
+                data.cusAcsCmp.Add(null);
+            while (data.showAccessories.Count < data.nowAccessories.Count)
+                data.showAccessories.Add(true);
+
 #if ME_Support
             ThisOutfitData.ReturnMaterialColor.AddRange(MaterialColor);
 
