@@ -24,14 +24,15 @@ namespace Cosplay_Academy
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
-            ThisOutfitData = Constants.ChaDefaults.Find(x => x.ChaName == ChaControl.name);
+            ThisOutfitData = Constants.ChaDefaults.Find(x => x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay && ChaControl.fileParam.personality == x.Personality);
             if (ThisOutfitData == null)
             {
-                //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chaid {ChaControl.chaID} name {ChaControl.name}");
-
+                //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chano {ChaControl.fileParam.strBirthDay} name {ChaControl.fileParam.personality}");
                 ThisOutfitData = new ChaDefault();
                 Constants.ChaDefaults.Add(ThisOutfitData);
-                ThisOutfitData.ChaName = ChaControl.name;
+                ThisOutfitData.FullName = ChaControl.fileParam.fullname;
+                ThisOutfitData.BirthDay = ChaControl.fileParam.strBirthDay;
+                ThisOutfitData.Personality = ChaControl.fileParam.personality;
             }
             self = this;
             if (GameMode.Maker == currentGameMode)
@@ -50,11 +51,12 @@ namespace Cosplay_Academy
             if (OutfitDecider.Reset)
             {
                 //OutfitList.Clear();
+                Constants.ChaDefaults.ForEach(x => x.processed = false);
+                ExpandedOutfit.Logger.LogWarning("Reset passed");
                 OutfitDecider.ResetDecider();
             }
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
-
                 WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
                 Dictionary<int, Dictionary<int, HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
@@ -265,16 +267,17 @@ namespace Cosplay_Academy
             {
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
-                    if (!OutfitDecider.ProcessedNames.Contains(ChaControl.name))//run if unprocessed
+                    if (!ThisOutfitData.processed)//run if unprocessed
                     {
                         OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                        OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
+                        //OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
+                        ThisOutfitData.processed = true;
                         if (!ExpandedOutfit.PermChangeOutfit.Value)
                         {
                             ExpandedOutfit.ChangeOutfit.Value = false;
                         }
                     }
-
+                    //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaControl.chaFile.loadProductNo} name {ChaControl.chaFile.loadVersion} {ChaControl.chaFile.facePngData}");
                     int HoldOutfit = ChaControl.fileStatus.coordinateType;
                     ClothingLoader.FullLoad(ChaControl, ThisOutfitData);//Load outfits; has to run again for story mode les scene at least
                     ChaControl.fileStatus.coordinateType = HoldOutfit;
@@ -583,7 +586,7 @@ namespace Cosplay_Academy
         {
             ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
 
-            object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
+            //object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
 
             Game _gamemgr = Game.Instance;
             List<SaveData.Heroine> Heroines = _gamemgr.HeroineList;
@@ -591,13 +594,10 @@ namespace Cosplay_Academy
             {
                 foreach (SaveData.Heroine Heroine in Heroines)
                 {
-                    if (Heroine.chaCtrl != null && ChaControl.name == Heroine.chaCtrl.name)
+                    if (Heroine.chaCtrl != null && Heroine.chaCtrl.name != null && ChaControl.name == Heroine.chaCtrl.name)
                     {
-                        if (ChaControl.name == Heroine.chaCtrl.name)
-                        {
-                            heroine = Heroine;
-                            break;
-                        }
+                        heroine = Heroine;
+                        break;
                     }
                 }
             }
@@ -610,20 +610,6 @@ namespace Cosplay_Academy
                     ExtendedSave.SetExtendedDataById(heroine.chaCtrl.chaFile, IDtoSET, data);
                     return;
                 }
-
-                //var npc = heroine.GetNPC();
-                //if (npc != null && npc.chaCtrl != null && npc.chaCtrl.name == ChaControl.name)
-                //{
-                //    ExpandedOutfit.Logger.LogWarning("is npc");
-
-                //    ExtendedSave.SetExtendedDataById(npc.chaCtrl.chaFile, IDtoSET, data);
-                //    ExpandedOutfit.Logger.LogWarning("NPC control matches");
-
-                //    // Update other instance to reflect the new ext data
-                //    var other = npc.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
-                //    if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
-                //    return;
-                //}
             }
 
             var player = ChaControl.GetPlayer();
@@ -635,6 +621,7 @@ namespace Cosplay_Academy
                     ExtendedSave.SetExtendedDataById(player.chaCtrl.chaFile, IDtoSET, data);
                 }
             }
+            heroine = null;
         }
         private void Finish()
         {
@@ -655,6 +642,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
+
             object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
             Repeat_stoppper = true;
             if (heroine != null && ChaControl.sex == 1)
@@ -664,6 +652,7 @@ namespace Cosplay_Academy
                     // Update other instance to reflect the new ext data
                     var other = heroine.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
                     if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
+                    heroine = null;
                     return;
                 }
             }
@@ -678,6 +667,7 @@ namespace Cosplay_Academy
                     if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
                 }
             }
+            heroine = null;
         }
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
@@ -686,6 +676,7 @@ namespace Cosplay_Academy
             {
                 return;
             }//if disabled don't run
+
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
             //Apply pre-existing Accessories in any open slot or final slots.
             #region Reassign Exisiting Accessories

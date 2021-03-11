@@ -211,11 +211,16 @@ namespace Cosplay_Academy
     public class ChaDefault
     {
         public bool firstpass = true;
+        public bool processed = false;
         public string ChaName;//not actual name but ChaControl.Name
         public List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.outfitpath.Length];
         public string[] outfitpath = new string[Constants.outfitpath.Length];
         #region hair accessories
         public List<CharaEvent.HairAccessoryInfo>[] HairAccQueue = new List<CharaEvent.HairAccessoryInfo>[Constants.outfitpath.Length];
+        public ChaControl ThisControl;
+        internal int Personality;
+        internal string BirthDay;
+        internal string FullName;
         #endregion
 #if ME_Support
         #region Material Editor Save

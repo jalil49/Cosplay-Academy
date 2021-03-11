@@ -11,7 +11,7 @@ namespace Cosplay_Academy
         private static OutfitData[] outfitData;
         private static bool IsInitialized;
 
-        public static List<string> ProcessedNames; //list of processed characters
+        //public static List<string> ProcessedNames; //list of processed characters
         private static readonly Game _gameMgr;
         private static List<SaveData.Heroine> heroines;
         private static SaveData.Heroine person;
@@ -22,7 +22,7 @@ namespace Cosplay_Academy
         static OutfitDecider()
         {
             _gameMgr = Game.Instance;
-            ProcessedNames = new List<string>();//initiate string
+            //ProcessedNames = new List<string>();//initiate string
             IsInitialized = false;
             Reset = true;
             outfitData = new OutfitData[Constants.InputStrings.Length];
@@ -34,7 +34,7 @@ namespace Cosplay_Academy
 
         public static void ResetDecider()
         {
-            ProcessedNames.Clear(); //reset list
+            //ProcessedNames.Clear(); //reset list
             Reset = false;
             if (IsInitialized)
             {
