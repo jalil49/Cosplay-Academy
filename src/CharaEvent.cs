@@ -189,7 +189,8 @@ namespace Cosplay_Academy
                 {
                     List<ChaFileAccessory.PartsInfo> AccImport = new List<ChaFileAccessory.PartsInfo>();
                     List<HairAccessoryInfo> HairImport = new List<HairAccessoryInfo>();
-
+                    ThisOutfitData.CoordinatePartsQueue[outfitnum].Clear();
+                    ThisOutfitData.HairAccQueue[outfitnum].Clear();
                     if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairAccessoryInfo> HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
@@ -249,7 +250,10 @@ namespace Cosplay_Academy
                         }
                     }
                 }
-                ThisOutfitData.firstpass = false;
+                if (currentGameMode != GameMode.Maker)
+                {
+                    ThisOutfitData.firstpass = false;
+                }
                 #endregion
 
 

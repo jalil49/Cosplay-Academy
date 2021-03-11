@@ -271,7 +271,6 @@ namespace Cosplay_Academy
         
         public void Print()
         {
-
             for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 for (int j = 0; j < RendererPropertyQueue[i].Count; j++)
@@ -294,8 +293,7 @@ namespace Cosplay_Academy
                 {
                     ExpandedOutfit.Logger.LogWarning($"Shade {(CoordinateType)i} {j}:\t{MaterialShaderQueue[i][j].MaterialName}\t\t\t{MaterialShaderQueue[i][j].Slot}");
                 }
-            }
-            
+            }            
         }
 #endif
     }
