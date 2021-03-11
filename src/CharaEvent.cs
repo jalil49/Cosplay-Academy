@@ -292,18 +292,10 @@ namespace Cosplay_Academy
                         return;
                     }
 
-                    //Reassign materials for Clothes
-                    var C_OverlayX = Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false);
-                    if (C_OverlayX != null)
-                    {
-                        KCOX_RePack();
-                    }
-                    //Reassign materials for accessories
-                    var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
-                    if (ME_OverlayX != null)
-                    {
-                        ME_RePack();
-                    }
+
+                    KCOX_RePack();//Reassign materials for Clothes
+
+                    ME_RePack();//Reassign materials for accessories
                     Finish();
                 }
             }
