@@ -273,32 +273,47 @@ namespace Cosplay_Academy
                 MaterialTexturePropertyQueue[i] = MaterialTexturePropertyQueue[i].OrderBy(x => x.Slot).ToList();
             }
         }
-        
+
         public void Print()
         {
             for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 for (int j = 0; j < RendererPropertyQueue[i].Count; j++)
                 {
-                    ExpandedOutfit.Logger.LogWarning($"Render {(CoordinateType)i} {j}:\t{RendererPropertyQueue[i][j].RendererName}\t\t\t{RendererPropertyQueue[i][j].Slot}");
+                    if (RendererPropertyQueue[i][j] != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Render {(CoordinateType)i} {j}:\t{RendererPropertyQueue[i][j].RendererName}\t\t\t{RendererPropertyQueue[i][j].Slot}\t\t\t{RendererPropertyQueue[i][j].Property}");
+                    }
                 }
                 for (int j = 0; j < MaterialFloatPropertyQueue[i].Count; j++)
                 {
-                    ExpandedOutfit.Logger.LogWarning($"Float {(CoordinateType)i} {j}:\t{MaterialFloatPropertyQueue[i][j].MaterialName}\t\t\t{MaterialFloatPropertyQueue[i][j].Slot}");
+                    if (MaterialFloatPropertyQueue[i][j] != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Float {(CoordinateType)i} {j}:\t{MaterialFloatPropertyQueue[i][j].MaterialName}\t\t\t{MaterialFloatPropertyQueue[i][j].Slot}\t\t\t{MaterialFloatPropertyQueue[i][j].Property}");
+                    }
                 }
                 for (int j = 0; j < MaterialColorPropertyQueue[i].Count; j++)
                 {
-                    ExpandedOutfit.Logger.LogWarning($"Color {(CoordinateType)i} {j}:\t{MaterialColorPropertyQueue[i][j].MaterialName}\t\t\t{MaterialColorPropertyQueue[i][j].Slot}");
+                    if (MaterialColorPropertyQueue[i][j] != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Color {(CoordinateType)i} {j}:\t{MaterialColorPropertyQueue[i][j].MaterialName}\t\t\t{MaterialColorPropertyQueue[i][j].Slot}\t\t\t{MaterialColorPropertyQueue[i][j].Property}");
+                    }
                 }
                 for (int j = 0; j < MaterialTexturePropertyQueue[i].Count; j++)
                 {
-                    ExpandedOutfit.Logger.LogWarning($"Tex {(CoordinateType)i} {j}:\t{MaterialTexturePropertyQueue[i][j].MaterialName}\t\t\t{MaterialTexturePropertyQueue[i][j].Slot}");
+                    if (MaterialTexturePropertyQueue[i][j] != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Tex {(CoordinateType)i} {j}:\t{MaterialTexturePropertyQueue[i][j].MaterialName}\t\t\t{MaterialTexturePropertyQueue[i][j].Property}\t\t\t{MaterialTexturePropertyQueue[i][j].Slot}");
+                    }
                 }
                 for (int j = 0; j < MaterialShaderQueue[i].Count; j++)
                 {
-                    ExpandedOutfit.Logger.LogWarning($"Shade {(CoordinateType)i} {j}:\t{MaterialShaderQueue[i][j].MaterialName}\t\t\t{MaterialShaderQueue[i][j].Slot}");
+                    if (MaterialShaderQueue[i][j] != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Shade {(CoordinateType)i} {j}:\t{MaterialShaderQueue[i][j].MaterialName}\t\t\t{MaterialShaderQueue[i][j].Slot}\t\t\t{MaterialShaderQueue[i][j].ShaderName}");
+                    }
                 }
-            }            
+            }
         }
 #endif
     }

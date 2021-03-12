@@ -1,5 +1,4 @@
-﻿
-using ExtensibleSaveFormat;
+﻿using ExtensibleSaveFormat;
 using HarmonyLib;
 using MessagePack;
 using MoreAccessoriesKOI;
@@ -13,7 +12,6 @@ namespace Cosplay_Academy
     {
         private static ChaControl chaControl;
         private static Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>> HairAccessories;
-        private static int SomeInt = 0;
         private static ChaDefault ThisOutfitData;
 #if ME_Support
         private static List<RendererProperty> RendererPropertyList = new List<RendererProperty>();
@@ -243,7 +241,7 @@ namespace Cosplay_Academy
                     {
                         chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
 
-                        if (HairQueue.Peek() != null)
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                         {
                             Temp.Add(ACCpostion, HairQueue.Dequeue());
                         }
@@ -253,7 +251,7 @@ namespace Cosplay_Academy
                         }
 #if ME_Support
 
-                        if (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null)
+                        if (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = RenderQueue.Peek().Slot;
                             while (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
@@ -268,10 +266,10 @@ namespace Cosplay_Academy
                             RenderQueue.Dequeue();
                         }
 #if Debug
-                        ExpandedOutfit.Logger.LogWarning("Render Pass");
+                        //ExpandedOutfit.Logger.LogWarning("Render Pass");
 #endif
 
-                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
+                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = ColorQueue.Peek().Slot;
                             while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
@@ -286,8 +284,7 @@ namespace Cosplay_Academy
                             ColorQueue.Dequeue();
                         }
 #if Debug
-                        ExpandedOutfit.Logger.LogWarning("Color Pass");
-                        ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
+                        //ExpandedOutfit.Logger.LogWarning("Color Pass");
 #endif
 
                         if (TextureQueue.Peek() != null)
@@ -298,7 +295,7 @@ namespace Cosplay_Academy
                                 if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                                 {
                                     ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                                    ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                    ExpandedOutfit.Logger.LogWarning($"Assigning texture for {ME_Info.MaterialName} to slot:{ACCpostion} {ME_Info.TexID}");
                                 }
                                 else
                                 {
@@ -313,10 +310,10 @@ namespace Cosplay_Academy
                             TextureQueue.Dequeue();
                         }
 #if Debug
-                        ExpandedOutfit.Logger.LogWarning("Texture Pass");
+                        //ExpandedOutfit.Logger.LogWarning("Texture Pass");
 #endif
 
-                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
+                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = FloatQueue.Peek().Slot;
                             while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
@@ -331,9 +328,9 @@ namespace Cosplay_Academy
                             FloatQueue.Dequeue();
                         }
 #if Debug
-                        ExpandedOutfit.Logger.LogWarning("Float Pass");
+                        //ExpandedOutfit.Logger.LogWarning("Float Pass");
 #endif
-                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
+                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = ShaderQueue.Peek().Slot;
                             while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
@@ -348,9 +345,8 @@ namespace Cosplay_Academy
                             ShaderQueue.Dequeue();
                         }
 #if Debug
-                        ExpandedOutfit.Logger.LogWarning("Shader Pass");
+                        //ExpandedOutfit.Logger.LogWarning("Shader Pass");
 #endif
-
 #endif
                     }
                 }
@@ -359,7 +355,7 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
 #if Debug
-                ExpandedOutfit.Logger.LogWarning("Force Color Pass");
+                //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
 #endif
 
             }
@@ -374,7 +370,7 @@ namespace Cosplay_Academy
                     if (!Temp.ContainsKey(ACCpostion))
                     {
                         NewRAW[ACCpostion] = PartsQueue.Dequeue();
-                        if (HairQueue.Peek() != null)
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                         {
                             Temp.Add(ACCpostion, HairQueue.Dequeue());
                         }
@@ -383,7 +379,7 @@ namespace Cosplay_Academy
                             HairQueue.Dequeue();
                         }
 #if ME_Support
-                        if (RenderQueue.Count > 0 && RenderQueue.Peek() != null)
+                        if (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int? slot = new int?(RenderQueue.Peek().Slot);
                             while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
@@ -398,7 +394,7 @@ namespace Cosplay_Academy
                             RenderQueue.Dequeue();
                         }
 
-                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
+                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = ColorQueue.Peek().Slot;
                             while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
@@ -421,7 +417,7 @@ namespace Cosplay_Academy
                                 if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                                 {
                                     ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                                    ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                    ExpandedOutfit.Logger.LogWarning($"Assigning texture for {ME_Info.MaterialName} to slot:{ACCpostion} {ME_Info.TexID}");
                                 }
                                 else
                                 {
@@ -438,7 +434,7 @@ namespace Cosplay_Academy
                             TextureQueue.Dequeue();
                         }
 
-                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
+                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = FloatQueue.Peek().Slot;
                             while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
@@ -453,7 +449,7 @@ namespace Cosplay_Academy
                             FloatQueue.Dequeue();
                         }
 
-                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
+                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
                         {
                             int slot = ShaderQueue.Peek().Slot;
                             while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
@@ -490,7 +486,7 @@ namespace Cosplay_Academy
                 if (!Temp.ContainsKey(ACCpostion))
                 {
                     NewRAW.Add(PartsQueue.Dequeue());
-                    if (HairQueue.Peek() != null)
+                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                     {
                         var HairInfo = HairQueue.Dequeue();
                         if (ExpandedOutfit.HairMatch.Value)
@@ -504,7 +500,7 @@ namespace Cosplay_Academy
                         HairQueue.Dequeue();
                     }
 #if ME_Support
-                    if (RenderQueue.Count > 0 && RenderQueue.Peek() != null)
+                    if (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         int slot = RenderQueue.Peek().Slot;
                         while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
@@ -518,7 +514,7 @@ namespace Cosplay_Academy
                     {
                         RenderQueue.Dequeue();
                     }
-                    if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
+                    if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         int slot = ColorQueue.Peek().Slot;
                         while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
@@ -540,7 +536,7 @@ namespace Cosplay_Academy
                             if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                             {
                                 ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                                ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                ExpandedOutfit.Logger.LogWarning($"Assigning texture for {ME_Info.MaterialName} to slot:{ACCpostion} {ME_Info.TexID}");
                             }
                             else
                             {
@@ -557,7 +553,7 @@ namespace Cosplay_Academy
                     {
                         TextureQueue.Dequeue();
                     }
-                    if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
+                    if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         int slot = FloatQueue.Peek().Slot;
                         while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
@@ -571,7 +567,7 @@ namespace Cosplay_Academy
                     {
                         FloatQueue.Dequeue();
                     }
-                    if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
+                    if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         int slot = ShaderQueue.Peek().Slot;
                         while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
@@ -607,7 +603,7 @@ namespace Cosplay_Academy
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
 #if Debug
-            ExpandedOutfit.Logger.LogWarning("add range");
+            //ExpandedOutfit.Logger.LogWarning("add range");
 #endif
 
 

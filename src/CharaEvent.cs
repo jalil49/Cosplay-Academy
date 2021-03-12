@@ -97,7 +97,7 @@ namespace Cosplay_Academy
                         foreach (var x in Des)
                         {
                             importedTextDic.Add(x.Key, x.Value);
-                            ImportDictionary[x.Key] = ME_Support.SetAndGetTextureID(x.Value);
+                            //ImportDictionary[x.Key] = ME_Support.SetAndGetTextureID(x.Value);
                         }
 
                     }
@@ -177,19 +177,19 @@ namespace Cosplay_Academy
                             var loadedProperty = properties[i];
                             if (loadedProperty.ObjectType == ObjectType.Accessory)
                             {
-                                int? texID = null;
+                                //int? texID = null;
                                 if (loadedProperty.TexID != null)
                                 {
                                     if (!ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].ContainsKey((int)loadedProperty.TexID))
                                     {
                                         ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
                                     }
-                                    texID = ImportDictionary[(int)loadedProperty.TexID];
+                                    //texID = ImportDictionary[(int)loadedProperty.TexID];
                                 }
-                                ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}");
+                                //ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}");
                                 //ExpandedOutfit.Logger.LogWarning($"Loaded:{(int)loadedProperty.TexID}\tTexID:\t{texID}\tSlot:{loadedProperty.Slot}");
 
-                                MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
+                                MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
                                 MaterialTexturePropertyQueue[loadedProperty.CoordinateIndex].Add(newTextureProperty);
                             }
                         }
@@ -241,7 +241,10 @@ namespace Cosplay_Academy
                         {
                             if (!HairInfo.TryGetValue(i, out HairAccessoryInfo ACCdata))
                             {
-                                ACCdata = null;
+                                ACCdata = new HairAccessoryInfo
+                                {
+                                    HairLength = -999
+                                };
                             }
 #if ME_Support
                             var ColorList = MaterialColorPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
@@ -251,27 +254,28 @@ namespace Cosplay_Academy
                             var RenderList = RendererPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             if (ColorList.Count == 0)
                             {
-                                ColorList.Add(null);
+                                Color color = new Color(0, 0, 0);
+                                ColorList.Add(new MaterialColorProperty(ObjectType.Unknown, outfitnum, i, "", "", color, color));
                                 //ExpandedOutfit.Logger.LogWarning("Color null");
                             }
                             if (FloatList.Count == 0)
                             {
-                                FloatList.Add(null);
+                                FloatList.Add(new MaterialFloatProperty(ObjectType.Unknown, outfitnum, i, "", "", "", ""));
                                 //ExpandedOutfit.Logger.LogWarning("FloatList null");
                             }
                             if (ShaderList.Count == 0)
                             {
-                                ShaderList.Add(null);
+                                ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, i, "", 0, 0));
                                 //ExpandedOutfit.Logger.LogWarning("ShaderList null");
                             }
                             if (TextureList.Count == 0)
                             {
-                                TextureList.Add(null);
+                                TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, i, "", ""));
                                 //ExpandedOutfit.Logger.LogWarning("TextureList null");
                             }
                             if (RenderList.Count == 0)
                             {
-                                RenderList.Add(null);
+                                RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, i, "", new RendererProperties(), "", ""));
                                 //ExpandedOutfit.Logger.LogWarning("Render null");
                             }
 
@@ -285,8 +289,8 @@ namespace Cosplay_Academy
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
                         }
                     }
-                    //ThisOutfitData.SortData();
                 }
+                //ThisOutfitData.Print();
                 if (currentGameMode != GameMode.Maker)
                 {
                     ThisOutfitData.firstpass = false;
@@ -334,6 +338,7 @@ namespace Cosplay_Academy
                     KCOX_RePack();//Reassign materials for Clothes
 
                     ME_RePack();//Reassign materials for accessories
+
                     Finish();
                 }
             }
