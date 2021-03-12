@@ -13,7 +13,7 @@ namespace Cosplay_Academy
     {
         private static ChaControl chaControl;
         private static Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>> HairAccessories;
-
+        private static int SomeInt = 0;
         private static ChaDefault ThisOutfitData;
 #if ME_Support
         private static List<RendererProperty> RendererPropertyList = new List<RendererProperty>();
@@ -31,7 +31,6 @@ namespace Cosplay_Academy
             HairAccessories = new Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>>();
             chaControl = input;
 #if ME_Support
-            ThisOutfitData.ReturnimportDictionary.Clear();
             ME_ListClear();
 #endif
 
@@ -98,16 +97,14 @@ namespace Cosplay_Academy
             var ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.MaterialColorPropertyQueue[outfitnum]);
             var TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.MaterialTexturePropertyQueue[outfitnum]);
             var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
+#if Debug
+            ExpandedOutfit.Logger.LogWarning($"Render: {RenderQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Float: {FloatQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"tColor: {ColorQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
+#endif
 
-            //var Renderlist = new List<RendererProperty>(ThisOutfitData.RendererPropertyQueue[0]);
-            //for (int i = 0; i < Renderlist.Count; i++)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning($"Render {i} not null: " + (Renderlist[i] != null));
-            //}
-
-
-            //var ImportDictionaryQueue = new Queue<KeyValuePair<int, int>>(ChaDefault.importDictionaryQueue[outfitnum]);
-            //var HairQueue = new Queue<
 #endif
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
@@ -131,15 +128,6 @@ namespace Cosplay_Academy
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
-
-            //var datacheck = ExtendedSave.GetAllExtendedData(chaControl.chaFile.coordinate[outfitnum]);
-
-            //for (int i = 0; i < datacheck.Count; i++)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning($"Key:\t{datacheck.ElementAt(i).Key}\t\t\t{datacheck.Values}");
-
-            //}
-
 
             var Inputdata = ExtendedSave.GetExtendedDataById(chaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
             var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
@@ -240,6 +228,9 @@ namespace Cosplay_Academy
             }
             #endregion
 #endif
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("Start loading accessories");
+#endif
 
             int ACCpostion = 0;
             bool Empty;
@@ -260,44 +251,60 @@ namespace Cosplay_Academy
                         {
                             HairQueue.Dequeue();
                         }
-                        //ExpandedOutfit.Logger.LogWarning("Queue1");
 #if ME_Support
-                        if (RenderQueue.Peek() != null)
+
+                        if (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null)
                         {
-                            RendererProperty ME_Info = RenderQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            Renderer.Add(ME_Info);
+                            int slot = RenderQueue.Peek().Slot;
+                            while (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                            {
+                                RendererProperty ME_Info = RenderQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                Renderer.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             RenderQueue.Dequeue();
                         }
-                        //ExpandedOutfit.Logger.LogWarning("Queue2");
+#if Debug
+                        ExpandedOutfit.Logger.LogWarning("Render Pass");
+#endif
 
-                        if (ColorQueue.Peek() != null)
+                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
                         {
-                            MaterialColorProperty ME_Info = ColorQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            MaterialColor.Add(ME_Info);
+                            int slot = ColorQueue.Peek().Slot;
+                            while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                            {
+                                MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialColor.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             ColorQueue.Dequeue();
                         }
-                        //ExpandedOutfit.Logger.LogWarning("Queue3");
+#if Debug
+                        ExpandedOutfit.Logger.LogWarning("Color Pass");
+                        ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
+#endif
 
                         if (TextureQueue.Peek() != null)
                         {
                             MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                            if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                            if (ME_Info.TexID != null)
                             {
-                                ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                                {
+                                    ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                                    ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                }
+                                else
+                                {
+                                    ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
+                                }
                             }
-                            else
-                            {
-                                ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
-                            }
-                            ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
                             ME_Info.Slot = ACCpostion;
                             MaterialTexture.Add(ME_Info);
                         }
@@ -305,31 +312,45 @@ namespace Cosplay_Academy
                         {
                             TextureQueue.Dequeue();
                         }
-                        //ExpandedOutfit.Logger.LogWarning("Queue4");
+#if Debug
+                        ExpandedOutfit.Logger.LogWarning("Texture Pass");
+#endif
 
-                        if (FloatQueue.Peek() != null)
+                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
                         {
-                            MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            MaterialFloat.Add(ME_Info);
+                            int slot = FloatQueue.Peek().Slot;
+                            while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                            {
+                                MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialFloat.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             FloatQueue.Dequeue();
                         }
-                        //ExpandedOutfit.Logger.LogWarning("Queue5");
-
-                        if (ShaderQueue.Peek() != null)
+#if Debug
+                        ExpandedOutfit.Logger.LogWarning("Float Pass");
+#endif
+                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
                         {
-                            MaterialShader ME_Info = ShaderQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-
-                            MaterialShade.Add(ME_Info);
+                            int slot = ShaderQueue.Peek().Slot;
+                            while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                            {
+                                MaterialShader ME_Info = ShaderQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialShade.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             ShaderQueue.Dequeue();
                         }
+#if Debug
+                        ExpandedOutfit.Logger.LogWarning("Shader Pass");
+#endif
+
 #endif
                     }
                 }
@@ -337,8 +358,14 @@ namespace Cosplay_Academy
                 {
                     info.ColorMatch = true;
                 }
-            }
+#if Debug
+                ExpandedOutfit.Logger.LogWarning("Force Color Pass");
+#endif
 
+            }
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("Start extra accessories");
+#endif
             for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
             {
                 Empty = NewRAW[ACCpostion].type == 120;
@@ -356,23 +383,30 @@ namespace Cosplay_Academy
                             HairQueue.Dequeue();
                         }
 #if ME_Support
-
-                        if (RenderQueue.Peek() != null)
+                        if (RenderQueue.Count > 0 && RenderQueue.Peek() != null)
                         {
-                            RendererProperty ME_Info = RenderQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            Renderer.Add(ME_Info);
+                            int? slot = new int?(RenderQueue.Peek().Slot);
+                            while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                            {
+                                RendererProperty ME_Info = RenderQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                Renderer.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             RenderQueue.Dequeue();
                         }
 
-                        if (ColorQueue.Peek() != null)
+                        if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
                         {
-                            MaterialColorProperty ME_Info = ColorQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            MaterialColor.Add(ME_Info);
+                            int slot = ColorQueue.Peek().Slot;
+                            while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                            {
+                                MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialColor.Add(ME_Info);
+                            }
                         }
                         else
                         {
@@ -382,15 +416,18 @@ namespace Cosplay_Academy
                         if (TextureQueue.Peek() != null)
                         {
                             MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                            if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                            if (ME_Info.TexID != null)
                             {
-                                ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                                {
+                                    ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                                    ExpandedOutfit.Logger.LogWarning("well shit it works");
+                                }
+                                else
+                                {
+                                    ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
+                                }
                             }
-                            else
-                            {
-                                ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
-                            }
-                            ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
                             ME_Info.Slot = ACCpostion;
 
                             ME_Info.Slot = ACCpostion;
@@ -401,22 +438,30 @@ namespace Cosplay_Academy
                             TextureQueue.Dequeue();
                         }
 
-                        if (FloatQueue.Peek() != null)
+                        if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
                         {
-                            MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            MaterialFloat.Add(ME_Info);
+                            int slot = FloatQueue.Peek().Slot;
+                            while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                            {
+                                MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialFloat.Add(ME_Info);
+                            }
                         }
                         else
                         {
                             FloatQueue.Dequeue();
                         }
 
-                        if (ShaderQueue.Peek() != null)
+                        if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
                         {
-                            MaterialShader ME_Info = ShaderQueue.Dequeue();
-                            ME_Info.Slot = ACCpostion;
-                            MaterialShade.Add(ME_Info);
+                            int slot = ShaderQueue.Peek().Slot;
+                            while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                            {
+                                MaterialShader ME_Info = ShaderQueue.Dequeue();
+                                ME_Info.Slot = ACCpostion;
+                                MaterialShade.Add(ME_Info);
+                            }
                         }
                         else
                         {
@@ -430,7 +475,12 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
             }
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("Start making extra accessories");
+#endif
+
             bool print = true;
+
             while (PartsQueue.Count != 0)
             {
                 if (print)
@@ -454,25 +504,29 @@ namespace Cosplay_Academy
                         HairQueue.Dequeue();
                     }
 #if ME_Support
-                    if (RenderQueue.Peek() != null)
+                    if (RenderQueue.Count > 0 && RenderQueue.Peek() != null)
                     {
-                        RendererProperty ME_Info = RenderQueue.Dequeue();
-                        ME_Info.Slot = ACCpostion;
-
-
-                        Renderer.Add(ME_Info);
+                        int slot = RenderQueue.Peek().Slot;
+                        while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                        {
+                            RendererProperty ME_Info = RenderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            Renderer.Add(ME_Info);
+                        }
                     }
                     else
                     {
                         RenderQueue.Dequeue();
                     }
-                    if (ColorQueue.Peek() != null)
+                    if (ColorQueue.Count > 0 && ColorQueue.Peek() != null)
                     {
-                        MaterialColorProperty ME_Info = ColorQueue.Dequeue();
-                        ME_Info.Slot = ACCpostion;
-
-
-                        MaterialColor.Add(ME_Info);
+                        int slot = ColorQueue.Peek().Slot;
+                        while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                        {
+                            MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialColor.Add(ME_Info);
+                        }
                     }
                     else
                     {
@@ -481,15 +535,18 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                        if (ME_Info.TexID != null)
                         {
-                            ExpandedOutfit.Logger.LogWarning("well shit it works");
+                            if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                            {
+                                ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                                ExpandedOutfit.Logger.LogWarning("well shit it works");
+                            }
+                            else
+                            {
+                                ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
+                            }
                         }
-                        else
-                        {
-                            ExpandedOutfit.Logger.LogWarning("well something unintended is going on");
-                        }
-                        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
                         ME_Info.Slot = ACCpostion;
 
 
@@ -500,25 +557,29 @@ namespace Cosplay_Academy
                     {
                         TextureQueue.Dequeue();
                     }
-                    if (FloatQueue.Peek() != null)
+                    if (FloatQueue.Count > 0 && FloatQueue.Peek() != null)
                     {
-                        MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
-                        ME_Info.Slot = ACCpostion;
-
-
-                        MaterialFloat.Add(ME_Info);
+                        int slot = FloatQueue.Peek().Slot;
+                        while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                        {
+                            MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialFloat.Add(ME_Info);
+                        }
                     }
                     else
                     {
                         FloatQueue.Dequeue();
                     }
-                    if (ShaderQueue.Peek() != null)
+                    if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null)
                     {
-                        MaterialShader ME_Info = ShaderQueue.Dequeue();
-                        ME_Info.Slot = ACCpostion;
-
-
-                        MaterialShade.Add(ME_Info);
+                        int slot = ShaderQueue.Peek().Slot;
+                        while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                        {
+                            MaterialShader ME_Info = ShaderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialShade.Add(ME_Info);
+                        }
                     }
                     else
                     {
@@ -545,6 +606,10 @@ namespace Cosplay_Academy
                 data.cusAcsCmp.Add(null);
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("add range");
+#endif
+
 
 #if ME_Support
             ThisOutfitData.ReturnMaterialColor.AddRange(MaterialColor);
@@ -557,6 +622,10 @@ namespace Cosplay_Academy
 
             ThisOutfitData.ReturnRenderer.AddRange(Renderer);
 #endif
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("finish");
+#endif
+
             #endregion
         }
 #if ME_Support
@@ -568,6 +637,8 @@ namespace Cosplay_Academy
             MaterialTexturePropertyList.Clear();
             MaterialShaderList.Clear();
             ImportList.Clear();
+            ThisOutfitData.ReturnimportDictionary.Clear();
+            ThisOutfitData.ReturnMaterialTexture.Clear();
         }
 #endif
     }
