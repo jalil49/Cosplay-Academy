@@ -1,7 +1,0 @@
-<Project>
-  <Target Name="IllusionLibsKoikatsuPartyAssembly-CSharp" AfterTargets="ResolveReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'IllusionLibs.KoikatsuParty.Assembly-CSharp'" />
-    </ItemGroup>
-  </Target>
-</Project>
