@@ -273,7 +273,19 @@ namespace Cosplay_Academy
                 MaterialTexturePropertyQueue[i] = MaterialTexturePropertyQueue[i].OrderBy(x => x.Slot).ToList();
             }
         }
-
+        public void TexturePrint()
+        {
+            foreach (var item in MaterialTexturePropertyQueue)
+            {
+                foreach (var loadedProperty in item)
+                {
+                    if (loadedProperty != null && loadedProperty.TexID != null)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"Texture print Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
+                    }
+                }
+            }
+        }
         public void Print()
         {
             for (int i = 0; i < Constants.outfitpath.Length; i++)

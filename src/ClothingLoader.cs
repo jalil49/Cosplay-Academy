@@ -96,6 +96,9 @@ namespace Cosplay_Academy
             var TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.MaterialTexturePropertyQueue[outfitnum]);
             var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
 #if Debug
+
+            ExpandedOutfit.Logger.LogWarning($"Parts: {PartsQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Hair: {HairQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"Render: {RenderQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"Float: {FloatQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"tColor: {ColorQueue.Count}");
@@ -240,13 +243,14 @@ namespace Cosplay_Academy
                     if (!Temp.ContainsKey(ACCpostion))
                     {
                         chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-
+                        ExpandedOutfit.Logger.LogWarning(chaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].id);
                         if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                         {
                             Temp.Add(ACCpostion, HairQueue.Dequeue());
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("Hair removed empty");
                             HairQueue.Dequeue();
                         }
 #if ME_Support
@@ -256,6 +260,8 @@ namespace Cosplay_Academy
                             int slot = RenderQueue.Peek().Slot;
                             while (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
                             {
+                                ExpandedOutfit.Logger.LogWarning("render repeat");
+
                                 RendererProperty ME_Info = RenderQueue.Dequeue();
                                 ME_Info.Slot = ACCpostion;
                                 Renderer.Add(ME_Info);
@@ -263,6 +269,7 @@ namespace Cosplay_Academy
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("Render removed empty");
                             RenderQueue.Dequeue();
                         }
 #if Debug
@@ -281,6 +288,8 @@ namespace Cosplay_Academy
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("color removed empty");
+
                             ColorQueue.Dequeue();
                         }
 #if Debug
@@ -307,6 +316,8 @@ namespace Cosplay_Academy
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("Texture removed empty");
+
                             TextureQueue.Dequeue();
                         }
 #if Debug
@@ -318,6 +329,8 @@ namespace Cosplay_Academy
                             int slot = FloatQueue.Peek().Slot;
                             while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
                             {
+                                ExpandedOutfit.Logger.LogWarning("float repeat");
+
                                 MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
                                 ME_Info.Slot = ACCpostion;
                                 MaterialFloat.Add(ME_Info);
@@ -325,6 +338,8 @@ namespace Cosplay_Academy
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("float empty");
+
                             FloatQueue.Dequeue();
                         }
 #if Debug
@@ -335,6 +350,8 @@ namespace Cosplay_Academy
                             int slot = ShaderQueue.Peek().Slot;
                             while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
                             {
+                                ExpandedOutfit.Logger.LogWarning("shade repeat");
+
                                 MaterialShader ME_Info = ShaderQueue.Dequeue();
                                 ME_Info.Slot = ACCpostion;
                                 MaterialShade.Add(ME_Info);
@@ -342,6 +359,8 @@ namespace Cosplay_Academy
                         }
                         else
                         {
+                            ExpandedOutfit.Logger.LogWarning("shaderemoved empty");
+
                             ShaderQueue.Dequeue();
                         }
 #if Debug

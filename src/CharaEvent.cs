@@ -128,7 +128,7 @@ namespace Cosplay_Academy
                             var loadedProperty = properties[i];
                             if (loadedProperty.ObjectType == ObjectType.Accessory)
                             {
-                                //ExpandedOutfit.Logger.LogWarning($"Renderer index: {loadedProperty.CoordinateIndex},\tSlot: {loadedProperty.Slot},\tProperty: {loadedProperty.Property},\tName: {loadedProperty.RendererName},\tValue: {loadedProperty.Value}");
+                                //ExpandedOutfit.Logger.LogWarning($"Renderer index: {loadedProperty.CoordinateIndex},\tSlot: {loadedProperty.Slot},\tName: {loadedProperty.RendererName}");
                                 RendererPropertyQueue[loadedProperty.CoordinateIndex].Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                             }
                         }
@@ -185,9 +185,9 @@ namespace Cosplay_Academy
                                         ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
                                     }
                                     //texID = ImportDictionary[(int)loadedProperty.TexID];
+                                    //ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
+
                                 }
-                                //ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}");
-                                //ExpandedOutfit.Logger.LogWarning($"Loaded:{(int)loadedProperty.TexID}\tTexID:\t{texID}\tSlot:{loadedProperty.Slot}");
 
                                 MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
                                 MaterialTexturePropertyQueue[loadedProperty.CoordinateIndex].Add(newTextureProperty);
@@ -231,8 +231,8 @@ namespace Cosplay_Academy
                         acclist = new List<ChaFileAccessory.PartsInfo>();
                     }
 
-                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(acclist);//create intermediate as it seems that acclist is a reference
-                    Intermediate.AddRange(ChaControl.chaFile.coordinate[outfitnum].accessory.parts);
+                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[outfitnum].accessory.parts);
+                    Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
 
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
@@ -256,26 +256,31 @@ namespace Cosplay_Academy
                             {
                                 Color color = new Color(0, 0, 0);
                                 ColorList.Add(new MaterialColorProperty(ObjectType.Unknown, outfitnum, i, "", "", color, color));
+                                ColorList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("Color null");
                             }
                             if (FloatList.Count == 0)
                             {
                                 FloatList.Add(new MaterialFloatProperty(ObjectType.Unknown, outfitnum, i, "", "", "", ""));
+                                //FloatList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("FloatList null");
                             }
                             if (ShaderList.Count == 0)
                             {
                                 ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, i, "", 0, 0));
+                                //ShaderList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("ShaderList null");
                             }
                             if (TextureList.Count == 0)
                             {
                                 TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, i, "", ""));
+                                //TextureList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("TextureList null");
                             }
                             if (RenderList.Count == 0)
                             {
                                 RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, i, "", new RendererProperties(), "", ""));
+                                //RenderList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("Render null");
                             }
 
@@ -290,6 +295,7 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+                ThisOutfitData.TexturePrint();
                 //ThisOutfitData.Print();
                 if (currentGameMode != GameMode.Maker)
                 {
