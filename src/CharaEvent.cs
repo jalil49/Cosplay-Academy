@@ -936,6 +936,13 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                        if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
+                        {
+                            if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                            {
+                                ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                            }
+                        }
                         ME_Info.Slot = ACCpostion;
                         MaterialTexture.Add(ME_Info);
                     }
@@ -1042,8 +1049,13 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        ME_Info.Slot = ACCpostion;
-
+                        if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
+                        {
+                            if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                            {
+                                ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                            }
+                        }
                         ME_Info.Slot = ACCpostion;
                         MaterialTexture.Add(ME_Info);
                     }
@@ -1147,6 +1159,13 @@ namespace Cosplay_Academy
                 if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                 {
                     MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                    if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
+                    {
+                        if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                        {
+                            ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                        }
+                    }
                     ME_Info.Slot = ACCpostion;
                     MaterialTexture.Add(ME_Info);
                 }

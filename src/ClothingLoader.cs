@@ -359,8 +359,6 @@ namespace Cosplay_Academy
                             }
                         }
                         ME_Info.Slot = ACCpostion;
-
-                        ME_Info.Slot = ACCpostion;
                         MaterialTexture.Add(ME_Info);
                     }
                     else
