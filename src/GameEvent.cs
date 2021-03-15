@@ -37,9 +37,12 @@ namespace Cosplay_Academy
         {
             if (freeH)
             {
-                Constants.ChaDefaults.Clear();
-                OutfitDecider.Reset = true;
-                ExpandedOutfit.Logger.LogInfo("Reset has applied");
+                foreach (var item in Constants.ChaDefaults)
+                {
+                    //    ChaInfo temp = (ChaInfo)item.ChaControl;
+                    //    item.ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true);
+                    item.ChaControl.SetAccessoryStateAll(true);
+                }
             }
         }
         protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
