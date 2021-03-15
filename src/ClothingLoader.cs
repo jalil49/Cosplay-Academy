@@ -16,7 +16,7 @@ namespace Cosplay_Academy
         private static List<MaterialColorProperty> MaterialColorPropertyList = new List<MaterialColorProperty>();
         private static List<MaterialTextureProperty> MaterialTexturePropertyList = new List<MaterialTextureProperty>();
         private static List<MaterialShader> MaterialShaderList = new List<MaterialShader>();
-        private static Dictionary<int, int> ImportList = new Dictionary<int, int>();
+        //private static Dictionary<int, int> ImportList = new Dictionary<int, int>();
         public void FullLoad()
         {
             var HairPlugin = new PluginData();
@@ -546,7 +546,7 @@ namespace Cosplay_Academy
             MaterialColorPropertyList.Clear();
             MaterialTexturePropertyList.Clear();
             MaterialShaderList.Clear();
-            ImportList.Clear();
+            //ImportList.Clear();
             ThisOutfitData.ReturnimportDictionary.Clear();
             ThisOutfitData.ReturnMaterialTexture.Clear();
         }

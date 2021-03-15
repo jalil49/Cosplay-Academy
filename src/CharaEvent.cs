@@ -18,11 +18,9 @@ namespace Cosplay_Academy
 {
     public partial class CharaEvent : CharaCustomFunctionController
     {
-        //private List<ChaFileCoordinate> OutfitList = new List<ChaFileCoordinate>();
         public static CharaEvent self;
         private bool Repeat_stoppper = false;
         private ChaDefault ThisOutfitData;
-        //private ClothingLoader ClothingLoader = new ClothingLoader();
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
@@ -1332,8 +1330,6 @@ namespace Cosplay_Academy
                     Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
                 }
             }
-
-
         }
     }
 }

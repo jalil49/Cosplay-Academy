@@ -270,6 +270,7 @@ namespace Cosplay_Academy
                 MaterialTexturePropertyQueue[i] = MaterialTexturePropertyQueue[i].OrderBy(x => x.Slot).ToList();
             }
         }
+#if Debug
         public void TexturePrint()
         {
             foreach (var item in MaterialTexturePropertyQueue)
@@ -325,6 +326,7 @@ namespace Cosplay_Academy
                 }
             }
         }
+#endif
         public void Clear()
         {
             for (int i = 0; i < Constants.outfitpath.Length; i++)
@@ -347,6 +349,7 @@ namespace Cosplay_Academy
             ReturnMaterialShade.Clear();
             ReturnimportDictionary.Clear();
         }
+#if Debug
         public void ClearReturn()
         {
             ReturnRenderer.Clear();
@@ -356,5 +359,6 @@ namespace Cosplay_Academy
             ReturnMaterialShade.Clear();
             ReturnimportDictionary.Clear();
         }
+#endif
     }
 }
