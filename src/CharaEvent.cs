@@ -1245,17 +1245,17 @@ namespace Cosplay_Academy
             #region Pack
             var SaveData = new PluginData();
 
-            List<int> IDsToPurge = new List<int>();
-            foreach (int texID in ME_Support.TextureDictionary.Keys)
-                if (MaterialTexturePropertyList.All(x => x.TexID != texID))
-                    IDsToPurge.Add(texID);
+            //List<int> IDsToPurge = new List<int>();
+            //foreach (int texID in ME_Support.TextureDictionary.Keys)
+            //    if (MaterialTexturePropertyList.All(x => x.TexID != texID))
+            //        IDsToPurge.Add(texID);
 
-            for (var i = 0; i < IDsToPurge.Count; i++)
-            {
-                int texID = IDsToPurge[i];
-                if (ME_Support.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
-                ME_Support.TextureDictionary.Remove(texID);
-            }
+            //for (var i = 0; i < IDsToPurge.Count; i++)
+            //{
+            //    int texID = IDsToPurge[i];
+            //    if (ME_Support.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
+            //    ME_Support.TextureDictionary.Remove(texID);
+            //}
 
 
             if (ME_Support.TextureDictionary.Count > 0)
