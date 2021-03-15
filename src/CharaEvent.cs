@@ -206,10 +206,6 @@ namespace Cosplay_Academy
                     ExpandedOutfit.Logger.LogWarning("Ended MaterialTexturePropertyList Pass");
 #endif
                 }
-                else
-                {
-                    ExpandedOutfit.Logger.LogError($"material editor null");
-                }
                 #endregion
 #if Debug
                 ExpandedOutfit.Logger.LogWarning("Ended First Pass");
@@ -877,16 +873,12 @@ namespace Cosplay_Academy
 
             #region Reassign Exisiting Accessories
 
-            //if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
-            //{
-            //    NewRAW = new List<ChaFileAccessory.PartsInfo>();
-            //}
             var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
-            //Dictionary<int, int> importDictionary = new Dictionary<int, int>();
+
             int ACCpostion = 0;
             bool Empty;
             for (int n = ChaControl.nowCoordinate.accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
@@ -944,13 +936,6 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        //if (ME_Info.TexID != null)
-                        //{
-                        //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
-                        //    {
-                        //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                        //    }
-                        //}
                         ME_Info.Slot = ACCpostion;
                         MaterialTexture.Add(ME_Info);
                     }
@@ -1057,13 +1042,6 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        //if (ME_Info.TexID != null)
-                        //{
-                        //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
-                        //    {
-                        //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                        //    }
-                        //}
                         ME_Info.Slot = ACCpostion;
 
                         ME_Info.Slot = ACCpostion;
@@ -1169,13 +1147,6 @@ namespace Cosplay_Academy
                 if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                 {
                     MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                    //if (ME_Info.TexID != null)
-                    //{
-                    //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
-                    //    {
-                    //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
-                    //    }
-                    //}
                     ME_Info.Slot = ACCpostion;
                     MaterialTexture.Add(ME_Info);
                 }
@@ -1238,7 +1209,7 @@ namespace Cosplay_Academy
 
             //ThisOutfitData.ReturnRenderer.AddRange(Renderer);
 #if Debug
-            ExpandedOutfit.Logger.LogWarning("finish");
+            ExpandedOutfit.Logger.LogWarning("finished coordinate load main process");
 #endif
 
             #endregion
