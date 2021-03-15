@@ -3,6 +3,7 @@ using HarmonyLib;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
+using KKAPI.Maker;
 using KoiClothesOverlayX;
 using Manager;
 using MessagePack;
@@ -15,7 +16,7 @@ using UnityEngine;
 using CoordinateType = ChaFileDefine.CoordinateType;
 namespace Cosplay_Academy
 {
-    public class CharaEvent : CharaCustomFunctionController
+    public partial class CharaEvent : CharaCustomFunctionController
     {
         //private List<ChaFileCoordinate> OutfitList = new List<ChaFileCoordinate>();
         public static CharaEvent self;
@@ -34,10 +35,13 @@ namespace Cosplay_Academy
                 ThisOutfitData.FullName = ChaControl.fileParam.fullname;
                 ThisOutfitData.BirthDay = ChaControl.fileParam.strBirthDay;
                 ThisOutfitData.Personality = ChaControl.fileParam.personality;
+                ThisOutfitData.ChaControl = ChaControl;
+                ThisOutfitData.Chafile = ChaFileControl;
             }
             self = this;
             if (GameMode.Maker == currentGameMode)
             {
+                ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
                 ThisOutfitData.firstpass = true;
                 if (ExpandedOutfit.ResetMaker.Value)
                 {
@@ -52,7 +56,7 @@ namespace Cosplay_Academy
             {
                 //OutfitList.Clear();
                 Constants.ChaDefaults.ForEach(x => x.processed = false);
-                ExpandedOutfit.Logger.LogWarning("Reset passed");
+                ExpandedOutfit.Logger.LogDebug("Reset passed");
                 OutfitDecider.ResetDecider();
             }
 #if Debug
@@ -60,14 +64,19 @@ namespace Cosplay_Academy
 #endif
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
+                ThisOutfitData.Clear();
+
                 WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
                 Dictionary<int, Dictionary<int, HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
-                PluginData HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFileControl, "com.deathweasel.bepinex.hairaccessorycustomizer");
+
+                PluginData HairExtendedData;
+                HairExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+
                 if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                     CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairAccessoryInfo>>>((byte[])AllHairAccessories);
-#if ME_Support
-                PluginData MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaFileControl, "com.deathweasel.bepinex.materialeditor");
+                PluginData MaterialEditorData;
+                MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
                 #region ME Acc Import
 
@@ -185,8 +194,9 @@ namespace Cosplay_Academy
                                         ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
                                     }
                                     //texID = ImportDictionary[(int)loadedProperty.TexID];
-                                    //ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
-
+#if Debug
+                                    ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
+#endif
                                 }
 
                                 MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
@@ -203,7 +213,6 @@ namespace Cosplay_Academy
                     ExpandedOutfit.Logger.LogError($"material editor null");
                 }
                 #endregion
-#endif
 #if Debug
                 ExpandedOutfit.Logger.LogWarning("Ended First Pass");
 #endif
@@ -214,26 +223,26 @@ namespace Cosplay_Academy
                 {
                     List<ChaFileAccessory.PartsInfo> AccImport = new List<ChaFileAccessory.PartsInfo>();
                     List<HairAccessoryInfo> HairImport = new List<HairAccessoryInfo>();
-                    ThisOutfitData.CoordinatePartsQueue[outfitnum].Clear();
-                    ThisOutfitData.HairAccQueue[outfitnum].Clear();
                     if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairAccessoryInfo> HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
                     }
 
-                    if (_accessoriesByChar.TryGetValue(ChaControl.chaFile, out var SaveAccessory) == false)
+                    if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out var SaveAccessory) == false)
                     {
                         SaveAccessory = new MoreAccessories.CharAdditionalData();
-                        _accessoriesByChar.Add(ChaControl.chaFile, SaveAccessory);
+                        _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
                     }
                     if (SaveAccessory.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> acclist) == false)
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
                     }
 
-                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[outfitnum].accessory.parts);
+                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts); ;
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
-
+#if Debug
+                    ExpandedOutfit.Logger.LogWarning($"Size of input {Intermediate.Count}");
+#endif
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
@@ -246,7 +255,7 @@ namespace Cosplay_Academy
                                     HairLength = -999
                                 };
                             }
-#if ME_Support
+
                             var ColorList = MaterialColorPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var FloatList = MaterialFloatPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var ShaderList = MaterialShaderQueue[outfitnum].FindAll(x => x.Slot == i);
@@ -256,7 +265,7 @@ namespace Cosplay_Academy
                             {
                                 Color color = new Color(0, 0, 0);
                                 ColorList.Add(new MaterialColorProperty(ObjectType.Unknown, outfitnum, i, "", "", color, color));
-                                ColorList.Add(null);
+                                //ColorList.Add(null);
                                 //ExpandedOutfit.Logger.LogWarning("Color null");
                             }
                             if (FloatList.Count == 0)
@@ -289,13 +298,14 @@ namespace Cosplay_Academy
                             ThisOutfitData.MaterialShaderQueue[outfitnum].AddRange(ShaderList);
                             ThisOutfitData.MaterialTexturePropertyQueue[outfitnum].AddRange(TextureList);
                             ThisOutfitData.RendererPropertyQueue[outfitnum].AddRange(RenderList);
-#endif
                             ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
                         }
                     }
                 }
+#if Debug
                 ThisOutfitData.TexturePrint();
+#endif
                 //ThisOutfitData.Print();
                 if (currentGameMode != GameMode.Maker)
                 {
@@ -326,9 +336,9 @@ namespace Cosplay_Academy
                             ExpandedOutfit.ChangeOutfit.Value = false;
                         }
                     }
-                    //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaControl.chaFile.loadProductNo} name {ChaControl.chaFile.loadVersion} {ChaControl.chaFile.facePngData}");
+                    //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaFileControl.loadProductNo} name {ChaFileControl.loadVersion} {ChaFileControl.facePngData}");
                     int HoldOutfit = ChaControl.fileStatus.coordinateType;
-                    ClothingLoader.FullLoad(ChaControl, ThisOutfitData);//Load outfits; has to run again for story mode les scene at least
+                    FullLoad();//Load outfits; has to run again for story mode les scene at least
                     ChaControl.fileStatus.coordinateType = HoldOutfit;
 
                     ChaInfo temp = (ChaInfo)ChaControl;
@@ -340,12 +350,13 @@ namespace Cosplay_Academy
                         return;
                     }
 
-
                     KCOX_RePack();//Reassign materials for Clothes
 
                     ME_RePack();//Reassign materials for accessories
 
-                    Finish();
+                    ChaControl.SetAccessoryStateAll(true);
+
+                    //Finish();
                 }
             }
             //else
@@ -363,9 +374,9 @@ namespace Cosplay_Academy
             var data = new PluginData { version = 1 };
             Dictionary<string, ClothesTexData> storage;
             Dictionary<CoordinateType, Dictionary<string, ClothesTexData>> Final = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
-            for (int i = 0; i < ChaControl.chaFile.coordinate.Length; i++)
+            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
             {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KCOX");
+                SavedData = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[i], "KCOX");
                 storage = new Dictionary<string, ClothesTexData>();
                 if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
                 {
@@ -377,9 +388,18 @@ namespace Cosplay_Academy
                     }
                 }
                 Final.Add((CoordinateType)i, storage);
+
             }
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
             SetExtendedData("KCOX", data);
+            var KoiOverlay = typeof(KoiClothesOverlayController);
+            if (KoiOverlay != null)
+            {
+                //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+                var temp = ChaControl.GetComponent(KoiOverlay);
+                object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            }
         }
         #region Stuff KCOX_RePack Needs
         //[MessagePackObject]
@@ -471,13 +491,11 @@ namespace Cosplay_Academy
             Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
 
             #region UnPackCoordinates
-#if ME_Support
             if (!ThisOutfitData.ME_Work)
             {
-#endif
-                for (int outfitnum = 0; outfitnum < ChaControl.chaFile.coordinate.Length; outfitnum++)
+                for (int outfitnum = 0; outfitnum < ThisOutfitData.Chafile.coordinate.Length; outfitnum++)
                 {
-                    var data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
+                    var data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
                     if (data?.data != null)
                     {
                         if (data.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
@@ -520,7 +538,6 @@ namespace Cosplay_Academy
                         }
                     }
                 }
-#if ME_Support
             }
             else
             {
@@ -530,7 +547,6 @@ namespace Cosplay_Academy
                 MaterialTexturePropertyList = ThisOutfitData.ReturnMaterialTexture;
                 MaterialShaderList = ThisOutfitData.ReturnMaterialShade;
             }
-#endif
             #endregion
             #region Pack
             var SaveData = new PluginData();
@@ -581,6 +597,14 @@ namespace Cosplay_Academy
             SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData);
 
             #endregion
+            var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+            if (ME_OverlayX != null)
+            {
+                UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
+                //Traverse.Create(test).Method("RePack").GetValue();
+                object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                Traverse.Create(ME_Controller).Method("OnReload", OnReloadArray).GetValue();
+            }
         }
 
         //public void HairAccessory_RePack()//original
@@ -588,9 +612,9 @@ namespace Cosplay_Academy
         //    Dictionary<int, HairAccessoryInfo> PluginData = new Dictionary<int, HairAccessoryInfo>();
         //    Dictionary<int, Dictionary<int, HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
         //    Dictionary<int, HairAccessoryInfo> Temp;
-        //    for (int i = 0; i < ChaControl.chaFile.coordinate.Length; i++)
+        //    for (int i = 0; i < ChaFileControl.coordinate.Length; i++)
         //    {
-        //        var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
+        //        var Inputdata = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
         //        Temp = new Dictionary<int, HairAccessoryInfo>();
         //        if (Inputdata != null)
         //            if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
@@ -634,7 +658,7 @@ namespace Cosplay_Academy
 
         public void SetExtendedData(string IDtoSET, PluginData data)
         {
-            ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
+            ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
 
             //object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
 
@@ -653,7 +677,7 @@ namespace Cosplay_Academy
             }
             if (heroine != null && ChaControl.sex == 1)
             {
-                ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
+                ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
                 ExtendedSave.SetExtendedDataById(heroine.charFile, IDtoSET, data);
                 if (ChaControl.name == heroine.chaCtrl.name)
                 {
@@ -673,52 +697,52 @@ namespace Cosplay_Academy
             }
             heroine = null;
         }
-        private void Finish()
-        {
+        //private void Finish()
+        //{
 
-            Game _gamemgr = Game.Instance;
-            List<SaveData.Heroine> Heroines = _gamemgr.HeroineList;
-            if (ChaControl.name != null && ChaControl.sex == 1)
-            {
-                foreach (SaveData.Heroine Heroine in Heroines)
-                {
-                    if (Heroine.chaCtrl != null && ChaControl.name == Heroine.chaCtrl.name)
-                    {
-                        if (ChaControl.name == Heroine.chaCtrl.name)
-                        {
-                            heroine = Heroine;
-                            break;
-                        }
-                    }
-                }
-            }
+        //    Game _gamemgr = Game.Instance;
+        //    List<SaveData.Heroine> Heroines = _gamemgr.HeroineList;
+        //    if (ChaControl.name != null && ChaControl.sex == 1)
+        //    {
+        //        foreach (SaveData.Heroine Heroine in Heroines)
+        //        {
+        //            if (Heroine.chaCtrl != null && ChaControl.name == Heroine.chaCtrl.name)
+        //            {
+        //                if (ChaControl.name == Heroine.chaCtrl.name)
+        //                {
+        //                    heroine = Heroine;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
 
-            object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
-            Repeat_stoppper = true;
-            if (heroine != null && ChaControl.sex == 1)
-            {
-                if (ChaControl.name == heroine.chaCtrl.name)
-                {
-                    // Update other instance to reflect the new ext data
-                    var other = heroine.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
-                    if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
-                    heroine = null;
-                    return;
-                }
-            }
+        //    object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
+        //    Repeat_stoppper = true;
+        //    if (heroine != null && ChaControl.sex == 1)
+        //    {
+        //        if (ChaControl.name == heroine.chaCtrl.name)
+        //        {
+        //            // Update other instance to reflect the new ext data
+        //            var other = heroine.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
+        //            if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
+        //            heroine = null;
+        //            return;
+        //        }
+        //    }
 
-            var player = ChaControl.GetPlayer();
-            if (player != null)
-            {
-                if (ChaControl != player.chaCtrl)
-                {
-                    // Update other instance to reflect the new ext data
-                    var other = player.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
-                    if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
-                }
-            }
-            heroine = null;
-        }
+        //    var player = ChaControl.GetPlayer();
+        //    if (player != null)
+        //    {
+        //        if (ChaControl != player.chaCtrl)
+        //        {
+        //            // Update other instance to reflect the new ext data
+        //            var other = player.chaCtrl.GetComponent(GetType()) as CharaCustomFunctionController;
+        //            if (other != null) Traverse.Create(other).Method("OnReloadInternal", Reload).GetValue();
+        //        }
+        //    }
+        //    heroine = null;
+        //}
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
         {
@@ -727,116 +751,471 @@ namespace Cosplay_Academy
                 return;
             }//if disabled don't run
 
-            WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+            #region Queue accessories to keep
+            int outfitnum = ChaControl.fileStatus.coordinateType;
+
+            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
+            var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+
+            var RenderQueue = new Queue<RendererProperty>(ThisOutfitData.RendererPropertyQueue[outfitnum]);
+            var FloatQueue = new Queue<MaterialFloatProperty>(ThisOutfitData.MaterialFloatPropertyQueue[outfitnum]);
+            var ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.MaterialColorPropertyQueue[outfitnum]);
+            var TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.MaterialTexturePropertyQueue[outfitnum]);
+            var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
+#if Debug
+
+            ExpandedOutfit.Logger.LogWarning($"Parts: {PartsQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Hair: {HairQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Render: {RenderQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Float: {FloatQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"tColor: {ColorQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
+            ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
+#endif
+            #region ME Acc Import
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.materialeditor");
+            //for (int i = 0; i < MaterialEditorData.data.Count; i++)
+            //{
+            //    ExpandedOutfit.Logger.LogWarning($"Key: {MaterialEditorData.data.ElementAt(i).Key} Value: {MaterialEditorData.data.ElementAt(i).Value}");
+            //}
+            List<RendererProperty> Renderer = new List<RendererProperty>();
+            List<MaterialFloatProperty> MaterialFloat = new List<MaterialFloatProperty>();
+            List<MaterialColorProperty> MaterialColor = new List<MaterialColorProperty>();
+            List<MaterialTextureProperty> MaterialTexture = new List<MaterialTextureProperty>();
+            List<MaterialShader> MaterialShade = new List<MaterialShader>();
+            Dictionary<int, int> importDictionary = new Dictionary<int, int>();
+            if (MaterialEditorData?.data != null)
+            {
+                List<ObjectType> objectTypesToLoad = new List<ObjectType>
+                {
+                    ObjectType.Accessory,
+                    ObjectType.Character,
+                    ObjectType.Clothing,
+                    ObjectType.Hair
+                };
+
+                if (MaterialEditorData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
+                {
+                    foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
+                        importDictionary[x.Key] = ME_Support.SetAndGetTextureID(x.Value);
+                }
+
+                if (MaterialEditorData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
+                            MaterialShade.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                    }
+                }
+
+                if (MaterialEditorData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
+                            Renderer.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (MaterialEditorData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
+                            MaterialFloat.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (MaterialEditorData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
+                            MaterialColor.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (MaterialEditorData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
+                        {
+                            int? texID = null;
+                            if (loadedProperty.TexID != null)
+                                texID = importDictionary[(int)loadedProperty.TexID];
+
+                            MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
+                            MaterialTexture.Add(newTextureProperty);
+                        }
+                    }
+                }
+            }
+            #endregion
+
+
+            #endregion
+
+
             //Apply pre-existing Accessories in any open slot or final slots.
+            WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+            if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out MoreAccessories.CharAdditionalData data) == false)
+            {
+                data = new MoreAccessories.CharAdditionalData();
+                _accessoriesByChar.Add(ThisOutfitData.Chafile, data);
+            }
+
+
             #region Reassign Exisiting Accessories
 
-            var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            Dictionary<int, CharaEvent.HairAccessoryInfo> Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
+            //if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
+            //{
+            //    NewRAW = new List<ChaFileAccessory.PartsInfo>();
+            //}
+            var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
-            if (_accessoriesByChar.TryGetValue(ChaControl.chaFile, out MoreAccessories.CharAdditionalData data) == false)
-            {
-                data = new MoreAccessories.CharAdditionalData();
-                _accessoriesByChar.Add(ChaControl.chaFile, data);
-            }
-
-
-            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[ChaFileControl.status.coordinateType]);
-            var HairQueue = new Queue<CharaEvent.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[ChaFileControl.status.coordinateType]);
-            //ExpandedOutfit.Logger.LogWarning($"CPQ: {ThisOutfitData.CoordinatePartsQueue[ChaFileControl.status.coordinateType].Count}");
-            //ExpandedOutfit.Logger.LogWarning($"HAQ: {ThisOutfitData.HairAccQueue[ChaFileControl.status.coordinateType].Count}");
-
+            //Dictionary<int, int> importDictionary = new Dictionary<int, int>();
             int ACCpostion = 0;
-
+            bool Empty;
             for (int n = ChaControl.nowCoordinate.accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
             {
-                if (ChaControl.nowCoordinate.accessory.parts[ACCpostion].type == 120) //120 is empty/default
+                Empty = ChaControl.nowCoordinate.accessory.parts[ACCpostion].type == 120;
+                if (Empty) //120 is empty/default
                 {
-                    if (!Temp.ContainsKey(ACCpostion))
+                    ChaControl.nowCoordinate.accessory.parts[ACCpostion] = PartsQueue.Dequeue();
+                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                     {
-                        ChaControl.nowCoordinate.accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-                        //ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque<20");
-                        if (HairQueue.Peek() != null)
-                        {
-                            Temp.Add(ACCpostion, HairQueue.Dequeue());
-                        }
-                        else
-                        {
-                            HairQueue.Dequeue();
-                        }
-                    }
-                }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
-                {
-                    //ExpandedOutfit.Logger.LogWarning($"Coordinate Hair Force prev state:{info.ColorMatch}");
-                    info.ColorMatch = true;
-                }
-            }
-            for (int n = data.nowAccessories.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
-            {
-                if (data.nowAccessories[ACCpostion].type == 120) //120 is empty/default
-                {
-                    if (!Temp.ContainsKey(ACCpostion))
-                    {
-                        //ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Deque>20");
-                        data.nowAccessories[ACCpostion] = PartsQueue.Dequeue();
-                        if (HairQueue.Peek() != null)
-                        {
-                            Temp.Add(ACCpostion, HairQueue.Dequeue());
-                        }
-                        else
-                        {
-                            HairQueue.Dequeue();
-                        }
-                    }
-                }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
-                {
-                    //ExpandedOutfit.Logger.LogWarning($"Coordinate Hair Force prev state:{info.ColorMatch}");
-                    info.ColorMatch = true;
-                }
-            }
-            bool print = true;
-            while (PartsQueue.Count != 0)
-            {
-                if (print)
-                {
-                    print = false;
-                    ExpandedOutfit.Logger.LogWarning(ChaControl.fileParam.fullname + $" Ran out of space for accessories, Making {PartsQueue.Count} space(s) at least (due to potential keys already existing just in case)");
-                }
-                if (!Temp.ContainsKey(ACCpostion))
-                {
-                    data.nowAccessories.Add(PartsQueue.Dequeue());
-                    if (HairQueue.Peek() != null)
-                    {
-                        var HairTemp = HairQueue.Dequeue();
-                        if (ExpandedOutfit.HairMatch.Value)
-                        {
-                            //ExpandedOutfit.Logger.LogWarning("Coordinate Hair Force");
-                            HairTemp.ColorMatch = true;
-                        }
-                        Temp.Add(ACCpostion, HairTemp);
+                        Temp[ACCpostion] = HairQueue.Dequeue();
                     }
                     else
                     {
                         HairQueue.Dequeue();
                     }
+
+                    if (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = RenderQueue.Peek().Slot;
+                        while (RenderQueue.Count > 0 && RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                        {
+
+                            RendererProperty ME_Info = RenderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            Renderer.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        RenderQueue.Dequeue();
+                    }
+#if Debug
+                    //ExpandedOutfit.Logger.LogWarning("Render Pass");
+#endif
+
+                    if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = ColorQueue.Peek().Slot;
+                        while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                        {
+                            MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialColor.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        ColorQueue.Dequeue();
+                    }
+#if Debug
+                    //ExpandedOutfit.Logger.LogWarning("Color Pass");
+#endif
+
+                    if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                        //if (ME_Info.TexID != null)
+                        //{
+                        //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                        //    {
+                        //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                        //    }
+                        //}
+                        ME_Info.Slot = ACCpostion;
+                        MaterialTexture.Add(ME_Info);
+                    }
+                    else
+                    {
+                        TextureQueue.Dequeue();
+                    }
+#if Debug
+                    //ExpandedOutfit.Logger.LogWarning("Texture Pass");
+#endif
+
+                    if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = FloatQueue.Peek().Slot;
+                        while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                        {
+                            MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialFloat.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        FloatQueue.Dequeue();
+                    }
+#if Debug
+                    //ExpandedOutfit.Logger.LogWarning("Float Pass");
+#endif
+                    if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = ShaderQueue.Peek().Slot;
+                        while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                        {
+                            MaterialShader ME_Info = ShaderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialShade.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        ShaderQueue.Dequeue();
+                    }
+#if Debug
+                    //ExpandedOutfit.Logger.LogWarning("Shader Pass");
+#endif
+                }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    info.ColorMatch = true;
+                }
+#if Debug
+                //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
+#endif
+
+            }
+#if Debug
+            ExpandedOutfit.Logger.LogWarning($"Start extra accessories at {ACCpostion} {NewRAW.Count}");
+#endif
+            for (int n = data.nowAccessories.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
+            {
+                Empty = data.nowAccessories[ACCpostion - 20].type == 120;
+                if (Empty) //120 is empty/default
+                {
+
+                    data.nowAccessories[ACCpostion - 20] = PartsQueue.Dequeue();
+                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                    {
+                        Temp[ACCpostion] = HairQueue.Dequeue();
+                    }
+                    else
+                    {
+                        HairQueue.Dequeue();
+                    }
+                    if (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int? slot = new int?(RenderQueue.Peek().Slot);
+                        while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                        {
+                            RendererProperty ME_Info = RenderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            Renderer.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        RenderQueue.Dequeue();
+                    }
+
+                    if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = ColorQueue.Peek().Slot;
+                        while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                        {
+                            MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialColor.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        ColorQueue.Dequeue();
+                    }
+
+                    if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                        //if (ME_Info.TexID != null)
+                        //{
+                        //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                        //    {
+                        //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                        //    }
+                        //}
+                        ME_Info.Slot = ACCpostion;
+
+                        ME_Info.Slot = ACCpostion;
+                        MaterialTexture.Add(ME_Info);
+                    }
+                    else
+                    {
+                        TextureQueue.Dequeue();
+                    }
+
+                    if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = FloatQueue.Peek().Slot;
+                        while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                        {
+                            MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialFloat.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        FloatQueue.Dequeue();
+                    }
+
+                    if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
+                    {
+                        int slot = ShaderQueue.Peek().Slot;
+                        while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                        {
+                            MaterialShader ME_Info = ShaderQueue.Dequeue();
+                            ME_Info.Slot = ACCpostion;
+                            MaterialShade.Add(ME_Info);
+                        }
+                    }
+                    else
+                    {
+                        ShaderQueue.Dequeue();
+                    }
+
+                }
+                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                {
+                    info.ColorMatch = true;
+                }
+            }
+#if Debug
+            ExpandedOutfit.Logger.LogWarning($"Start making extra accessories at {ACCpostion}");
+#endif
+
+            bool print = true;
+
+            while (PartsQueue.Count != 0)
+            {
+                if (print)
+                {
+                    ExpandedOutfit.Logger.LogDebug($"Ran out of space in new coordiante adding {PartsQueue.Count}");
+                    print = false;
+                }
+                data.nowAccessories.Add(PartsQueue.Dequeue());
+                if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                {
+                    var HairInfo = HairQueue.Dequeue();
+                    if (ExpandedOutfit.HairMatch.Value)
+                    {
+                        HairInfo.ColorMatch = true;
+                    }
+                    Temp[ACCpostion] = HairInfo;
                 }
                 else
                 {
-                    data.nowAccessories.Add(new ChaFileAccessory.PartsInfo());
+                    HairQueue.Dequeue();
                 }
-                data.infoAccessory.Add(null);
-                data.objAccessory.Add(null);
-                data.objAcsMove.Add(new GameObject[2]);
-                data.cusAcsCmp.Add(null);
-                data.showAccessories.Add(true);
+
+                if (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().ObjectType != ObjectType.Unknown)
+                {
+                    int slot = RenderQueue.Peek().Slot;
+                    while (RenderQueue.Count > 0 && RenderQueue.Peek() != null && RenderQueue.Peek().Slot == slot)
+                    {
+                        RendererProperty ME_Info = RenderQueue.Dequeue();
+                        ME_Info.Slot = ACCpostion;
+                        Renderer.Add(ME_Info);
+                    }
+                }
+                else
+                {
+                    RenderQueue.Dequeue();
+                }
+                if (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
+                {
+                    int slot = ColorQueue.Peek().Slot;
+                    while (ColorQueue.Count > 0 && ColorQueue.Peek() != null && ColorQueue.Peek().Slot == slot)
+                    {
+                        MaterialColorProperty ME_Info = ColorQueue.Dequeue();
+                        ME_Info.Slot = ACCpostion;
+                        MaterialColor.Add(ME_Info);
+                    }
+                }
+                else
+                {
+                    ColorQueue.Dequeue();
+                }
+                if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
+                {
+                    MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                    //if (ME_Info.TexID != null)
+                    //{
+                    //    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                    //    {
+                    //        ME_Info.TexID = ME_Support.SetAndGetTextureID(imgbyte);
+                    //    }
+                    //}
+                    ME_Info.Slot = ACCpostion;
+                    MaterialTexture.Add(ME_Info);
+                }
+                else
+                {
+                    TextureQueue.Dequeue();
+                }
+                if (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
+                {
+                    int slot = FloatQueue.Peek().Slot;
+                    while (FloatQueue.Count > 0 && FloatQueue.Peek() != null && FloatQueue.Peek().Slot == slot)
+                    {
+                        MaterialFloatProperty ME_Info = FloatQueue.Dequeue();
+                        ME_Info.Slot = ACCpostion;
+                        MaterialFloat.Add(ME_Info);
+                    }
+                }
+                else
+                {
+                    FloatQueue.Dequeue();
+                }
+                if (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
+                {
+                    int slot = ShaderQueue.Peek().Slot;
+                    while (ShaderQueue.Count > 0 && ShaderQueue.Peek() != null && ShaderQueue.Peek().Slot == slot)
+                    {
+                        MaterialShader ME_Info = ShaderQueue.Dequeue();
+                        ME_Info.Slot = ACCpostion;
+                        MaterialShade.Add(ME_Info);
+                    }
+                }
+                else
+                {
+                    ShaderQueue.Dequeue();
+                }
                 ACCpostion++;
             }
 
-            //needed it to stop errors in FreeH when swapping
             while (data.infoAccessory.Count < data.nowAccessories.Count)
                 data.infoAccessory.Add(null);
             while (data.objAccessory.Count < data.nowAccessories.Count)
@@ -847,14 +1226,100 @@ namespace Cosplay_Academy
                 data.cusAcsCmp.Add(null);
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
-            Traverse.Create(_accessoriesByChar).Method("Purge").GetValue();
+#if Debug
+            //ExpandedOutfit.Logger.LogWarning("add range");
+#endif
+
+            //ThisOutfitData.ReturnMaterialColor.AddRange(MaterialColor);
+
+            //ThisOutfitData.ReturnMaterialFloat.AddRange(MaterialFloat);
+
+            //ThisOutfitData.ReturnMaterialShade.AddRange(MaterialShade);
+
+            //ThisOutfitData.ReturnMaterialTexture.AddRange(MaterialTexture);
+
+            //ThisOutfitData.ReturnRenderer.AddRange(Renderer);
+#if Debug
+            ExpandedOutfit.Logger.LogWarning("finish");
+#endif
+
             #endregion
+
             Traverse.Create(MoreAccessories._self).Method("UpdateUI").GetValue();
 
-            var Plugdata = new PluginData();
+
+
+            RendererPropertyList = Renderer;
+            MaterialFloatPropertyList = MaterialFloat;
+            MaterialColorPropertyList = MaterialColor;
+            MaterialTexturePropertyList = MaterialTexture;
+            MaterialShaderList = MaterialShade;
+
+            #region Pack
+            var SaveData = new PluginData();
+
+            List<int> IDsToPurge = new List<int>();
+            foreach (int texID in ME_Support.TextureDictionary.Keys)
+                if (MaterialTexturePropertyList.All(x => x.TexID != texID))
+                    IDsToPurge.Add(texID);
+
+            for (var i = 0; i < IDsToPurge.Count; i++)
+            {
+                int texID = IDsToPurge[i];
+                if (ME_Support.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
+                ME_Support.TextureDictionary.Remove(texID);
+            }
+
+
+            if (ME_Support.TextureDictionary.Count > 0)
+                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(ME_Support.TextureDictionary.ToDictionary(pair => pair.Key, pair => pair.Value.Data)));
+            else
+                SaveData.data.Add("TextureDictionary", null);
+
+            if (RendererPropertyList.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(RendererPropertyList));
+            else
+                SaveData.data.Add("RendererPropertyList", null);
+
+            if (MaterialFloatPropertyList.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(MaterialFloatPropertyList));
+            else
+                SaveData.data.Add("MaterialFloatPropertyList", null);
+
+            if (MaterialColorPropertyList.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(MaterialColorPropertyList));
+            else
+                SaveData.data.Add("MaterialColorPropertyList", null);
+
+            if (MaterialTexturePropertyList.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(MaterialTexturePropertyList));
+            else
+                SaveData.data.Add("MaterialTexturePropertyList", null);
+
+            if (MaterialShaderList.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(MaterialShaderList));
+            else
+                SaveData.data.Add("MaterialShaderList", null);
+
+            ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
+
+
+            #endregion
+
+
+
+            var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+            if (ME_OverlayX != null)
+            {
+                UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
+                object[] OnReloadArray = new object[2] { coordinate, false };
+                Traverse.Create(ME_Controller).Method("OnCoordinateBeingLoaded", OnReloadArray).GetValue();
+            }
 
             if (ExpandedOutfit.HairMatch.Value)
             {
+                var Plugdata = new PluginData();
+
                 Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
@@ -867,6 +1332,8 @@ namespace Cosplay_Academy
                     Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
                 }
             }
+
+
         }
     }
 }

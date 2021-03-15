@@ -222,7 +222,6 @@ namespace Cosplay_Academy
         internal string BirthDay;
         internal string FullName;
         #endregion
-#if ME_Support
         #region Material Editor Save
         public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.outfitpath.Length];
         public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.outfitpath.Length];
@@ -240,28 +239,26 @@ namespace Cosplay_Academy
         public List<MaterialTextureProperty> ReturnMaterialTexture = new List<MaterialTextureProperty>();
         public List<MaterialShader> ReturnMaterialShade = new List<MaterialShader>();
         public Dictionary<int, int> ReturnimportDictionary = new Dictionary<int, int>();
+        internal ChaControl ChaControl;
+        internal ChaFile Chafile;
 
         #endregion
 
-#endif
         public ChaDefault()
         {
             for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
-#if ME_Support
                 RendererPropertyQueue[i] = new List<RendererProperty>();
                 MaterialFloatPropertyQueue[i] = new List<MaterialFloatProperty>();
                 MaterialColorPropertyQueue[i] = new List<MaterialColorProperty>();
                 MaterialTexturePropertyQueue[i] = new List<MaterialTextureProperty>();
                 MaterialShaderQueue[i] = new List<MaterialShader>();
                 importDictionaryQueue[i] = new Dictionary<int, byte[]>();
-#endif
                 HairAccQueue[i] = new List<CharaEvent.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
                 outfitpath[i] = " ";
             }
         }
-#if ME_Support
         public void SortData()
         {
             for (int i = 0; i < Constants.outfitpath.Length; i++)
@@ -277,6 +274,7 @@ namespace Cosplay_Academy
         {
             foreach (var item in MaterialTexturePropertyQueue)
             {
+                ExpandedOutfit.Logger.LogWarning("\n\n");
                 foreach (var loadedProperty in item)
                 {
                     if (loadedProperty != null && loadedProperty.TexID != null)
@@ -327,6 +325,36 @@ namespace Cosplay_Academy
                 }
             }
         }
-#endif
+        public void Clear()
+        {
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
+            {
+                RendererPropertyQueue[i].Clear();
+                MaterialFloatPropertyQueue[i].Clear();
+                MaterialColorPropertyQueue[i].Clear();
+                MaterialTexturePropertyQueue[i].Clear();
+                MaterialShaderQueue[i].Clear();
+                importDictionaryQueue[i].Clear();
+                HairAccQueue[i].Clear();
+                CoordinatePartsQueue[i].Clear();
+                outfitpath[i] = " ";
+            }
+            ME_Work = false;
+            ReturnRenderer.Clear();
+            ReturnMaterialFloat.Clear();
+            ReturnMaterialColor.Clear();
+            ReturnMaterialTexture.Clear();
+            ReturnMaterialShade.Clear();
+            ReturnimportDictionary.Clear();
+        }
+        public void ClearReturn()
+        {
+            ReturnRenderer.Clear();
+            ReturnMaterialFloat.Clear();
+            ReturnMaterialColor.Clear();
+            ReturnMaterialTexture.Clear();
+            ReturnMaterialShade.Clear();
+            ReturnimportDictionary.Clear();
+        }
     }
 }
