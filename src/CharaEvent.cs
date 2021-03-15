@@ -300,13 +300,12 @@ namespace Cosplay_Academy
 #if Debug
                 ThisOutfitData.TexturePrint();
 #endif
+                #endregion
                 //ThisOutfitData.Print();
                 if (currentGameMode != GameMode.Maker)
                 {
                     ThisOutfitData.firstpass = false;
                 }
-                #endregion
-
 
             }
             if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode || Repeat_stoppper && GameMode.Maker != currentGameMode/*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
@@ -370,7 +369,7 @@ namespace Cosplay_Academy
             Dictionary<CoordinateType, Dictionary<string, ClothesTexData>> Final = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
             for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
             {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[i], "KCOX");
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KCOX");
                 storage = new Dictionary<string, ClothesTexData>();
                 if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
                 {
@@ -545,17 +544,17 @@ namespace Cosplay_Academy
             #region Pack
             var SaveData = new PluginData();
 
-            List<int> IDsToPurge = new List<int>();
-            foreach (int texID in ME_Support.TextureDictionary.Keys)
-                if (MaterialTexturePropertyList.All(x => x.TexID != texID))
-                    IDsToPurge.Add(texID);
+            //List<int> IDsToPurge = new List<int>();
+            //foreach (int texID in ME_Support.TextureDictionary.Keys)
+            //    if (MaterialTexturePropertyList.All(x => x.TexID != texID))
+            //        IDsToPurge.Add(texID);
 
-            for (var i = 0; i < IDsToPurge.Count; i++)
-            {
-                int texID = IDsToPurge[i];
-                if (ME_Support.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
-                ME_Support.TextureDictionary.Remove(texID);
-            }
+            //for (var i = 0; i < IDsToPurge.Count; i++)
+            //{
+            //    int texID = IDsToPurge[i];
+            //    if (ME_Support.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
+            //    ME_Support.TextureDictionary.Remove(texID);
+            //}
 
 
             if (ME_Support.TextureDictionary.Count > 0)
@@ -767,7 +766,7 @@ namespace Cosplay_Academy
             ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
 #endif
             #region ME Acc Import
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.materialeditor");
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
             //for (int i = 0; i < MaterialEditorData.data.Count; i++)
             //{
             //    ExpandedOutfit.Logger.LogWarning($"Key: {MaterialEditorData.data.ElementAt(i).Key} Value: {MaterialEditorData.data.ElementAt(i).Value}");
@@ -873,7 +872,7 @@ namespace Cosplay_Academy
 
             #region Reassign Exisiting Accessories
 
-            var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.nowCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var Inputdata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
             var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)

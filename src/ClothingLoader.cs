@@ -16,11 +16,11 @@ namespace Cosplay_Academy
         private static List<MaterialColorProperty> MaterialColorPropertyList = new List<MaterialColorProperty>();
         private static List<MaterialTextureProperty> MaterialTexturePropertyList = new List<MaterialTextureProperty>();
         private static List<MaterialShader> MaterialShaderList = new List<MaterialShader>();
-        //private static Dictionary<int, int> ImportList = new Dictionary<int, int>();
+
+
         public void FullLoad()
         {
             var HairPlugin = new PluginData();
-            var ME_Plugin = new PluginData();
             HairAccessories = new Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>>();
             ME_ListClear();
 
@@ -35,6 +35,8 @@ namespace Cosplay_Academy
             CharaEvent.self.SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin);
             ThisOutfitData.ME_Work = true;
         }
+
+
         private void GeneralizedLoad(int outfitnum)
         {
             //queue Accessorys to keep
@@ -48,8 +50,8 @@ namespace Cosplay_Academy
             var ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.MaterialColorPropertyQueue[outfitnum]);
             var TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.MaterialTexturePropertyQueue[outfitnum]);
             var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
-#if Debug
 
+#if Debug
             ExpandedOutfit.Logger.LogWarning($"Parts: {PartsQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"Hair: {HairQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"Render: {RenderQueue.Count}");
@@ -58,9 +60,8 @@ namespace Cosplay_Academy
             ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
             ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
 #endif
-
-
             #endregion
+
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
             if (_accessoriesByChar.TryGetValue(ChaFileControl, out MoreAccessories.CharAdditionalData data) == false)
             {
@@ -85,19 +86,16 @@ namespace Cosplay_Academy
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+
             List<RendererProperty> Renderer = new List<RendererProperty>();
             List<MaterialFloatProperty> MaterialFloat = new List<MaterialFloatProperty>();
             List<MaterialColorProperty> MaterialColor = new List<MaterialColorProperty>();
             List<MaterialTextureProperty> MaterialTexture = new List<MaterialTextureProperty>();
             List<MaterialShader> MaterialShade = new List<MaterialShader>();
-            //Dictionary<int, int> importDictionary = new Dictionary<int, int>();
 
             #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
-            //for (int i = 0; i < MaterialEditorData.data.Count; i++)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning($"Key: {MaterialEditorData.data.ElementAt(i).Key} Value: {MaterialEditorData.data.ElementAt(i).Value}");
-            //}
+
             if (MaterialEditorData?.data != null)
             {
                 List<ObjectType> objectTypesToLoad = new List<ObjectType>
@@ -238,7 +236,7 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        if (ME_Info.TexID != null)
+                        if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
                         {
                             if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                             {
@@ -351,7 +349,7 @@ namespace Cosplay_Academy
                     if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                     {
                         MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                        if (ME_Info.TexID != null)
+                        if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
                         {
                             if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                             {
@@ -461,7 +459,7 @@ namespace Cosplay_Academy
                 if (TextureQueue.Peek() != null && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
                 {
                     MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                    if (ME_Info.TexID != null)
+                    if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
                     {
                         if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
                         {
