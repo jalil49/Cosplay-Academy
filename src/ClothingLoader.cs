@@ -23,14 +23,14 @@ namespace Cosplay_Academy
             var HairPlugin = new PluginData();
             HairAccessories = new Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>>();
             ME_ListClear();
-
-
+            bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").GetValue();
+            Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").SetValue(true);
             for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 GeneralizedLoad(i);
                 ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
-
+            Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").SetValue(retain);
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
             CharaEvent.self.SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin);
             ThisOutfitData.ME_Work = true;
