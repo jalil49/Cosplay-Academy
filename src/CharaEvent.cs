@@ -766,7 +766,7 @@ namespace Cosplay_Academy
             ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
 #endif
             #region ME Acc Import
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor");
             //for (int i = 0; i < MaterialEditorData.data.Count; i++)
             //{
             //    ExpandedOutfit.Logger.LogWarning($"Key: {MaterialEditorData.data.ElementAt(i).Key} Value: {MaterialEditorData.data.ElementAt(i).Value}");
@@ -872,7 +872,7 @@ namespace Cosplay_Academy
 
             #region Reassign Exisiting Accessories
 
-            var Inputdata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
