@@ -410,7 +410,7 @@ namespace Cosplay_Academy
             {
                 if (print)
                 {
-                    ExpandedOutfit.Logger.LogDebug($"Ran out of space in new coordiante adding {PartsQueue.Count}");
+                    ExpandedOutfit.Logger.LogDebug($"Ran out of space in new coordinate adding {PartsQueue.Count}");
                     print = false;
                 }
                 NewRAW.Add(PartsQueue.Dequeue());
