@@ -35,12 +35,11 @@ namespace Cosplay_Academy
         }
         protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
         {
-            if (freeH)
+            if (freeH && ExpandedOutfit.EnableSetting.Value)
             {
                 foreach (var item in Constants.ChaDefaults)
                 {
-                    //    ChaInfo temp = (ChaInfo)item.ChaControl;
-                    //    item.ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true);
+                    item.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.School01, true);
                     item.ChaControl.SetAccessoryStateAll(true);
                 }
             }
