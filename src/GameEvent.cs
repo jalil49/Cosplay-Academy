@@ -1,6 +1,5 @@
 ﻿using ActionGame;
 using KKAPI.MainGame;
-using Manager;
 namespace Cosplay_Academy
 {
     public class GameEvent : GameCustomFunctionController
