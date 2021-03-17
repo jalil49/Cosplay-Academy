@@ -330,9 +330,9 @@ namespace Cosplay_Academy
                         }
                     }
                     //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaFileControl.loadProductNo} name {ChaFileControl.loadVersion} {ChaFileControl.facePngData}");
-                    int HoldOutfit = ChaControl.fileStatus.coordinateType;
+                    int HoldOutfit = ChaFileControl.status.coordinateType;
                     FullLoad();//Load outfits; has to run again for story mode les scene at least
-                    ChaControl.fileStatus.coordinateType = HoldOutfit;
+                    ChaFileControl.status.coordinateType = HoldOutfit;
 
                     ChaInfo temp = (ChaInfo)ChaControl;
                     ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
@@ -667,6 +667,10 @@ namespace Cosplay_Academy
                         break;
                     }
                 }
+            }
+            if (heroine == null)
+            {
+                ExtendedSave.SetExtendedDataById(ChaFileControl, IDtoSET, data);
             }
             if (heroine != null && ChaControl.sex == 1)
             {
