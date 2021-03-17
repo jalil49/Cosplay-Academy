@@ -1,8 +1,10 @@
 ﻿using ExtensibleSaveFormat;
 using HarmonyLib;
+using KKAPI;
 using KKAPI.Chara;
 using MessagePack;
 using MoreAccessoriesKOI;
+using System;
 using System.Collections.Generic;
 using ToolBox;
 using UnityEngine;
@@ -23,16 +25,25 @@ namespace Cosplay_Academy
             var HairPlugin = new PluginData();
             HairAccessories = new Dictionary<int, Dictionary<int, CharaEvent.HairAccessoryInfo>>();
             ME_ListClear();
-            bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").GetValue();
-            Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").SetValue(true);
+            bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_inH").GetValue();
+            Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(false);
             for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 GeneralizedLoad(i);
                 ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
-            Traverse.Create(MoreAccessories._self).Field("_loadAdditionalAccessories").SetValue(retain);
+            Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
             CharaEvent.self.SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin);
+
+            var Hair_Acc_Controller = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
+            if (Hair_Acc_Controller != null)
+            {
+                UnityEngine.Component HairACC_Controller = ChaControl.gameObject.GetComponent(Hair_Acc_Controller);
+                object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                Traverse.Create(HairACC_Controller).Method("OnReload", OnReloadArray).GetValue();
+            }
+
             ThisOutfitData.ME_Work = true;
         }
 
@@ -62,30 +73,30 @@ namespace Cosplay_Academy
 #endif
             #endregion
 
+
+            //Load new outfit
+            ChaFileControl.status.coordinateType = outfitnum;
+            ChaFileControl.coordinate[outfitnum].LoadFile(ThisOutfitData.outfitpath[outfitnum]);
+
+            #region Reassign Exisiting Accessories
+
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+
             if (_accessoriesByChar.TryGetValue(ChaFileControl, out MoreAccessories.CharAdditionalData data) == false)
             {
                 data = new MoreAccessories.CharAdditionalData();
                 _accessoriesByChar.Add(ChaFileControl, data);
             }
 
-            //Load new outfit
-            ChaControl.fileStatus.coordinateType = outfitnum;
-            ChaFileControl.coordinate[outfitnum].LoadFile(ThisOutfitData.outfitpath[outfitnum]);
-            //var checkdata = ExtendedSave.GetAllExtendedData(ChaFileControl.coordinate[outfitnum]);
-
-            //Apply pre-existing Accessories in any open slot or final slots.
-            #region Reassign Exisiting Accessories
-
             if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
             var Inputdata = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
-            var Temp = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
+            var HairAccInfo = new Dictionary<int, CharaEvent.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                    Temp = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+                    HairAccInfo = MessagePackSerializer.Deserialize<Dictionary<int, CharaEvent.HairAccessoryInfo>>((byte[])loadedHairAccessories);
 
             List<RendererProperty> Renderer = new List<RendererProperty>();
             List<MaterialFloatProperty> MaterialFloat = new List<MaterialFloatProperty>();
@@ -178,10 +189,9 @@ namespace Cosplay_Academy
 #if Debug
             ExpandedOutfit.Logger.LogWarning("Start loading accessories");
 #endif
-
             int ACCpostion = 0;
             bool Empty;
-            for (int n = ChaFileControl.coordinate[outfitnum].accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
+            for (int n = ChaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
             {
                 Empty = ChaFileControl.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
                 if (Empty) //120 is empty/default
@@ -189,7 +199,7 @@ namespace Cosplay_Academy
                     ChaFileControl.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
                     if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                     {
-                        Temp[ACCpostion] = HairQueue.Dequeue();
+                        HairAccInfo[ACCpostion] = HairQueue.Dequeue();
                     }
                     else
                     {
@@ -289,14 +299,13 @@ namespace Cosplay_Academy
                     //ExpandedOutfit.Logger.LogWarning("Shader Pass");
 #endif
                 }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
 #if Debug
                 //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
 #endif
-
             }
 #if Debug
             ExpandedOutfit.Logger.LogWarning($"Start extra accessories at {ACCpostion} {NewRAW.Count}");
@@ -310,7 +319,7 @@ namespace Cosplay_Academy
                     NewRAW[ACCpostion - 20] = PartsQueue.Dequeue();
                     if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                     {
-                        Temp[ACCpostion] = HairQueue.Dequeue();
+                        HairAccInfo[ACCpostion] = HairQueue.Dequeue();
                     }
                     else
                     {
@@ -395,7 +404,7 @@ namespace Cosplay_Academy
                     }
 
                 }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
@@ -421,7 +430,7 @@ namespace Cosplay_Academy
                     {
                         HairInfo.ColorMatch = true;
                     }
-                    Temp[ACCpostion] = HairInfo;
+                    HairAccInfo[ACCpostion] = HairInfo;
                 }
                 else
                 {
@@ -505,7 +514,7 @@ namespace Cosplay_Academy
             }
             data.rawAccessoriesInfos[outfitnum] = NewRAW;
 
-            HairAccessories.Add(outfitnum, Temp);
+            HairAccessories.Add(outfitnum, HairAccInfo);
             while (data.infoAccessory.Count < data.nowAccessories.Count)
                 data.infoAccessory.Add(null);
             while (data.objAccessory.Count < data.nowAccessories.Count)
