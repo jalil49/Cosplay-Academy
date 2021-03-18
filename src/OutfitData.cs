@@ -60,42 +60,42 @@ namespace Cosplay_Academy
             temp.AddRange(FirstTime);
             return temp;
         }
-        public void Insert(int level, string[] Data, bool IsSet)//Insert data and append existing data to new list and confirm if this is a set item
+        public void Insert(int level, string[] Data, bool IsSet)//Insert data according to lewd state and confirm if it is a setitem.
         {
-            List<string> temp = new List<string>();
-            if (Exportarray(level).Length > 0)//append existing data
-            {
-                string[] temp2 = Exportarray(level);
-                temp.AddRange(temp2);
-            }
+            //List<string> temp = new List<string>();
+            //if (Exportarray(level).Length > 0)//append existing data
+            //{
+            //    string[] temp2 = Exportarray(level);
+            //    temp.AddRange(temp2);
+            //}
             if (level == 3)
             {
-                temp.AddRange(Data);
-                Lewd = temp.ToArray();
-                //Lewd = Data;
+                //temp.AddRange(Data);
+                //Lewd = temp.ToArray();
+                Lewd = Data;
                 Set_Lewd = IsSet;
             }
             else if (level == 2)
             {
-                temp.AddRange(Data);
-                Pro = temp.ToArray();
-                //Pro = Data;
+                //temp.AddRange(Data);
+                //Pro = temp.ToArray();
+                Pro = Data;
 
                 Set_Pro = IsSet;
             }
             else if (level == 1)
             {
-                temp.AddRange(Data);
-                Amateur = temp.ToArray();
-                //Amateur = Data;
+                //temp.AddRange(Data);
+                //Amateur = temp.ToArray();
+                Amateur = Data;
 
                 Set_Amateur = IsSet;
             }
             else
             {
-                temp.AddRange(Data);
-                FirstTime = temp.ToArray();
-                //FirstTime = Data;
+                //temp.AddRange(Data);
+                //FirstTime = temp.ToArray();
+                FirstTime = Data;
 
                 Set_FirstTime = IsSet;
             }
