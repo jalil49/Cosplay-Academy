@@ -63,7 +63,7 @@ namespace Cosplay_Academy
             }
             return Choosen;
         }
-        public static List<string> Get_Outfits_From_Path(string FilePath)
+        public static List<string> Get_Outfits_From_Path(string FilePath, bool RemoveSets = true)
         {
             ExpandedOutfit.Logger.LogDebug("Searching " + FilePath);
             Choosen.Clear();
@@ -78,6 +78,10 @@ namespace Cosplay_Academy
             //step through each folder and grab files
             foreach (string path in Paths)
             {
+                if (RemoveSets && path.Contains(@"\Sets"))
+                {
+                    continue;
+                }
                 string[] files = System.IO.Directory.GetFiles(path);
                 Choosen.AddRange(files);
 

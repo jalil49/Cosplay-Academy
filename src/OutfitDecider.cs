@@ -174,7 +174,7 @@ namespace Cosplay_Academy
                         temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
                         string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
                         Setsfunction(array);
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
                         outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
                     }
                 }
@@ -209,7 +209,7 @@ namespace Cosplay_Academy
                             break;
                         }
                         //outfitData[j].Path_set(exp, result[i]);
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item);
+                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, false);
                         outfitData[j].Insert(exp, temp.ToArray(), true);
                         break;
                     }
