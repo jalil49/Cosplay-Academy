@@ -679,6 +679,7 @@ namespace Cosplay_Academy
                 if (ChaControl.name == heroine.chaCtrl.name)
                 {
                     ExtendedSave.SetExtendedDataById(heroine.chaCtrl.chaFile, IDtoSET, data);
+                    heroine = null;
                     return;
                 }
             }
