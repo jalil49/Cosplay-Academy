@@ -158,10 +158,10 @@ namespace Cosplay_Academy
                     }
                     string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
 
-                    if (!result.Contains(@"\Sets\") || !ExpandedOutfit.EnableSets.Value)
+                    if (!ExpandedOutfit.EnableSets.Value || !result.Contains(@"\Sets\"))
                     {
                         string choosen = Grabber(Input1, result);
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2, ExpandedOutfit.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
                         if (ExpandedOutfit.EnableDefaults.Value)
                         {
                             temp2.Add("Defaults");
