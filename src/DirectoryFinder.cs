@@ -48,6 +48,12 @@ namespace Cosplay_Academy
             FoldersPath.AddRange(folders);
             int index = FoldersPath.FindIndex(a => a.EndsWith(@"\Sets"));
             FoldersPath.RemoveAt(index);
+#if Debug
+            foreach (var item in FoldersPath)
+            {
+                ExpandedOutfit.Logger.LogError(item);
+            }
+#endif
             return FoldersPath;
         }
         public static List<string> Get_Set_Paths(string Narrow)
