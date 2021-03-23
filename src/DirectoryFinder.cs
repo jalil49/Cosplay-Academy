@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Cosplay_Academy
 {
     static class DirectoryFinder
     {
-        static List<string> Choosen;
-        static List<string> FoldersPath;
+        static readonly List<string> Choosen;
+        static readonly List<string> FoldersPath;
         static bool Reset;
         static DirectoryFinder()
         {
@@ -45,15 +46,32 @@ namespace Cosplay_Academy
             FoldersPath.Clear();
             FoldersPath.Add(input);
             string[] folders = System.IO.Directory.GetDirectories(input, "*", System.IO.SearchOption.AllDirectories); //grab child folders
-            FoldersPath.AddRange(folders);
-            int index = FoldersPath.FindIndex(a => a.EndsWith(@"\Sets"));
-            FoldersPath.RemoveAt(index);
-#if Debug
-            foreach (var item in FoldersPath)
+            List<string> FolderLists = folders.ToList();
+            int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
+            FolderLists.RemoveAt(index);
+            FoldersPath.AddRange(FolderLists);
+            if (ExpandedOutfit.NonMatchWeight.Value)
             {
-                ExpandedOutfit.Logger.LogError(item);
+                List<string> append = new List<string>();
+                foreach (var item in FoldersPath)
+                {
+                    if (!item.Contains(@"\Sets\"))
+                    {
+                        for (int i = 1; i < Directory.GetFiles(item).Length; i++)
+                        {
+                            append.Add(item);
+                        }
+                    }
+                }
+                FoldersPath.AddRange(append);
             }
-#endif
+
+            //ExpandedOutfit.Logger.LogWarning("\n\n");
+
+            //foreach (var item in FoldersPath)
+            //{
+            //    ExpandedOutfit.Logger.LogError(item);
+            //}
             return FoldersPath;
         }
         public static List<string> Get_Set_Paths(string Narrow)
@@ -71,11 +89,13 @@ namespace Cosplay_Academy
         }
         public static List<string> Get_Outfits_From_Path(string FilePath, bool RemoveSets = true)
         {
-            ExpandedOutfit.Logger.LogDebug("Searching " + FilePath);
+            //ExpandedOutfit.Logger.LogDebug("Searching " + FilePath);
             Choosen.Clear();
-            List<string> Paths = new List<string>();
-            Paths.Add(FilePath); //add parent folder to list
-                                 //ExpandedOutfit.Logger.LogDebug(coordinatepath + "coordinate" + Narrow);
+            List<string> Paths = new List<string>
+            {
+                FilePath //add parent folder to list
+            };
+            //ExpandedOutfit.Logger.LogDebug(coordinatepath + "coordinate" + Narrow);
             string[] folders = System.IO.Directory.GetDirectories(FilePath, "*", System.IO.SearchOption.AllDirectories); //grab child folders
             if (folders.Length > 0)
             {

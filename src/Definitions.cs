@@ -56,6 +56,7 @@ namespace Cosplay_Academy
         };
         public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
     }
+
     public enum HStates
     {
         FirstTime, //0

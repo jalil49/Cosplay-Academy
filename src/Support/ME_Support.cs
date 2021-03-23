@@ -9,10 +9,10 @@ namespace Cosplay_Academy
 {
     #region Stuff ME_RePack Needs
     //int outfitnum => ChaControl.fileStatus.coordinateType;
-    public static class ME_Support
+    public class ME_Support
     {
-        public static Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
-        public static int SetAndGetTextureID(byte[] textureBytes)
+        public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
+        public int SetAndGetTextureID(byte[] textureBytes)
         {
             int highestID = 0;
             foreach (var tex in TextureDictionary)

@@ -1,5 +1,4 @@
-﻿using Manager;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,21 +7,15 @@ namespace Cosplay_Academy
 {
     public static class OutfitDecider
     {
-        private static OutfitData[] outfitData;
+        private static readonly OutfitData[] outfitData;
         private static bool IsInitialized;
 
-        //public static List<string> ProcessedNames; //list of processed characters
-        private static readonly Game _gameMgr;
-        private static List<SaveData.Heroine> heroines;
-        private static SaveData.Heroine person;
-        public static bool Reset; //
+        public static bool Reset;
         private static ChaDefault ThisOutfitData;
         private static int HExperience;
-
+        private static int LastHeroineClub = -1;
         static OutfitDecider()
         {
-            _gameMgr = Game.Instance;
-            //ProcessedNames = new List<string>();//initiate string
             IsInitialized = false;
             Reset = true;
             outfitData = new OutfitData[Constants.InputStrings.Length];
@@ -34,7 +27,6 @@ namespace Cosplay_Academy
 
         public static void ResetDecider()
         {
-            //ProcessedNames.Clear(); //reset list
             Reset = false;
             if (IsInitialized)
             {
@@ -44,23 +36,14 @@ namespace Cosplay_Academy
                 }
             }
             IsInitialized = false;
-
+            LastHeroineClub = -1;
             ExpandedOutfit.Logger.LogInfo("Reset has occured");
         }
 
         public static void Decision(string name, ChaDefault cha)
         {
             ThisOutfitData = cha;
-            person = null;
-            heroines = _gameMgr.HeroineList;
-            foreach (SaveData.Heroine heroine in heroines)
-            {
-                if (name == heroine.Name)
-                {
-                    person = heroine;
-                    break;
-                }
-            }
+            SaveData.Heroine person = ThisOutfitData.heroine;
             if (!IsInitialized)
             {
                 Get_Outfits();
@@ -107,7 +90,15 @@ namespace Cosplay_Academy
 
             //set up Club outfits
             ExpandedOutfit.Logger.LogDebug("Clubs");
-            ClubOutfit(person == null ? (int)ExpandedOutfit.ClubChoice.Value : person.clubActivities);
+            if (person == null && LastHeroineClub != -1)
+            {
+                ClubOutfit(LastHeroineClub);
+            }
+            else
+            {
+                LastHeroineClub = (person == null ? (int)ExpandedOutfit.ClubChoice.Value : person.clubActivities);
+                ClubOutfit(LastHeroineClub);
+            }
             ExpandedOutfit.Logger.LogDebug("Clubs completed");
 
             ExpandedOutfit.Logger.LogDebug("Casual");
@@ -143,6 +134,12 @@ namespace Cosplay_Academy
                 foreach (string Input2 in Constants.InputStrings2)
                 {
                     exp++;
+                    if (ExpandedOutfit.ListOverrideBool[set].Value)
+                    {
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(ExpandedOutfit.ListOverride[set].Value, false); //when sets are enabled don't include them in rolls, but do if disabled
+                        outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
+                        continue;
+                    }
                     if (outfitData[set].IsSet(exp))//Skip set items
                     {
                         continue;
@@ -157,7 +154,6 @@ namespace Cosplay_Academy
                         temp2.AddRange(DirectoryFinder.Grab_All_Files(coordinatepath + @"coordinate\Swimsuit" + Input2));
                     }
                     string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
-
                     if (!ExpandedOutfit.EnableSets.Value || !result.Contains(@"\Sets\"))
                     {
                         string choosen = Grabber(Input1, result);
@@ -173,7 +169,10 @@ namespace Cosplay_Academy
                         string[] split = result.Split('\\');
                         temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
                         string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
-                        Setsfunction(array);
+                        if (!ExpandedOutfit.IndividualSets.Value)
+                        {
+                            Setsfunction(array);
+                        }
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
                         outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
                     }
@@ -270,11 +269,12 @@ namespace Cosplay_Academy
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.outfitpath[0];
                     break;
             }
-            if (person == null ? ExpandedOutfit.KoiClub.Value : person.isStaff)
+            ThisOutfitData.Koipath = outfitData[11].RandomSet(HExperience, ExpandedOutfit.MatchKoiClub.Value);
+            if (ThisOutfitData.heroine == null ? ExpandedOutfit.KoiClub.Value : ThisOutfitData.heroine.isStaff && ExpandedOutfit.KeepOldBehavior.Value)
             {
                 if (UnityEngine.Random.Range(1, 101) <= ExpandedOutfit.KoiChance.Value)
                 {
-                    Generalized_Assignment(ExpandedOutfit.MatchKoiClub.Value, 4, 11);
+                    ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
                 }
             }
         }
@@ -286,9 +286,9 @@ namespace Cosplay_Academy
         {
             Generalized_Assignment(ExpandedOutfit.MatchNightwear.Value, 6, 10);
         }
-        private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
+        private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
-            ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+            return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
         }
         private static string Grabber(string Input1, string result)
         {
