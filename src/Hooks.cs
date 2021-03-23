@@ -184,7 +184,10 @@ namespace Cosplay_Academy
                             //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
                             //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
                             //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
-                            ThisOutfitData.ChangeClubToKoi = true;
+                            if (UnityEngine.Random.Range(1, 101) <= ExpandedOutfit.KoiChance.Value)
+                            {
+                                ThisOutfitData.ChangeClubToKoi = true;
+                            }
                         }
                         else if (_npc.mapNo == 22 && wp.MapNo == 46)
                         {
@@ -192,7 +195,7 @@ namespace Cosplay_Academy
                         }
                         else if (_npc.mapNo == 22 && wp.MapNo != 22)
                         {
-                            ThisOutfitData.ChangeClubToKoi = true;
+                            ThisOutfitData.ChangeKoiToClub = true;
                             //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
                             //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
                             //tempcoord.Add(4);
@@ -240,7 +243,7 @@ namespace Cosplay_Academy
             }
             ThisOutfitData.ChangeKoiToClub = false;
             ThisOutfitData.ChangeClubToKoi = false;
-            if (__instance.mapNo == 22)
+            if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= ExpandedOutfit.KoiChance.Value)
             {
                 ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
                 ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
