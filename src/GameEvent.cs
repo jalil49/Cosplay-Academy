@@ -45,7 +45,7 @@ namespace Cosplay_Academy
             {
                 foreach (var item in Constants.ChaDefaults)
                 {
-                    item.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.School01, true);
+                    item.ChaControl.ChangeCoordinateTypeAndReload();
                     item.ChaControl.SetAccessoryStateAll(true);
                 }
             }
