@@ -9,19 +9,11 @@ A BepInEx plugin for Koikatu and Koikatsu Party main games that allows "randomiz
 
 ## Notes
 
-1. Some outfits will break, I don't know the exact reason but it probably has to do with overlays/material overrides like in color varients of same costume already being used.
+1. A file structure is required and can be copied from this repositry, but the files will be created when on the "going to school" cutscene happens.
 
-	1a. The more coordinated you leave everyone the less likely to encounter a break.
-
-2. A file structure is required and can be copied from this repositry, but the files will be created when on the "going to school" cutscene happens.
-
-3. I originally wanted to use Tags for the images rather than forcing file paths, but unfortunatly PNG doesn't actually support it.
-
-4. The Sets folder is used for folders of outfits that have similar asthetics such as "Beezys School Uniforms" and want people to follow a theme if choosen and hopefully don't conflict with each other.
-
-	4A. Beware of simple color varients in sets such as NekoMaids (the skirts in particular), for example (hope it gets patched), as they will conflict with each other.
+2. I originally wanted to use Tags for the images rather than forcing file paths, but unfortunatly PNG doesn't actually support it.
 	
-5. Anything that is in the parent folder of \Sets will be coordinating with itself rather than with those that share the folder unlike the Sets folder when proper match is enabled.
+3. Anything that is in the parent folder of \Sets will be coordinating with itself rather than with those that share the folder unlike the Sets folder when proper match is enabled.
 
 ## Known issues
 1. Reloading a Save will cause this to break for characters already loaded. Going back to Title will fix this.
