@@ -49,14 +49,15 @@ namespace Cosplay_Academy
             SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
 
 
-            var Hair_Acc_Controller = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
+            //var Hair_Acc_Controller = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
 
-            if (Hair_Acc_Controller != null)
-            {
-                UnityEngine.Component HairACC_Controller = ChaControl.gameObject.GetComponent(Hair_Acc_Controller);
-                object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-                Traverse.Create(HairACC_Controller).Method("OnReload", OnReloadArray).GetValue();
-            }
+            //if (Hair_Acc_Controller != null)
+            //{
+            //    UnityEngine.Component HairACC_Controller = ChaControl.gameObject.GetComponent(Hair_Acc_Controller);
+            //    object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(HairACC_Controller).Method("OnReload", OnReloadArray).GetValue();
+            //}
+            ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
 
             ThisOutfitData.ME_Work = true;
             ME_RePack(character, ThisOutfitData);
@@ -64,8 +65,8 @@ namespace Cosplay_Academy
             KKABM_Repack(character, ThisOutfitData);
             DynamicBone_Repack(character, ThisOutfitData);
             PushUp_RePack(character, ThisOutfitData);
+            ClothingUnlocker_RePack(character, ThisOutfitData);
         }
-
 
         private void GeneralizedLoad(int outfitnum)
         {
@@ -668,13 +669,15 @@ namespace Cosplay_Academy
 
 
 
-            var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
-            if (ME_OverlayX != null)
-            {
-                UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
-                object[] OnReloadArray = new object[2] { coordinate, false };
-                Traverse.Create(ME_Controller).Method("OnCoordinateBeingLoaded", OnReloadArray).GetValue();
-            }
+            //var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+            //if (ME_OverlayX != null)
+            //{
+            //    UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
+            //    object[] OnReloadArray = new object[2] { coordinate, false };
+            //    Traverse.Create(ME_Controller).Method("OnCoordinateBeingLoaded", OnReloadArray).GetValue();
+            //}
+            //RePack_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
+            ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
 
             if (ExpandedOutfit.HairMatch.Value)
             {
@@ -683,18 +686,19 @@ namespace Cosplay_Academy
                 Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
-                var HairAccessoryCustomizer = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
-                if (HairAccessoryCustomizer != null)
-                {
-                    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-                    var temp = ChaControl.GetComponent(HairAccessoryCustomizer);
-                    object[] HairInput = new object[2] { coordinate, false };
-                    Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
-                }
+                //var HairAccessoryCustomizer = Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false);
+                //if (HairAccessoryCustomizer != null)
+                //{
+                //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+                //    var temp = ChaControl.GetComponent(HairAccessoryCustomizer);
+                //    object[] HairInput = new object[2] { coordinate, false };
+                //    Traverse.Create(temp).Method("OnCoordinateBeingLoaded", HairInput).GetValue();
+                //}
+                ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
             }
         }
 
-        public static void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private static void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             ChaFile ChaFile = ChaControl.chaFile;
             List<RendererProperty> RendererPropertyList = new List<RendererProperty>();
@@ -808,24 +812,18 @@ namespace Cosplay_Academy
             //    Traverse.Create(ME_Controller).Method("OnReload", OnReloadArray).GetValue();
             //}
         }
-        public static void KCOX_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private static void KCOX_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             PluginData SavedData;
             var data = new PluginData { version = 1 };
             Dictionary<string, ClothesTexData> storage;
             Dictionary<CoordinateType, Dictionary<string, ClothesTexData>> Final = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
-            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KCOX");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
-                var asdasdas = ExtendedSave.GetAllExtendedData(ChaControl.chaFile.coordinate[i]);
                 storage = new Dictionary<string, ClothesTexData>();
                 if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
                 {
-                    foreach (var item in SavedData.data)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i}\tVersion {SavedData.version}\t data key: {item.Key}\t data Value: {item.Value}");
-                    }
-
                     var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(byteArr);
                     if (dict != null)
                     {
@@ -833,15 +831,11 @@ namespace Cosplay_Academy
                             storage.Add(texData.Key, texData.Value);
                     }
                 }
-                foreach (var item in asdasdas)
-                {
-                    ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i}\t data key: {item.Key}\t data Value: {item.Value}");
-                }
                 Final.Add((CoordinateType)i, storage);
             }
 
-            //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            //SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
+            data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
+            SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
             //var KoiOverlay = typeof(KoiClothesOverlayController);
             //if (KoiOverlay != null)
             //{
@@ -851,7 +845,34 @@ namespace Cosplay_Academy
             //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
             //}
         }
-        public static void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private static void ClothingUnlocker_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            PluginData SavedData;
+            Dictionary<int, bool> Final = new Dictionary<int, bool>();
+            bool result;
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
+            {
+                result = false;
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
+                if (SavedData != null && SavedData.data.TryGetValue("ClothingUnlockedCoordinate", out var loadedClothingUnlocked))
+                {
+                    result = (bool)loadedClothingUnlocked;
+                }
+                Final.Add(i, result);
+            }
+            var data = new PluginData();
+            data.data.Add("ClothingUnlocked", MessagePackSerializer.Serialize(Final));
+            SetExtendedData("com.deathweasel.bepinex.clothingunlocker", data, ChaControl, ThisOutfitData);
+            //var KoiOverlay = typeof(KoiClothesOverlayController);
+            //if (KoiOverlay != null)
+            //{
+            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+            //    var temp = ChaControl.GetComponent(KoiOverlay);
+            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            //}
+        }
+        private static void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             Pushup.ClothData newBraData;
             Pushup.ClothData newTopData;
@@ -859,7 +880,7 @@ namespace Cosplay_Academy
             PluginData SavedData;
             Dictionary<int, Pushup.ClothData> FinalBra = new Dictionary<int, Pushup.ClothData>();
             Dictionary<int, Pushup.ClothData> FinalTop = new Dictionary<int, Pushup.ClothData>();
-            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 newBraData = new Pushup.ClothData();
                 newTopData = new Pushup.ClothData();
@@ -892,11 +913,11 @@ namespace Cosplay_Academy
             //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
             //}
         }
-        public static void KKABM_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private static void KKABM_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             PluginData SavedData;
             List<BoneModifier> Modifiers = new List<BoneModifier>();
-            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
                 if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes is byte[] byteArr)
@@ -943,11 +964,11 @@ namespace Cosplay_Academy
             //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
             //}
         }
-        public static void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private static void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             PluginData SavedData;
             List<DynamicBoneData> Modifiers = new List<DynamicBoneData>();
-            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            for (int i = 0; i < Constants.outfitpath.Length; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
                 if (SavedData != null && SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes is byte[] byteArr)
@@ -974,16 +995,26 @@ namespace Cosplay_Academy
             var data = new PluginData();
             data.data.Add("AccessoryDynamicBoneData", MessagePackSerializer.Serialize(Modifiers));
             SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", data, ChaControl, ThisOutfitData);
-            //var KoiOverlay = typeof(KoiClothesOverlayController);
-            //if (KoiOverlay != null)
-            //{
-            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-            //    var temp = ChaControl.GetComponent(KoiOverlay);
-            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            //}
         }
 
+        public static void Reload_RePacks(ChaControl ChaControl)
+        {
+            ControllerReload_Loop(typeof(KoiClothesOverlayController), ChaControl);
+            ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
+            ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
+            ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);
+            ControllerReload_Loop(typeof(BoneController), ChaControl);
+            ControllerReload_Loop(typeof(KK_Plugins.DynamicBoneEditor.CharaController), ChaControl);
+        }
+        private static void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
+        {
+            if (Controller != null)
+            {
+                var temp = ChaControl.GetComponent(Controller);
+                object[] Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
+            }
+        }
 
         private static void ME_Float_Loop(Queue<MaterialFloatProperty> FloatQueue, int ACCpostion, List<MaterialFloatProperty> MaterialFloat)
         {

@@ -20,9 +20,42 @@ namespace Cosplay_Academy
     {
         public static CharaEvent self;
         private ChaDefault ThisOutfitData;
+        protected override void Awake()
+        {
+            base.Awake();
+            Process(KoikatuAPI.GetCurrentGameMode());
+        }
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
-            //ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);
+            if (currentGameMode == GameMode.Studio)
+            {
+                return;
+            }
+            if (currentGameMode == GameMode.Maker)
+            {
+                Process(currentGameMode);
+                ClothingLoader.Reload_RePacks(ChaControl);
+            }
+            else if (ThisOutfitData.heroine == null)
+            {
+                Game _gamemgr = Game.Instance;
+                foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
+                {
+                    if (Heroine.chaCtrl != null && Heroine.chaCtrl.name != null && ChaControl.name == Heroine.chaCtrl.name)
+                    {
+                        ThisOutfitData.heroine = Heroine;
+                        break;
+                    }
+                }
+            }
+        }
+        protected override void OnCardBeingSaved(GameMode currentGameMode)
+        {
+            //unused mandatory function 
+        }
+        private void Process(GameMode currentGameMode)
+        {
+            ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
@@ -351,12 +384,8 @@ namespace Cosplay_Academy
                     ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
                 }
             }
-        }
-        protected override void OnCardBeingSaved(GameMode currentGameMode)
-        {
-            //unused mandatory function 
-        }
 
+        }
         //public void HairAccessory_RePack()//original
         //{
         //    Dictionary<int, HairAccessoryInfo> PluginData = new Dictionary<int, HairAccessoryInfo>();

@@ -39,40 +39,40 @@ namespace Cosplay_Academy
             OutfitDecider.Reset = true;
             ExpandedOutfit.Logger.LogInfo("Reset has applied");
         }
-        protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
-        {
-            if (freeH && ExpandedOutfit.EnableSetting.Value)
-            {
-                foreach (var item in Constants.ChaDefaults)
-                {
-                    item.ChaControl.ChangeCoordinateTypeAndReload();
-                    item.ChaControl.SetAccessoryStateAll(true);
-                }
-            }
-            else if (!freeH && ExpandedOutfit.EnableSetting.Value) //required when starting H from special scenes: 3P, caught playing with self, les
-            {
-                ClothingLoader clothingLoader = new ClothingLoader();
-                List<ChaControl> lstFemale = (List<ChaControl>)Traverse.Create(hSceneProc).Field("lstFemale").GetValue();
-                foreach (var item in lstFemale)
-                {
-                    //chacontrols from special scenes do not seem to be the same as the ones from reload as changes don't take effect
-                    //used to do it in CharaEvent, but it broke with textures after talkng to someone
-                    var ChaPara = item.fileParam;
+        //protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
+        //{
+        //    if (freeH && ExpandedOutfit.EnableSetting.Value)
+        //    {
+        //        foreach (var item in Constants.ChaDefaults)
+        //        {
+        //            item.ChaControl.ChangeCoordinateTypeAndReload();
+        //            item.ChaControl.SetAccessoryStateAll(true);
+        //        }
+        //    }
+        //    else if (!freeH && ExpandedOutfit.EnableSetting.Value) //required when starting H from special scenes: 3P, caught playing with self, les
+        //    {
+        //        ClothingLoader clothingLoader = new ClothingLoader();
+        //        List<ChaControl> lstFemale = (List<ChaControl>)Traverse.Create(hSceneProc).Field("lstFemale").GetValue();
+        //        foreach (var item in lstFemale)
+        //        {
+        //            //chacontrols from special scenes do not seem to be the same as the ones from reload as changes don't take effect
+        //            //used to do it in CharaEvent, but it broke with textures after talkng to someone
+        //            var ChaPara = item.fileParam;
 
-                    var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-                    if (ThisOutfitData != null)
-                    {
-                        //Storedwaifus[ChaPara.fullname + ChaPara.personality + ChaPara.strBirthDay] = ThisOutfitData.ChaControl;
-                        //ThisOutfitData.ChaControl = item;
-                        //ThisOutfitData.Chafile = item.chaFile;
-                        int retain = item.chaFile.status.coordinateType;
-                        clothingLoader.FullLoad(ThisOutfitData, item, item.chaFile);
-                        item.chaFile.status.coordinateType = retain;
-                        item.ChangeCoordinateTypeAndReload();
-                    }
-                }
-            }
-        }
+        //            var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
+        //            if (ThisOutfitData != null)
+        //            {
+        //                //Storedwaifus[ChaPara.fullname + ChaPara.personality + ChaPara.strBirthDay] = ThisOutfitData.ChaControl;
+        //                //ThisOutfitData.ChaControl = item;
+        //                //ThisOutfitData.Chafile = item.chaFile;
+        //                int retain = item.chaFile.status.coordinateType;
+        //                clothingLoader.FullLoad(ThisOutfitData, item, item.chaFile);
+        //                item.chaFile.status.coordinateType = retain;
+        //                item.ChangeCoordinateTypeAndReload();
+        //            }
+        //        }
+        //    }
+        //}
         protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
         {
             //ExpandedOutfit.Logger.LogWarning($"freeh is {freeH}");

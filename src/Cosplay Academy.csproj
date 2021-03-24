@@ -88,8 +88,14 @@
       <HintPath>packages\IllusionModdingAPI.KKAPI.1.15.0\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="KK_ClothingUnlocker">
+      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_ClothingUnlocker.dll</HintPath>
+    </Reference>
     <Reference Include="KK_DynamicBoneEditor">
       <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_DynamicBoneEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="KK_MaterialEditor">
+      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_MaterialEditor.dll</HintPath>
     </Reference>
     <Reference Include="KK_OverlayMods, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\OverlayMods.Koikatu.6.0.0\lib\net35\KK_OverlayMods.dll</HintPath>
