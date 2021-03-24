@@ -1,8 +1,10 @@
 ﻿using Cosplay_Academy.Hair;
 using ExtensibleSaveFormat;
 using HarmonyLib;
+using KK_Plugins;
+using KK_Plugins.DynamicBoneEditor;
+using KKABMX.Core;
 using KKAPI;
-using KKAPI.Chara;
 using KoiClothesOverlayX;
 using MessagePack;
 using MoreAccessoriesKOI;
@@ -59,6 +61,9 @@ namespace Cosplay_Academy
             ThisOutfitData.ME_Work = true;
             ME_RePack(character, ThisOutfitData);
             KCOX_RePack(character, ThisOutfitData);
+            KKABM_Repack(character, ThisOutfitData);
+            DynamicBone_Repack(character, ThisOutfitData);
+            PushUp_RePack(character, ThisOutfitData);
         }
 
 
@@ -794,14 +799,14 @@ namespace Cosplay_Academy
 
             SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl, ThisOutfitData);
 
-            var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
-            if (ME_OverlayX != null)
-            {
-                UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
-                //Traverse.Create(test).Method("RePack").GetValue();
-                object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-                Traverse.Create(ME_Controller).Method("OnReload", OnReloadArray).GetValue();
-            }
+            //var ME_OverlayX = Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false);
+            //if (ME_OverlayX != null)
+            //{
+            //    UnityEngine.Component ME_Controller = ChaControl.gameObject.GetComponent(ME_OverlayX);
+            //    //Traverse.Create(test).Method("RePack").GetValue();
+            //    object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(ME_Controller).Method("OnReload", OnReloadArray).GetValue();
+            //}
         }
         public static void KCOX_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
@@ -812,9 +817,15 @@ namespace Cosplay_Academy
             for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KCOX");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
+                var asdasdas = ExtendedSave.GetAllExtendedData(ChaControl.chaFile.coordinate[i]);
                 storage = new Dictionary<string, ClothesTexData>();
                 if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
                 {
+                    foreach (var item in SavedData.data)
+                    {
+                        ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i}\tVersion {SavedData.version}\t data key: {item.Key}\t data Value: {item.Value}");
+                    }
+
                     var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(byteArr);
                     if (dict != null)
                     {
@@ -822,20 +833,157 @@ namespace Cosplay_Academy
                             storage.Add(texData.Key, texData.Value);
                     }
                 }
+                foreach (var item in asdasdas)
+                {
+                    ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i}\t data key: {item.Key}\t data Value: {item.Value}");
+                }
                 Final.Add((CoordinateType)i, storage);
             }
 
-            data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
-            var KoiOverlay = typeof(KoiClothesOverlayController);
-            if (KoiOverlay != null)
-            {
-                //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-                var temp = ChaControl.GetComponent(KoiOverlay);
-                object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-                Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            }
+            //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
+            //SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
+            //var KoiOverlay = typeof(KoiClothesOverlayController);
+            //if (KoiOverlay != null)
+            //{
+            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+            //    var temp = ChaControl.GetComponent(KoiOverlay);
+            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            //}
         }
+        public static void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            Pushup.ClothData newBraData;
+            Pushup.ClothData newTopData;
+
+            PluginData SavedData;
+            Dictionary<int, Pushup.ClothData> FinalBra = new Dictionary<int, Pushup.ClothData>();
+            Dictionary<int, Pushup.ClothData> FinalTop = new Dictionary<int, Pushup.ClothData>();
+            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            {
+                newBraData = new Pushup.ClothData();
+                newTopData = new Pushup.ClothData();
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.pushup");
+                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
+                {
+                    newBraData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
+                }
+                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
+                {
+                    newTopData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
+                }
+                FinalBra.Add(i, newBraData);
+                FinalTop.Add(i, newTopData);
+            }
+            var data = new PluginData();
+            data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
+            data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
+            data.data.Add("Pushup_BodyData", null);
+            SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl, ThisOutfitData);
+
+            //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
+            //SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
+            //var KoiOverlay = typeof(KoiClothesOverlayController);
+            //if (KoiOverlay != null)
+            //{
+            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+            //    var temp = ChaControl.GetComponent(KoiOverlay);
+            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            //}
+        }
+        public static void KKABM_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            PluginData SavedData;
+            List<BoneModifier> Modifiers = new List<BoneModifier>();
+            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            {
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
+                if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes is byte[] byteArr)
+                {
+                    Dictionary<string, BoneModifierData> import;
+                    try
+                    {
+                        if (SavedData.version != 2)
+                            throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
+
+                        import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, BoneModifierData>>(byteArr);
+                        if (import != null)
+                        {
+                            foreach (var modifier in import)
+                            {
+                                var target = new BoneModifier(modifier.Key);
+                                Modifiers.Add(target);
+                                target.MakeCoordinateSpecific();
+                                target.CoordinateModifiers[i] = modifier.Value;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExpandedOutfit.Logger.LogError("[Cosplay Academy] =>[KKABMX] Failed to load extended data - " + ex);
+                    }
+                }
+            }
+            if (Modifiers.Count == 0)
+            {
+                SetExtendedData("KKABMPlugin.ABMData", null, ChaControl, ThisOutfitData);
+                return;
+            }
+
+            var data = new PluginData { version = 2 };
+            data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
+            SetExtendedData("KKABMPlugin.ABMData", data, ChaControl, ThisOutfitData);
+            //var KoiOverlay = typeof(KoiClothesOverlayController);
+            //if (KoiOverlay != null)
+            //{
+            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+            //    var temp = ChaControl.GetComponent(KoiOverlay);
+            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            //}
+        }
+        public static void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            PluginData SavedData;
+            List<DynamicBoneData> Modifiers = new List<DynamicBoneData>();
+            for (int i = 0; i < ThisOutfitData.Chafile.coordinate.Length; i++)
+            {
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
+                if (SavedData != null && SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes is byte[] byteArr)
+                {
+                    List<DynamicBoneData> import;
+
+                    import = MessagePackSerializer.Deserialize<List<DynamicBoneData>>(byteArr);
+                    if (import != null)
+                    {
+                        foreach (var dbData in import)
+                        {
+                            dbData.CoordinateIndex = i;
+                            Modifiers.Add(dbData);
+                        }
+                    }
+                }
+            }
+            if (Modifiers.Count == 0)
+            {
+                SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", null, ChaControl, ThisOutfitData);
+                return;
+            }
+
+            var data = new PluginData();
+            data.data.Add("AccessoryDynamicBoneData", MessagePackSerializer.Serialize(Modifiers));
+            SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", data, ChaControl, ThisOutfitData);
+            //var KoiOverlay = typeof(KoiClothesOverlayController);
+            //if (KoiOverlay != null)
+            //{
+            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
+            //    var temp = ChaControl.GetComponent(KoiOverlay);
+            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
+            //}
+        }
+
 
         private static void ME_Float_Loop(Queue<MaterialFloatProperty> FloatQueue, int ACCpostion, List<MaterialFloatProperty> MaterialFloat)
         {
