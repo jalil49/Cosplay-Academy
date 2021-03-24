@@ -137,6 +137,7 @@ namespace Cosplay_Academy
         private void MakerAPI_Clear(object sender, System.EventArgs e)
         {
             Constants.ChaDefaults.Clear();
+            OutfitDecider.ResetDecider();
         }
     }
 }
