@@ -878,7 +878,7 @@ namespace Cosplay_Academy
             var data = new PluginData();
             data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
             data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
-            data.data.Add("Pushup_BodyData", null);
+            //data.data.Add("Pushup_BodyData", null);
             SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl, ThisOutfitData);
 
             //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
