@@ -1,6 +1,7 @@
 ﻿using ActionGame;
 using ActionGame.Chara;
 using HarmonyLib;
+using Illusion.Extensions;
 using Manager;
 using System;
 using System.Reflection;
@@ -126,7 +127,12 @@ namespace Cosplay_Academy
             {
                 ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
                 ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
-                ThisOutfitData.heroine.coordinates[ThisOutfitData.heroine.NowCoordinate] = 4;
+                int num = ThisOutfitData.heroine.isDresses.Check(false);
+                if (num == -1)
+                {
+                    num = 0;
+                }
+                ThisOutfitData.heroine.coordinates[num] = 4;
                 clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                 Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 Chara.chaCtrl.SetAccessoryStateAll(true);
@@ -139,7 +145,12 @@ namespace Cosplay_Academy
                 if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
                 {
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.PreviousPath;
-                    ThisOutfitData.heroine.coordinates[ThisOutfitData.heroine.NowCoordinate] = 4;
+                    int num = ThisOutfitData.heroine.isDresses.Check(false);
+                    if (num == -1)
+                    {
+                        num = 0;
+                    }
+                    ThisOutfitData.heroine.coordinates[num] = 4;
                     clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                     ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
