@@ -55,7 +55,7 @@ namespace Cosplay_Academy
         }
         private void Process(GameMode currentGameMode)
         {
-            ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);
+            //ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
