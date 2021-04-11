@@ -267,7 +267,7 @@ namespace Cosplay_Academy
                 ThisOutfitData.heroine.coordinates[0] = 4;
                 __instance.chaCtrl.SetAccessoryStateAll(true);
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
-                ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                ClothingLoader.Reload_RePacks(__instance.chaCtrl);
                 //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
             }
         }
