@@ -28,17 +28,19 @@ namespace Cosplay_Academy
             {
                 return;
             }
+            //ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
+
             if (currentGameMode == GameMode.Maker)
             {
                 Process(currentGameMode);
                 ClothingLoader.Reload_RePacks(ChaControl);
             }
-            else if (ThisOutfitData.heroine == null)
+            else if (ThisOutfitData != null && ThisOutfitData.heroine == null)
             {
                 Game _gamemgr = Game.Instance;
                 foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
                 {
-                    if (Heroine.chaCtrl != null && Heroine.chaCtrl.name != null && ChaControl.name == Heroine.chaCtrl.name)
+                    if (Heroine.parameter.personality == ChaControl.fileParam.personality && Heroine.parameter.fullname == ChaControl.fileParam.fullname && Heroine.parameter.strBirthDay == ChaControl.fileParam.strBirthDay)
                     {
                         ThisOutfitData.heroine = Heroine;
                         break;
@@ -67,7 +69,7 @@ namespace Cosplay_Academy
                 Game _gamemgr = Game.Instance;
                 foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
                 {
-                    if (Heroine.chaCtrl != null && Heroine.chaCtrl.name != null && ChaControl.name == Heroine.chaCtrl.name)
+                    if (Heroine.parameter.personality == ChaControl.fileParam.personality && Heroine.parameter.fullname == ChaControl.fileParam.fullname && Heroine.parameter.strBirthDay == ChaControl.fileParam.strBirthDay)
                     {
                         ThisOutfitData.heroine = Heroine;
                         break;

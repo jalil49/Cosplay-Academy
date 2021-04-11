@@ -19,7 +19,7 @@ namespace Cosplay_Academy
         private string Path_Amateur;
         private string Path_Pro;
         private string Path_Lewd;
-        public bool Anger;
+        public bool Anger = false;
         //private bool[] ScaleableBool ; //All Scale with Constants.inputstrings2
         //private string[] ScaleableString []; 
         //private string[] ScaleablePaths; 

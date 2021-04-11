@@ -1132,7 +1132,7 @@ namespace Cosplay_Academy
             if (ThisOutfitData.heroine != null && ChaControl.sex == 1)
             {
                 ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
-                ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.chaCtrl.chaFile, IDtoSET, data);
+                //ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.chaCtrl.chaFile, IDtoSET, data);
             }
         }
     }
