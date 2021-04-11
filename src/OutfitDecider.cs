@@ -52,7 +52,6 @@ namespace Cosplay_Academy
                 {
                     foreach (OutfitData data in outfitData)
                     {
-                        data.Anger = false;
                         data.Coordinate();
                     }
                     HExperience = (int)ExpandedOutfit.MakerHstate.Value;
@@ -61,11 +60,17 @@ namespace Cosplay_Academy
                 {
                     foreach (OutfitData data in outfitData)
                     {
-                        data.Anger = person.isAnger;
                         data.Coordinate();
                     }
 
                     HExperience = (int)person.HExperience;
+                }
+            }
+            if (person != null)
+            {
+                for (int i = 0; i < outfitData.Length; i++)
+                {
+                    outfitData[i].Anger = person.isAnger;
                 }
             }
             //Set up Normal uniform
