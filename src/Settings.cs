@@ -59,6 +59,8 @@ namespace Cosplay_Academy
 
 
         public static ConfigEntry<bool> AccKeeper { get; private set; }
+        public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
+        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
 
@@ -88,6 +90,8 @@ namespace Cosplay_Academy
             AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, "Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald");
             ExtremeAccKeeper = Config.Bind("Main Game", "KEEP ALL ACCESSORIES", false, "Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories");
             HairMatch = Config.Bind("Main Game", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
+            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
+            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Don't load new outfits");
             NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
             StoryModeChange = Config.Bind("Story Mode", "KoiKatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behaviour", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");

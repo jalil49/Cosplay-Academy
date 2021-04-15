@@ -32,7 +32,7 @@ namespace Cosplay_Academy
                     {
                         if (!Directory.Exists(coordinatepath + "coordinate" + input + input2 + input3))
                         {
-                            ExpandedOutfit.Logger.LogWarning("File not found, creating directory at " + "coordinate" + input + input2 + input3);
+                            ExpandedOutfit.Logger.LogWarning("Folder not found, creating directory at " + "coordinate" + input + input2 + input3);
                             Directory.CreateDirectory(coordinatepath + "coordinate" + input + input2 + input3);
                         }
                     }

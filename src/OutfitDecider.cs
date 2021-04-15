@@ -65,6 +65,16 @@ namespace Cosplay_Academy
             {
                 HExperience = (int)ExpandedOutfit.MakerHstate.Value;
             }
+            UnderwearChoice();
+            if (ExpandedOutfit.RandomizeUnderwearOnly.Value)
+            {
+                if (person != null)
+                {
+                    ExpandedOutfit.Logger.LogDebug(name + " is processed.");
+                }
+                return;
+            }
+
             //Set up Normal uniform
             ExpandedOutfit.Logger.LogDebug("Uniform");
             UniformOutfit();
@@ -282,6 +292,10 @@ namespace Cosplay_Academy
         private static void NightOutfit()
         {
             Generalized_Assignment(ExpandedOutfit.MatchNightwear.Value, 6, 10);
+        }
+        private static void UnderwearChoice()
+        {
+            ThisOutfitData.Underwear = outfitData[12].RandomSet(HExperience, ExpandedOutfit.MatchNightwear.Value);
         }
         private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {

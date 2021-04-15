@@ -216,6 +216,7 @@ namespace Cosplay_Academy
         //public string ChaName;//not actual name but ChaControl.Name
         internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.outfitpath.Length];
         internal string[] outfitpath = new string[Constants.outfitpath.Length];
+        internal string Underwear = "";
         internal int Personality;
         internal string BirthDay;
         internal string FullName;
