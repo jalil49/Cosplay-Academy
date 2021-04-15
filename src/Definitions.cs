@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 namespace Cosplay_Academy
 {
@@ -27,7 +28,8 @@ namespace Cosplay_Academy
             @"\Club\Track", //8
             @"\Casual" , //9
             @"\Nightwear", //10
-            @"\Club\Koi" //11
+            @"\Club\Koi", //11
+            @"\Underwear"//12
         };//Folders
         public static readonly string[] InputStrings2 = {
             @"\FirstTime", //0
@@ -35,7 +37,7 @@ namespace Cosplay_Academy
             @"\Pro", //2
             @"\Lewd" //3
         };//Experience States; easy to make scale with size
-        public static string[] outfitpath = { " ", " ", " ", " ", " ", " ", " " };//Number of outfits starting from uniform to nightwear
+        public static int outfitpath = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;//Number of outfits starting from uniform to nightwear
         public static readonly string[] Inclusion =
         {
             "a_n_headtop",//0
@@ -55,6 +57,17 @@ namespace Cosplay_Academy
             "a_n_hair_pin_R" //14
         };
         public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
+        public static string[] KCOX_Cat = {
+            "ct_clothesTop",//0
+            "ct_clothesBot",//1
+            "ct_bra",//2
+            "ct_shorts",//3
+            "ct_gloves",//4
+            "ct_panst",//5
+            "ct_socks",//6
+            "ct_shoes_inner",//7
+            "ct_shoes_outer"//8
+        };
     }
 
     public enum HStates

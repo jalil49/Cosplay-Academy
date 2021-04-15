@@ -10,8 +10,12 @@ namespace Cosplay_Academy
         {
             if (period == Cycle.Type.GotoSchool && ExpandedOutfit.UpdateFrequency.Value == OutfitUpdate.Daily)
             {
-                Constants.ChaDefaults.Clear();
+                //Constants.ChaDefaults.Clear();
                 OutfitDecider.Reset = true;
+                foreach (var ChaInfo in Constants.ChaDefaults)
+                {
+                    ChaInfo.CharaEvent.Process(KKAPI.GameMode.MainGame);
+                }
             }
             foreach (var item in Constants.ChaDefaults)
             {
@@ -22,13 +26,16 @@ namespace Cosplay_Academy
         {
             if ((Cycle.Week.Monday == day && ExpandedOutfit.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && ExpandedOutfit.SundayDate.Value)
             {
-                Constants.ChaDefaults.Clear();
+                //Constants.ChaDefaults.Clear();
                 OutfitDecider.Reset = true;
+                foreach (var ChaInfo in Constants.ChaDefaults)
+                {
+                    ChaInfo.CharaEvent.Process(KKAPI.GameMode.MainGame);
+                }
             }
         }
         protected override void OnGameLoad(GameSaveLoadEventArgs args)
         {
-
             Constants.ChaDefaults.Clear();
             OutfitDecider.Reset = true;
             ExpandedOutfit.Logger.LogInfo("Reset has applied");

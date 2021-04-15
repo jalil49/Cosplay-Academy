@@ -16,7 +16,7 @@ namespace Cosplay_Academy
     {
         public const string Guid = "Cosplay_Academy";
         public const string Version = Versions.Version;
-
+        public static ExpandedOutfit Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
         public static ConfigEntry<bool> EnableSetting { get; private set; }
@@ -51,9 +51,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> FullSet { get; private set; }
         public static ConfigEntry<bool> KoiClub { get; private set; }
         public static ConfigEntry<bool> ResetMaker { get; set; }
-        public static ConfigEntry<bool> PermReset { get; set; }
+        //public static ConfigEntry<bool> PermReset { get; set; }
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
-        public static ConfigEntry<bool> PermChangeOutfit { get; set; }
+        //public static ConfigEntry<bool> PermChangeOutfit { get; set; }
         public static ConfigEntry<int> KoiChance { get; private set; }
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
@@ -75,13 +75,15 @@ namespace Cosplay_Academy
 
         public void Awake()
         {
+            Instance = this;
+
             Logger = base.Logger;
             Hooks.Init();
             //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
-
             GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
             CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
+            CharaEvent.Initialize();
             MakerAPI.MakerExiting += MakerAPI_Clear;
             MakerAPI.MakerStartedLoading += MakerAPI_Clear;
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
@@ -129,9 +131,9 @@ namespace Cosplay_Academy
             MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
             ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub, "Affects club outfit in FreeH and cutscene non-heroine NPCs in story mode");
             ResetMaker = Config.Bind("Maker", "Randomize Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
-            PermReset = Config.Bind("Maker", "Keep Randomize Sets on", false, "Reset randomize Sets to disable once called");
+            //PermReset = Config.Bind("Maker", "Keep Randomize Sets on", false, "Reset randomize Sets to disable once called");
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false);
-            PermChangeOutfit = Config.Bind("Maker", "Keep change generated outit on", false, "Reset change generated outfit to disable once called");
+            //PermChangeOutfit = Config.Bind("Maker", "Keep change generated outit on", false, "Reset change generated outfit to disable once called");
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
             for (int i = 0; i < Constants.InputStrings.Length; i++)
             {
