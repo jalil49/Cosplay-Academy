@@ -56,7 +56,7 @@ namespace Cosplay_Academy
         //    }
         //    foreach (var entry in CharaFinallyFinished.GetInvocationList())
         //    {
-        //        var handler = (FinishedLoadingHandler)entry;
+        //var handler = (FinishedLoadingHandler)entry;
         //        try
         //        {
         //            handler.Invoke();
@@ -111,7 +111,7 @@ namespace Cosplay_Academy
                     ThisOutfitData.ChangeKoiToClub = false;
                     ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                     Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    Chara.chaCtrl.SetAccessoryStateAll(true);
+                    //Chara.chaCtrl.SetAccessoryStateAll(true);
                 }
                 //else if (ThisOutfitData != null && ThisOutfitData.ChangeClubToKoi)
                 //{
@@ -137,7 +137,7 @@ namespace Cosplay_Academy
                 ThisOutfitData.ChangeClubToKoi = false;
                 ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                 Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                Chara.chaCtrl.SetAccessoryStateAll(true);
+                //Chara.chaCtrl.SetAccessoryStateAll(true);
             }
             else if (ThisOutfitData.ChangeKoiToClub && __instance.MapNo != 22)
             {
@@ -154,7 +154,7 @@ namespace Cosplay_Academy
                     clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                     ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
+                    //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
                 }
                 ThisOutfitData.ChangeKoiToClub = false;
             }
@@ -267,7 +267,7 @@ namespace Cosplay_Academy
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
                 ClothingLoader.Reload_RePacks(__instance.chaCtrl);
                 __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                __instance.chaCtrl.SetAccessoryStateAll(true);
+                //__instance.chaCtrl.SetAccessoryStateAll(true);
                 //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
             }
         }

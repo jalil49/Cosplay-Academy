@@ -85,7 +85,8 @@ namespace Cosplay_Academy
             CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
             CharaEvent.Initialize();
             MakerAPI.MakerExiting += MakerAPI_Clear;
-            MakerAPI.MakerStartedLoading += MakerAPI_Clear;
+            MakerAPI.MakerStartedLoading += MakerAPI_MakerStartedLoading;
+            MakerAPI.MakerFinishedLoading += MakerAPI_MakerFinishedLoading;
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
@@ -142,8 +143,21 @@ namespace Cosplay_Academy
             }
         }
 
+        private void MakerAPI_MakerFinishedLoading(object sender, System.EventArgs e)
+        {
+            CharaEvent.finishedloading = true;
+        }
+
+        private void MakerAPI_MakerStartedLoading(object sender, RegisterCustomControlsEvent e)
+        {
+            CharaEvent.finishedloading = false;
+            Constants.ChaDefaults.Clear();
+            OutfitDecider.ResetDecider();
+        }
+
         private void MakerAPI_Clear(object sender, System.EventArgs e)
         {
+            CharaEvent.finishedloading = false;
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }

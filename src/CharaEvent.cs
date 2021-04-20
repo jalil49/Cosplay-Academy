@@ -19,10 +19,16 @@ namespace Cosplay_Academy
         public static CharaEvent self;
         private ChaDefault ThisOutfitData;
         public bool ClearData;
+        public static bool finishedloading;
+        bool firstmakerpass;
         protected override void Awake()
         {
             base.Awake();
             //ExpandedOutfit.Logger.LogError($"{ChaControl.fileParam.fullname} Awake, Reset? {OutfitDecider.Reset}");
+            if (KoikatuAPI.GetCurrentGameMode() == GameMode.Maker)
+            {
+                return;
+            }
             Process(KoikatuAPI.GetCurrentGameMode());
         }
 
@@ -62,7 +68,7 @@ namespace Cosplay_Academy
             }
             //ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
 
-            if (currentGameMode == GameMode.Maker)
+            if (currentGameMode == GameMode.Maker && firstmakerpass)
             {
                 if (ClearData)
                 {
@@ -82,6 +88,10 @@ namespace Cosplay_Academy
                         break;
                     }
                 }
+            }
+            else if (currentGameMode == GameMode.Maker)
+            {
+                firstmakerpass = true;
             }
         }
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -290,23 +300,23 @@ namespace Cosplay_Academy
                 ExpandedOutfit.Logger.LogWarning("Ended First Pass");
 #endif
 
-                //Dictionary<int, HairAccessoryInfo> HairInfo;
+
                 #region Queue accessories to keep
-                //List<int>[] HairKeep;
+                List<int>[] HairKeep;
                 List<int>[] ACCKeep;
                 var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
                 if (Required_Support != null)
                 {
-                    //HairKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Required_Support.data["HairAcc"]);
+                    HairKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Required_Support.data["HairAcc"]);
                     ACCKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Required_Support.data["AccKeep"]);
                 }
                 else
                 {
-                    //HairKeep = new List<int>[Constants.outfitpath];
+                    HairKeep = new List<int>[Constants.outfitpath];
                     ACCKeep = new List<int>[Constants.outfitpath];
                     for (int i = 0; i < Constants.outfitpath; i++)
                     {
-                        //HairKeep[i] = new List<int>();
+                        HairKeep[i] = new List<int>();
                         ACCKeep[i] = new List<int>();
                     }
                 }
@@ -353,7 +363,7 @@ namespace Cosplay_Academy
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Inclusion.Contains(Intermediate[i].parentKey)/*|| HairKeep[outfitnum].Contains(i)*/|| ACCKeep[outfitnum].Contains(i))
+                        if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Inclusion.Contains(Intermediate[i].parentKey) || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
                         {
                             if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
                             {
@@ -361,11 +371,15 @@ namespace Cosplay_Academy
                                 {
                                     HairLength = -999
                                 };
+                                //ThisOutfitData.HairPluginQueue[outfitnum].Add(false);
                             }
+                            //else { ThisOutfitData.HairPluginQueue[outfitnum].Add(true); }
                             //if (ExpandedOutfit.HairMatch.Value)
                             //{
                             //    ACCdata.ColorMatch = true;
                             //}
+                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep[outfitnum].Contains(i));
+                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep[outfitnum].Contains(i));
                             var ColorList = MaterialColorPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var FloatList = MaterialFloatPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var ShaderList = MaterialShaderQueue[outfitnum].FindAll(x => x.Slot == i);
@@ -457,7 +471,7 @@ namespace Cosplay_Academy
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 clothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
-                ChaControl.SetAccessoryStateAll(true);
+                //ChaControl.SetAccessoryStateAll(true);
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
@@ -494,20 +508,22 @@ namespace Cosplay_Academy
             }//if disabled don't run
             ClothingLoader.CoordinateLoad(ThisOutfitData, coordinate, ChaControl);
         }
+
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)
         {
             ChaFileCoordinate Temp = new ChaFileCoordinate();
             var TempClothPart = Temp.clothes.parts;
             var SourceClothPart = OriginalCoordinate.clothes.parts;
+
             for (int i = 0; i < TempClothPart.Length; i++)
             {
                 int idpass = SourceClothPart[i].id;
                 TempClothPart[i].id = idpass;
-                for (int j = 0; j < TempClothPart[i].hideOpt.Length; j++)
-                {
-                    bool hideoptpass = SourceClothPart[i].hideOpt[j];
-                    TempClothPart[i].hideOpt[j] = hideoptpass;
-                }
+                //for (int j = 0; j < TempClothPart[i].hideOpt.Length; j++) //doesnt exist in party
+                //{
+                //    bool hideoptpass = SourceClothPart[i].hideOpt[j];
+                //    TempClothPart[i].hideOpt[j] = hideoptpass;
+                //}
                 for (int j = 0; j < TempClothPart[i].colorInfo.Length; j++)
                 {
                     Color PassBaseColor = SourceClothPart[i].colorInfo[j].baseColor;
@@ -520,11 +536,14 @@ namespace Cosplay_Academy
                     TempClothPart[i].colorInfo[j].tiling = Passtiling;
                 }
                 int Emblem1 = SourceClothPart[i].emblemeId;
-                int Emblem2 = SourceClothPart[i].emblemeId2;
                 TempClothPart[i].emblemeId = Emblem1;
-                TempClothPart[i].emblemeId2 = Emblem2;
-                int passsleave = SourceClothPart[i].sleevesType;
-                TempClothPart[i].sleevesType = passsleave;
+                //{
+                //    //doesnt exist in party
+                //    int Emblem2 = SourceClothPart[i].emblemeId2;
+                //    TempClothPart[i].emblemeId2 = Emblem2;
+                //    int passsleave = SourceClothPart[i].sleevesType;
+                //    TempClothPart[i].sleevesType = passsleave;
+                //}
             }
             return Temp;
         }

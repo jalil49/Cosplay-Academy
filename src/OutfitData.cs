@@ -232,10 +232,16 @@ namespace Cosplay_Academy
         internal CharaEvent CharaEvent;
         internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.outfitpath];
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
+
+        internal List<bool>[] HairKeepQueue = new List<bool>[Constants.outfitpath];
+        internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.outfitpath];
+        //internal List<bool>[] HairPluginQueue = new List<bool>[Constants.outfitpath];
+
         #region hair accessories
         public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.outfitpath];
         public ChaControl ThisControl;
         #endregion
+
         #region Material Editor Save
         public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.outfitpath];
         public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.outfitpath];
@@ -257,6 +263,9 @@ namespace Cosplay_Academy
 
         #endregion
 
+        internal List<int>[] HairKeepReturn = new List<int>[Constants.outfitpath];
+        internal List<int>[] ACCKeepReturn = new List<int>[Constants.outfitpath];
+
         public ChaDefault()
         {
             for (int i = 0; i < Constants.outfitpath; i++)
@@ -270,66 +279,14 @@ namespace Cosplay_Academy
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
                 outfitpath[i] = " ";
+                HairKeepQueue[i] = new List<bool>();
+                ACCKeepQueue[i] = new List<bool>();
+                HairKeepReturn[i] = new List<int>();
+                ACCKeepReturn[i] = new List<int>();
+                //HairPluginQueue[i] = new List<bool>();
                 //ExtendedCharacterData[i] = new Dictionary<string, PluginData>();
             }
         }
-#if Debug
-        public void TexturePrint()
-        {
-            foreach (var item in MaterialTexturePropertyQueue)
-            {
-                ExpandedOutfit.Logger.LogWarning("\n\n");
-                foreach (var loadedProperty in item)
-                {
-                    if (loadedProperty != null && loadedProperty.TexID != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Texture print Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
-                    }
-                }
-            }
-        }
-        public void Print()
-        {
-            for (int i = 0; i < Constants.outfitpath; i++)
-            {
-                for (int j = 0; j < RendererPropertyQueue[i].Count; j++)
-                {
-                    if (RendererPropertyQueue[i][j] != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Render {(CoordinateType)i} {j}:\t{RendererPropertyQueue[i][j].RendererName}\t\t\t{RendererPropertyQueue[i][j].Slot}\t\t\t{RendererPropertyQueue[i][j].Property}");
-                    }
-                }
-                for (int j = 0; j < MaterialFloatPropertyQueue[i].Count; j++)
-                {
-                    if (MaterialFloatPropertyQueue[i][j] != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Float {(CoordinateType)i} {j}:\t{MaterialFloatPropertyQueue[i][j].MaterialName}\t\t\t{MaterialFloatPropertyQueue[i][j].Slot}\t\t\t{MaterialFloatPropertyQueue[i][j].Property}");
-                    }
-                }
-                for (int j = 0; j < MaterialColorPropertyQueue[i].Count; j++)
-                {
-                    if (MaterialColorPropertyQueue[i][j] != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Color {(CoordinateType)i} {j}:\t{MaterialColorPropertyQueue[i][j].MaterialName}\t\t\t{MaterialColorPropertyQueue[i][j].Slot}\t\t\t{MaterialColorPropertyQueue[i][j].Property}");
-                    }
-                }
-                for (int j = 0; j < MaterialTexturePropertyQueue[i].Count; j++)
-                {
-                    if (MaterialTexturePropertyQueue[i][j] != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Tex {(CoordinateType)i} {j}:\t{MaterialTexturePropertyQueue[i][j].MaterialName}\t\t\t{MaterialTexturePropertyQueue[i][j].Property}\t\t\t{MaterialTexturePropertyQueue[i][j].Slot}");
-                    }
-                }
-                for (int j = 0; j < MaterialShaderQueue[i].Count; j++)
-                {
-                    if (MaterialShaderQueue[i][j] != null)
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"Shade {(CoordinateType)i} {j}:\t{MaterialShaderQueue[i][j].MaterialName}\t\t\t{MaterialShaderQueue[i][j].Slot}\t\t\t{MaterialShaderQueue[i][j].ShaderName}");
-                    }
-                }
-            }
-        }
-#endif
         public void Clear_ME()
         {
             for (int i = 0; i < Constants.outfitpath; i++)
@@ -362,16 +319,5 @@ namespace Cosplay_Academy
             ReturnMaterialTexture.Clear();
             ReturnMaterialShade.Clear();
         }
-
-#if Debug
-        public void ClearReturn()
-        {
-            ReturnRenderer.Clear();
-            ReturnMaterialFloat.Clear();
-            ReturnMaterialColor.Clear();
-            ReturnMaterialTexture.Clear();
-            ReturnMaterialShade.Clear();
-        }
-#endif
     }
 }

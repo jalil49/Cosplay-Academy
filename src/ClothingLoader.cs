@@ -1,11 +1,7 @@
 ﻿using Cosplay_Academy.Hair;
 using ExtensibleSaveFormat;
 using HarmonyLib;
-using KK_Plugins;
-using KK_Plugins.DynamicBoneEditor;
-using KKABMX.Core;
 using KKAPI;
-using KoiClothesOverlayX;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System;
@@ -13,16 +9,16 @@ using System.Collections.Generic;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
-using CoordinateType = ChaFileDefine.CoordinateType;
+
 namespace Cosplay_Academy
 {
-    public class ClothingLoader
+    public partial class ClothingLoader
     {
         private Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> HairAccessories;
         private ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
-        private ChaFileCoordinate Underwear = new ChaFileCoordinate();
+        private readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
 
         public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
         {
@@ -61,7 +57,6 @@ namespace Cosplay_Academy
             //    object[] OnReloadArray = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
             //    Traverse.Create(HairACC_Controller).Method("OnReload", OnReloadArray).GetValue();
             //}
-            ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
 
             ThisOutfitData.ME_Work = true;
             ME_RePack(character, ThisOutfitData);
@@ -70,6 +65,8 @@ namespace Cosplay_Academy
             DynamicBone_Repack(character, ThisOutfitData);
             PushUp_RePack(character, ThisOutfitData);
             ClothingUnlocker_RePack(character, ThisOutfitData);
+            Personal_Repack(character, ThisOutfitData);
+            AccessoryStateSync_Repack(character, ThisOutfitData);
         }
 
         private void GeneralizedLoad(int outfitnum)
@@ -78,6 +75,10 @@ namespace Cosplay_Academy
             #region Queue accessories to keep
             var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             var HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+
+            var HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
+            //var HairPluginQueue = new Queue<bool>(ThisOutfitData.HairPluginQueue[outfitnum]);
+            var ACCKeepqueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
 
             var RenderQueue = new Queue<RendererProperty>(ThisOutfitData.RendererPropertyQueue[outfitnum]);
             var FloatQueue = new Queue<MaterialFloatProperty>(ThisOutfitData.MaterialFloatPropertyQueue[outfitnum]);
@@ -101,14 +102,20 @@ namespace Cosplay_Academy
 
             bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
             bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
+            List<int> HairToColor = new List<int>();
+            #region Reassign Existing Accessories
 
-            var ExpandedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "Required_ACC");
+            var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Required_ACC");
             var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
             if (ExpandedData != null)
             {
                 if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var S_CoordinateSaveBools) && S_CoordinateSaveBools != null)
                 {
                     UnderClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])S_CoordinateSaveBools);
+                }
+                if (ExpandedData.data.TryGetValue("HairAcc", out var S_HairAcc) && S_HairAcc != null)
+                {
+                    HairToColor = MessagePackSerializer.Deserialize<List<int>>((byte[])S_HairAcc);
                 }
             }
             if (PersonalData != null)
@@ -126,7 +133,8 @@ namespace Cosplay_Academy
                 }
             }
 
-            #region Reassign Existing Accessories
+
+
 
             WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
@@ -140,7 +148,7 @@ namespace Cosplay_Academy
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
-            var Inputdata = ExtendedSave.GetExtendedDataById(ChaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
@@ -154,7 +162,7 @@ namespace Cosplay_Academy
 
 
             #region ME Acc Import
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
 
             if (MaterialEditorData?.data != null)
             {
@@ -470,6 +478,43 @@ namespace Cosplay_Academy
                 ChaControl.chaFile.coordinate[outfitnum].clothes.parts[i] = ThisOutfitData.Original_Coordinates[outfitnum].clothes.parts[i];
                 Underwear_ME(i, outfitnum, Original_ME_MC_properties, Original_ME_MS_properties, Original_ME_R_properties, Original_ME_MF_properties, Original_ME_MT_properties);
             }
+
+            if (ExpandedOutfit.HairMatch.Value)
+            {
+                Color[] haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
+
+                foreach (var item in HairToColor)
+                {
+                    if (item < 20)
+                    {
+                        ChaControl.chaFile.coordinate[outfitnum].accessory.parts[item].color = haircolor;
+                    }
+                    else
+                    {
+                        NewRAW[item - 20].color = haircolor;
+                    }
+                    var haircomponent = ThisOutfitData.ReturnMaterialColor.FindAll(x => x.CoordinateIndex == outfitnum && x.Slot == item && x.ObjectType == ObjectType.Accessory);
+                    for (int i = 0; i < haircomponent.Count; i++)
+                    {
+                        if (haircomponent[i].Property == "Color")
+                        {
+                            haircomponent[i].Value = ChaControl.fileHair.parts[1].baseColor;
+                        }
+                        else if (haircomponent[i].Property == "Color2")
+                        {
+                            haircomponent[i].Value = ChaControl.fileHair.parts[1].startColor;
+                        }
+                        else if (haircomponent[i].Property == "Color3")
+                        {
+                            haircomponent[i].Value = ChaControl.fileHair.parts[1].endColor;
+                        }
+                        else if (haircomponent[i].Property == "ShadowColor")
+                        {
+                            haircomponent[i].Value = ChaControl.fileHair.parts[1].outlineColor;
+                        }
+                    }
+                }
+            }
 #if Debug
             ExpandedOutfit.Logger.LogWarning("Start loading accessories");
 #endif
@@ -488,6 +533,15 @@ namespace Cosplay_Academy
                     else
                     {
                         HairQueue.Dequeue();
+                    }
+
+                    if (HairKeepQueue.Dequeue())
+                    {
+                        ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
+                    }
+                    if (ACCKeepqueue.Dequeue())
+                    {
+                        ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
                     }
 
                     ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
@@ -527,6 +581,15 @@ namespace Cosplay_Academy
                         HairQueue.Dequeue();
                     }
 
+                    if (HairKeepQueue.Dequeue())
+                    {
+                        ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
+                    }
+                    if (ACCKeepqueue.Dequeue())
+                    {
+                        ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
+                    }
+
                     ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
 
                     ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
@@ -564,6 +627,15 @@ namespace Cosplay_Academy
                 else
                 {
                     HairQueue.Dequeue();
+                }
+
+                if (HairKeepQueue.Dequeue())
+                {
+                    ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
+                }
+                if (ACCKeepqueue.Dequeue())
+                {
+                    ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
                 }
 
                 ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
@@ -943,433 +1015,6 @@ namespace Cosplay_Academy
             }
         }
 
-        private static void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            ChaFile ChaFile = ChaControl.chaFile;
-            List<RendererProperty> RendererPropertyList = new List<RendererProperty>();
-            List<MaterialFloatProperty> MaterialFloatPropertyList = new List<MaterialFloatProperty>();
-            List<MaterialColorProperty> MaterialColorPropertyList = new List<MaterialColorProperty>();
-            List<MaterialTextureProperty> MaterialTexturePropertyList = new List<MaterialTextureProperty>();
-            List<MaterialShader> MaterialShaderList = new List<MaterialShader>();
-            Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
-
-            #region UnPackCoordinates
-            if (!ThisOutfitData.ME_Work)
-            {
-                for (int outfitnum = 0; outfitnum < ChaFile.coordinate.Length; outfitnum++)
-                {
-                    var data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
-                    if (data?.data != null)
-                    {
-                        if (data.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
-                            foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                                importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
-
-                        if (data.data.TryGetValue("MaterialShaderList", out var materialShaders) && materialShaders != null)
-                        {
-                            MaterialShaderList = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])materialShaders);
-                        }
-
-                        if (data.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
-                        {
-                            RendererPropertyList = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
-                        {
-                            MaterialFloatPropertyList = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
-                        {
-                            MaterialColorPropertyList = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
-                        {
-                            var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
-                            for (var i = 0; i < properties.Count; i++)
-                            {
-                                var loadedProperty = properties[i];
-                                int? texID = null;
-                                if (loadedProperty.TexID != null)
-                                    texID = importDictionaryList[(int)loadedProperty.TexID];
-
-                                MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
-                                MaterialTexturePropertyList.Add(newTextureProperty);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                RendererPropertyList = ThisOutfitData.ReturnRenderer;
-                MaterialFloatPropertyList = ThisOutfitData.ReturnMaterialFloat;
-                MaterialColorPropertyList = ThisOutfitData.ReturnMaterialColor;
-                MaterialTexturePropertyList = ThisOutfitData.ReturnMaterialTexture;
-                MaterialShaderList = ThisOutfitData.ReturnMaterialShade;
-            }
-            #endregion
-            #region Pack
-            var SaveData = new PluginData();
-
-            if (ThisOutfitData.ME.TextureDictionary.Count > 0)
-                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(ThisOutfitData.ME.TextureDictionary.ToDictionary(pair => pair.Key, pair => pair.Value.Data)));
-            else
-                SaveData.data.Add("TextureDictionary", null);
-
-            if (RendererPropertyList.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(RendererPropertyList));
-            else
-                SaveData.data.Add("RendererPropertyList", null);
-
-            if (MaterialFloatPropertyList.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(MaterialFloatPropertyList));
-            else
-                SaveData.data.Add("MaterialFloatPropertyList", null);
-
-            if (MaterialColorPropertyList.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(MaterialColorPropertyList));
-            else
-                SaveData.data.Add("MaterialColorPropertyList", null);
-
-            if (MaterialTexturePropertyList.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(MaterialTexturePropertyList));
-            else
-                SaveData.data.Add("MaterialTexturePropertyList", null);
-
-            if (MaterialShaderList.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(MaterialShaderList));
-            else
-                SaveData.data.Add("MaterialShaderList", null);
-
-            #endregion
-
-            SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl, ThisOutfitData);
-        }
-
-        private static void KCOX_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            PluginData SavedData;
-            var data = new PluginData { version = 1 };
-            Dictionary<string, ClothesTexData> storage;
-            Dictionary<CoordinateType, Dictionary<string, ClothesTexData>> Final = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
-            ChaFileCoordinate Underwear = new ChaFileCoordinate();
-            Underwear.LoadFile(ThisOutfitData.Underwear);
-            var UnderwearSavedData = ExtendedSave.GetExtendedDataById(Underwear, "KCOX");
-            var underweardict = new Dictionary<string, ClothesTexData>();
-            Dictionary<CoordinateType, Dictionary<string, ClothesTexData>> CharacterData = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
-            if (UnderwearSavedData != null && UnderwearSavedData.data.TryGetValue("Overlays", out var underbytes) && underbytes is byte[] underbyteArr)
-            {
-                underweardict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(underbyteArr);
-            }
-            var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KCOX");
-            if (ExtendedCharacterData != null && ExtendedCharacterData.data.TryGetValue("Overlays", out var coordinatedata) && coordinatedata != null)
-            {
-                CharacterData = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
-            }
-            foreach (var item in CharacterData)
-            {
-                ExpandedOutfit.Logger.LogWarning(item.Key);
-                foreach (var item2 in item.Value)
-                {
-                    ExpandedOutfit.Logger.LogWarning("\t" + item2.Key);
-                }
-            }
-            for (int outfitnum = 0; outfitnum < Constants.outfitpath; outfitnum++)
-            {
-                if (!CharacterData.TryGetValue((CoordinateType)outfitnum, out var CurrentCharacterData))
-                {
-                    CurrentCharacterData = new Dictionary<string, ClothesTexData>();
-                }
-                bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
-                bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
-
-                var ExpandedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile.coordinate[outfitnum], "Required_ACC");
-                var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
-                if (ExpandedData != null)
-                {
-                    if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var S_CoordinateSaveBools) && S_CoordinateSaveBools != null)
-                    {
-                        UnderClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])S_CoordinateSaveBools);
-                    }
-                }
-                if (PersonalData != null)
-                {
-                    if (PersonalData.data.TryGetValue("Personal_Clothing_Save", out var S_Clothing_Save) && S_Clothing_Save != null)
-                    {
-                        CharacterClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])S_Clothing_Save);
-                        for (int i = 0; i < 9; i++)
-                        {
-                            if (CharacterClothingKeep[i])
-                            {
-                                UnderClothingKeep[i] = true;
-                            }
-                        }
-                    }
-                }
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
-                storage = new Dictionary<string, ClothesTexData>();
-                if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
-                {
-                    var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(byteArr);
-                    if (dict != null)
-                    {
-                        foreach (var texData in dict)
-                        {
-                            //int index = Array.IndexOf(Constants.KCOX_Cat, texData.Key);
-                            //if (CharacterClothingKeep[index])
-                            //{
-                            //    continue;
-                            //}
-                            storage.Add(texData.Key, texData.Value);
-                        }
-                    }
-                }
-                if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null)
-                {
-                    if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
-                    {
-                        if (!UnderClothingKeep[2] && underweardict.TryGetValue("ct_bra", out var bra) && bra != null && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
-                        {
-                            storage["ct_bra"] = bra;
-                        }
-                        else if (!UnderClothingKeep[2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
-                        {
-                            storage.Remove("ct_bra");
-                        }
-                        if (!UnderClothingKeep[3] && underweardict.TryGetValue("ct_shorts", out var Panties) && Panties != null && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
-                        {
-                            storage["ct_shorts"] = Panties;
-                        }
-                        else if (!UnderClothingKeep[3] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
-                        {
-                            storage.Remove("ct_shorts");
-                        }
-                    }
-                    //if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0)
-                    //{
-                    //    ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
-                    //}
-                    if (outfitnum != 2)
-                    {
-                        if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[5].id != 0)
-                        {
-                            if (!UnderClothingKeep[5] && underweardict.TryGetValue("ct_panst", out var Pantyhose) && Pantyhose != null)
-                            {
-                                storage["ct_panst"] = Pantyhose;
-                            }
-                            else if (!UnderClothingKeep[5])
-                            {
-                                storage.Remove("ct_panst");
-                            }
-
-                            if (!UnderClothingKeep[6] && underweardict.TryGetValue("ct_socks", out var Socks) && Socks != null)
-                            {
-                                storage["ct_socks"] = Socks;
-                            }
-                            else if (!UnderClothingKeep[6])
-                            {
-                                storage.Remove("ct_socks");
-                            }
-                        }
-
-                        if (!UnderClothingKeep[6] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[6].id != 0)
-                        {
-                            if (underweardict.TryGetValue("ct_socks", out var Socks) && Socks != null)
-                            {
-                                storage["ct_socks"] = Socks;
-                            }
-                            else
-                            {
-                                storage.Remove("ct_socks");
-                            }
-                        }
-                    }
-                }
-                for (int i = 0; i < CharacterClothingKeep.Length; i++)
-                {
-                    if (!CharacterClothingKeep[i])
-                    {
-                        continue;
-                    }
-                    ExpandedOutfit.Logger.LogWarning($"attempting {Constants.KCOX_Cat[i]}");
-                    if (CurrentCharacterData.TryGetValue(Constants.KCOX_Cat[i], out var outfitpart))
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"\tKept old");
-                        storage[Constants.KCOX_Cat[i]] = outfitpart;
-                    }
-                    else
-                    {
-                        ExpandedOutfit.Logger.LogWarning($"\tremoved");
-                        storage.Remove(Constants.KCOX_Cat[i]);
-                    }
-                }
-                Final.Add((CoordinateType)outfitnum, storage);
-            }
-
-            data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
-        }
-
-        private static void ClothingUnlocker_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            PluginData SavedData;
-            Dictionary<int, bool> Final = new Dictionary<int, bool>();
-            bool result;
-            for (int i = 0; i < Constants.outfitpath; i++)
-            {
-                result = false;
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
-                if (SavedData != null && SavedData.data.TryGetValue("ClothingUnlockedCoordinate", out var loadedClothingUnlocked))
-                {
-                    result = (bool)loadedClothingUnlocked;
-                }
-                Final.Add(i, result);
-            }
-            var data = new PluginData();
-            data.data.Add("ClothingUnlocked", MessagePackSerializer.Serialize(Final));
-            SetExtendedData("com.deathweasel.bepinex.clothingunlocker", data, ChaControl, ThisOutfitData);
-        }
-
-        private static void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            Pushup.ClothData newBraData;
-            Pushup.ClothData newTopData;
-
-            PluginData SavedData;
-            Dictionary<int, Pushup.ClothData> FinalBra = new Dictionary<int, Pushup.ClothData>();
-            Dictionary<int, Pushup.ClothData> FinalTop = new Dictionary<int, Pushup.ClothData>();
-            for (int i = 0; i < Constants.outfitpath; i++)
-            {
-                newBraData = new Pushup.ClothData();
-                newTopData = new Pushup.ClothData();
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.pushup");
-                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
-                {
-                    newBraData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
-                }
-                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
-                {
-                    newTopData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
-                }
-                FinalBra.Add(i, newBraData);
-                FinalTop.Add(i, newTopData);
-            }
-            var data = new PluginData();
-            data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
-            data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
-            //data.data.Add("Pushup_BodyData", null);
-            SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl, ThisOutfitData);
-
-            //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            //SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
-            //var KoiOverlay = typeof(KoiClothesOverlayController);
-            //if (KoiOverlay != null)
-            //{
-            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-            //    var temp = ChaControl.GetComponent(KoiOverlay);
-            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            //}
-        }
-
-        private static void KKABM_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            PluginData SavedData;
-            List<BoneModifier> Modifiers = new List<BoneModifier>();
-            for (int i = 0; i < Constants.outfitpath; i++)
-            {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
-                if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes is byte[] byteArr)
-                {
-                    Dictionary<string, BoneModifierData> import;
-                    try
-                    {
-                        if (SavedData.version != 2)
-                            throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
-
-                        import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, BoneModifierData>>(byteArr);
-                        if (import != null)
-                        {
-                            foreach (var modifier in import)
-                            {
-                                var target = new BoneModifier(modifier.Key);
-                                Modifiers.Add(target);
-                                target.MakeCoordinateSpecific();
-                                target.CoordinateModifiers[i] = modifier.Value;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ExpandedOutfit.Logger.LogError("[Cosplay Academy] =>[KKABMX] Failed to load extended data - " + ex);
-                    }
-                }
-            }
-            if (Modifiers.Count == 0)
-            {
-                SetExtendedData("KKABMPlugin.ABMData", null, ChaControl, ThisOutfitData);
-                return;
-            }
-
-            var data = new PluginData { version = 2 };
-            data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
-            SetExtendedData("KKABMPlugin.ABMData", data, ChaControl, ThisOutfitData);
-            //var KoiOverlay = typeof(KoiClothesOverlayController);
-            //if (KoiOverlay != null)
-            //{
-            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-            //    var temp = ChaControl.GetComponent(KoiOverlay);
-            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            //}
-        }
-
-        private static void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            PluginData SavedData;
-            List<DynamicBoneData> Modifiers = new List<DynamicBoneData>();
-            for (int i = 0; i < Constants.outfitpath; i++)
-            {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
-                if (SavedData != null && SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes is byte[] byteArr)
-                {
-                    List<DynamicBoneData> import;
-
-                    import = MessagePackSerializer.Deserialize<List<DynamicBoneData>>(byteArr);
-                    if (import != null)
-                    {
-                        foreach (var dbData in import)
-                        {
-                            dbData.CoordinateIndex = i;
-                            Modifiers.Add(dbData);
-                        }
-                    }
-                }
-            }
-            if (Modifiers.Count == 0)
-            {
-                SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", null, ChaControl, ThisOutfitData);
-                return;
-            }
-
-            var data = new PluginData();
-            data.data.Add("AccessoryDynamicBoneData", MessagePackSerializer.Serialize(Modifiers));
-            SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", data, ChaControl, ThisOutfitData);
-        }
-
-        public static void Reload_RePacks(ChaControl ChaControl)
-        {
-            ControllerReload_Loop(typeof(KoiClothesOverlayController), ChaControl);
-            ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
-            ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
-            ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);
-            ControllerReload_Loop(typeof(BoneController), ChaControl);
-            ControllerReload_Loop(typeof(KK_Plugins.DynamicBoneEditor.CharaController), ChaControl);
-        }
-
         private static void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
         {
             if (Controller != null)
@@ -1380,6 +1025,7 @@ namespace Cosplay_Academy
             }
         }
 
+        #region ME_Loops
         private static void ME_Float_Loop(Queue<MaterialFloatProperty> FloatQueue, int ACCpostion, List<MaterialFloatProperty> MaterialFloat)
         {
             if (FloatQueue.Count != 0 && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
@@ -1488,6 +1134,7 @@ namespace Cosplay_Academy
                 RendererQueue.Dequeue();
             }
         }
+        #endregion
 
         public static void SetExtendedData(string IDtoSET, PluginData data, ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
