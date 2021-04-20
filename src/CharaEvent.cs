@@ -1,4 +1,5 @@
 ﻿using Cosplay_Academy.Hair;
+using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
+
 namespace Cosplay_Academy
 {
     public class CharaEvent : CharaCustomFunctionController
@@ -94,10 +96,12 @@ namespace Cosplay_Academy
                 firstmakerpass = true;
             }
         }
+
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
             //unused mandatory function 
         }
+
         public void Process(GameMode currentGameMode)
         {
             //ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);

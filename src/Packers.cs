@@ -1,8 +1,10 @@
-﻿using ExtensibleSaveFormat;
+﻿using Cosplay_Academy.ME;
+using Cosplay_Academy.Support;
+using ExtensibleSaveFormat;
 using KK_Plugins;
 using KK_Plugins.DynamicBoneEditor;
 using KKABMX.Core;
-using KoiClothesOverlayX;
+//using KoiClothesOverlayX;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -575,7 +577,7 @@ namespace Cosplay_Academy
 
         public static void Reload_RePacks(ChaControl ChaControl)
         {
-            ControllerReload_Loop(typeof(KoiClothesOverlayController), ChaControl);
+            ControllerReload_Loop(typeof(KoiClothesOverlayX.KoiClothesOverlayController), ChaControl);
             ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
             ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
             ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);

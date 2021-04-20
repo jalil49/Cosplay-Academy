@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Cosplay_Academy
+namespace Cosplay_Academy.ME
 {
     #region Stuff ME_RePack Needs
-    //int outfitnum => ChaControl.fileStatus.coordinateType;
+
     public class ME_Support
     {
         public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
