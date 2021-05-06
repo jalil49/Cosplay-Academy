@@ -215,8 +215,8 @@ namespace Cosplay_Academy
         internal bool firstpass = true;
         internal bool processed = false;
         //public string ChaName;//not actual name but ChaControl.Name
-        internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.outfitpath];
-        internal string[] outfitpath = new string[Constants.outfitpath];
+        internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.Outfit_Size];
+        internal string[] outfitpath = new string[Constants.Outfit_Size];
         internal string Underwear = "";
         internal int Personality;
         internal string BirthDay;
@@ -230,25 +230,25 @@ namespace Cosplay_Academy
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
         internal CharaEvent CharaEvent;
-        internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.outfitpath];
+        internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.Outfit_Size];
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
-
-        internal List<bool>[] HairKeepQueue = new List<bool>[Constants.outfitpath];
-        internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.outfitpath];
+        internal ClothingLoader ClothingLoader = new ClothingLoader();
+        internal List<bool>[] HairKeepQueue = new List<bool>[Constants.Outfit_Size];
+        internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.Outfit_Size];
         //internal List<bool>[] HairPluginQueue = new List<bool>[Constants.outfitpath];
 
         #region hair accessories
-        public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.outfitpath];
+        public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.Outfit_Size];
         public ChaControl ThisControl;
         #endregion
 
         #region Material Editor Save
-        public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.outfitpath];
-        public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.outfitpath];
-        public List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.outfitpath];
-        public List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.outfitpath];
-        public List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.outfitpath];
-        public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.outfitpath];
+        public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.Outfit_Size];
+        public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.Outfit_Size];
+        public List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.Outfit_Size];
+        public List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.Outfit_Size];
+        public List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.Outfit_Size];
+        public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.Outfit_Size];
         #endregion
 
         #region Material Editor Return
@@ -263,12 +263,12 @@ namespace Cosplay_Academy
 
         #endregion
 
-        internal List<int>[] HairKeepReturn = new List<int>[Constants.outfitpath];
-        internal List<int>[] ACCKeepReturn = new List<int>[Constants.outfitpath];
+        internal List<int>[] HairKeepReturn = new List<int>[Constants.Outfit_Size];
+        internal List<int>[] ACCKeepReturn = new List<int>[Constants.Outfit_Size];
 
         public ChaDefault()
         {
-            for (int i = 0; i < Constants.outfitpath; i++)
+            for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 RendererPropertyQueue[i] = new List<RendererProperty>();
                 MaterialFloatPropertyQueue[i] = new List<MaterialFloatProperty>();
@@ -289,7 +289,7 @@ namespace Cosplay_Academy
         }
         public void Clear_ME()
         {
-            for (int i = 0; i < Constants.outfitpath; i++)
+            for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 RendererPropertyQueue[i].Clear();
                 MaterialFloatPropertyQueue[i].Clear();

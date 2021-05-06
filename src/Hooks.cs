@@ -109,7 +109,7 @@ namespace Cosplay_Academy
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.PreviousPath;
                     clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                     ThisOutfitData.ChangeKoiToClub = false;
-                    ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                     Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     //Chara.chaCtrl.SetAccessoryStateAll(true);
                 }
@@ -135,7 +135,7 @@ namespace Cosplay_Academy
                 ThisOutfitData.heroine.coordinates[num] = 4;
                 clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                 ThisOutfitData.ChangeClubToKoi = false;
-                ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                 Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 //Chara.chaCtrl.SetAccessoryStateAll(true);
             }
@@ -152,7 +152,7 @@ namespace Cosplay_Academy
                     }
                     ThisOutfitData.heroine.coordinates[num] = 4;
                     clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
-                    ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
                 }
@@ -261,11 +261,10 @@ namespace Cosplay_Academy
             {
                 ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
                 ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
-                ClothingLoader clothingLoader = new ClothingLoader();
-                clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
+                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                 ThisOutfitData.heroine.coordinates[0] = 4;
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
-                ClothingLoader.Reload_RePacks(__instance.chaCtrl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl);
                 __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 //__instance.chaCtrl.SetAccessoryStateAll(true);
                 //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);

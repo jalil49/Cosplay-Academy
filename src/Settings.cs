@@ -12,6 +12,7 @@ namespace Cosplay_Academy
 {
     [BepInPlugin(Guid, "Cosplay Academy", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    [BepInDependency("com.joan6694.illusionplugins.moreaccessories", BepInDependency.DependencyFlags.HardDependency)]
     public class ExpandedOutfit : BaseUnityPlugin
     {
         public const string Guid = "Cosplay_Academy";
@@ -41,6 +42,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> MatchKoiClub { get; private set; }
         public static ConfigEntry<bool> MatchCasual { get; private set; }
         public static ConfigEntry<bool> MatchNightwear { get; private set; }
+        public static ConfigEntry<bool> MatchUnderwear { get; private set; }
 
         public static ConfigEntry<bool> HairMatch { get; private set; }
 
@@ -61,6 +63,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
+        public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
 
@@ -95,6 +98,7 @@ namespace Cosplay_Academy
             HairMatch = Config.Bind("Main Game", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
             RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Don't load new outfits");
+            UnderwearStates = Config.Bind("Main Game", "Randomize Underwear: ACC_States", false, "");
             NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
             StoryModeChange = Config.Bind("Story Mode", "KoiKatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behaviour", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
@@ -112,13 +116,14 @@ namespace Cosplay_Academy
             MatchGym = Config.Bind("Match Outfit", "Coordinated Gym Uniforms", true, "Everyone wears same uniform during Gym");
             MatchSwim = Config.Bind("Match Outfit", "Coordinated Swim class outfits", false, "Everyone wears same uniform during Swim Class");
             MatchSwimClub = Config.Bind("Match Outfit", "Coordinated Swim Club outfits", true, "Everyone wears same uniform during Swim Club");
-            MatchCheerClub = Config.Bind("Match Outfit", "Coordinated Cheerleader Uniforms", true, "Everyone wears same uniform during Track & Field");
+            MatchCheerClub = Config.Bind("Match Outfit", "Coordinated Cheerleader Uniforms", true, "Everyone wears same uniform during Cheerleading");
             MatchTrackClub = Config.Bind("Match Outfit", "Coordinated Track & Field Uniforms", true, "Everyone wears same uniform during Track & Field");
             MatchMangaClub = Config.Bind("Match Outfit", "Coordinated Manga Cosplay", false, "Everyone wears same uniform during clubs");
             MatchTeaClub = Config.Bind("Match Outfit", "Coordinated Tea Ceremony Uniforms", false, "Everyone wears same uniform during clubs");
             MatchKoiClub = Config.Bind("Match Outfit", "Coordinated Koikatsu Uniforms", false, "Everyone wears same uniform during clubs");
             MatchCasual = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, "It's an option");
             MatchNightwear = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
+            MatchUnderwear = Config.Bind("Match Outfit", "Coordinated Underwear", false, "It's an option");
             GrabSwimsuits = Config.Bind("Additional Outfit", "Grab Swimsuits for Swimclub", true);
             //Probability
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));

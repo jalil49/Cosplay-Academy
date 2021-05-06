@@ -57,7 +57,7 @@ namespace Cosplay_Academy
                 {
                     if (!item.Contains(@"\Sets\"))
                     {
-                        for (int i = 1; i < Directory.GetFiles(item).Length; i++)
+                        for (int i = 1; i < Directory.GetFiles(item, "*.png").Length; i++)
                         {
                             append.Add(item);
                         }
@@ -108,7 +108,7 @@ namespace Cosplay_Academy
                 {
                     continue;
                 }
-                string[] files = System.IO.Directory.GetFiles(path);
+                string[] files = System.IO.Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
 
             }

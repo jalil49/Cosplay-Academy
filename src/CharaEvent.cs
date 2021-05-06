@@ -18,25 +18,21 @@ namespace Cosplay_Academy
 {
     public class CharaEvent : CharaCustomFunctionController
     {
-        public static CharaEvent self;
         private ChaDefault ThisOutfitData;
         public bool ClearData;
         public static bool finishedloading;
-        bool firstmakerpass;
-        protected override void Awake()
-        {
-            base.Awake();
-            //ExpandedOutfit.Logger.LogError($"{ChaControl.fileParam.fullname} Awake, Reset? {OutfitDecider.Reset}");
-            if (KoikatuAPI.GetCurrentGameMode() == GameMode.Maker)
-            {
-                return;
-            }
-            Process(KoikatuAPI.GetCurrentGameMode());
-        }
+        bool firstmakerpass = false;
 
         internal static void Initialize()
         {
             MakerAPI.RegisterCustomSubCategories += RegisterCustomSubCategories;
+        }
+
+
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
         }
 
         private static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
@@ -68,32 +64,33 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            //ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
+            bool IsMaker = currentGameMode == GameMode.Maker;
+            bool alreadyexists = false;
+            if (ThisOutfitData == null)
+            {
+                ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
+                if (ThisOutfitData != null)
+                {
 
-            if (currentGameMode == GameMode.Maker && firstmakerpass)
+                }
+            }
+            if (IsMaker && firstmakerpass || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) && !alreadyexists)
             {
                 if (ClearData)
                 {
                     Constants.ChaDefaults.Clear();
                 }
                 Process(currentGameMode);
-                ClothingLoader.Reload_RePacks(ChaControl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
-            else if (ThisOutfitData != null && ThisOutfitData.heroine == null)
-            {
-                Game _gamemgr = Game.Instance;
-                foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
-                {
-                    if (Heroine.parameter.personality == ChaControl.fileParam.personality && Heroine.parameter.fullname == ChaControl.fileParam.fullname && Heroine.parameter.strBirthDay == ChaControl.fileParam.strBirthDay)
-                    {
-                        ThisOutfitData.heroine = Heroine;
-                        break;
-                    }
-                }
-            }
-            else if (currentGameMode == GameMode.Maker)
+            else if (IsMaker)
             {
                 firstmakerpass = true;
+            }
+            else if (alreadyexists && ChaControl.chaFile.coordinate != ThisOutfitData.ChaControl.chaFile.coordinate)
+            {
+                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
         }
 
@@ -127,8 +124,11 @@ namespace Cosplay_Academy
                     }
                 }
             }
-
-            self = this;
+            if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher)
+            {
+                ThisOutfitData.processed = true;
+                return;
+            }
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.ChaControl = ChaControl;
@@ -171,14 +171,14 @@ namespace Cosplay_Academy
 
                 #region ME Acc Import
 
-                List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.outfitpath];
-                List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.outfitpath];
-                List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.outfitpath];
-                List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.outfitpath];
-                List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.outfitpath];
+                List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.Outfit_Size];
+                List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.Outfit_Size];
+                List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.Outfit_Size];
+                List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.Outfit_Size];
+                List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.Outfit_Size];
                 Dictionary<int, byte[]> importedTextDic = new Dictionary<int, byte[]>();
 
-                for (int i = 0; i < Constants.outfitpath; i++)
+                for (int i = 0; i < Constants.Outfit_Size; i++)
                 {
                     RendererPropertyQueue[i] = new List<RendererProperty>();
                     MaterialFloatPropertyQueue[i] = new List<MaterialFloatProperty>();
@@ -300,48 +300,38 @@ namespace Cosplay_Academy
 #endif
                 }
                 #endregion
-#if Debug
-                ExpandedOutfit.Logger.LogWarning("Ended First Pass");
-#endif
-
 
                 #region Queue accessories to keep
-                List<int>[] HairKeep;
-                List<int>[] ACCKeep;
+                List<int>[] HairKeep = new List<int>[Constants.Outfit_Size];
+                List<int>[] ACCKeep = new List<int>[Constants.Outfit_Size];
+                for (int i = 0; i < Constants.Outfit_Size; i++)
+                {
+                    HairKeep[i] = new List<int>();
+                    ACCKeep[i] = new List<int>();
+                }
+
+                bool Cosplay_Academy_Ready = false;
                 var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
                 if (Required_Support != null)
                 {
-                    HairKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Required_Support.data["HairAcc"]);
-                    ACCKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Required_Support.data["AccKeep"]);
-                }
-                else
-                {
-                    HairKeep = new List<int>[Constants.outfitpath];
-                    ACCKeep = new List<int>[Constants.outfitpath];
-                    for (int i = 0; i < Constants.outfitpath; i++)
+                    if (Required_Support.data.TryGetValue("HairAcc", out var Bytedata))
                     {
-                        HairKeep[i] = new List<int>();
-                        ACCKeep[i] = new List<int>();
+                        HairKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Bytedata);
+                    }
+                    if (Required_Support.data.TryGetValue("AccKeep", out Bytedata))
+                    {
+                        ACCKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Bytedata);
+                    }
+                    if (Required_Support.data.TryGetValue("Cosplay_Academy_Ready", out Bytedata))
+                    {
+                        Cosplay_Academy_Ready = MessagePackSerializer.Deserialize<bool>((byte[])Bytedata);
                     }
                 }
 
-                //Dictionary<string, PluginData> temp = ExtendedSave.GetAllExtendedData(ChaFileControl);
-                //if (currentGameMode == GameMode.Maker)
-                //{
-                //    temp = ExtendedSave.GetAllExtendedData(MakerAPI.LastLoadedChaFile);
-                //}
-                //if (temp == null)
-                //{
-                //    ThisOutfitData.ExtendedCharacterData = new Dictionary<string, PluginData>();
-                //}
-                //else
-                //{
-                //    ThisOutfitData.ExtendedCharacterData = new Dictionary<string, PluginData>(temp);
-                //}
-
-                for (int outfitnum = 0, n = Constants.outfitpath; outfitnum < n; outfitnum++)
+                for (int outfitnum = 0, n = Constants.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
+
                     List<ChaFileAccessory.PartsInfo> AccImport = new List<ChaFileAccessory.PartsInfo>();
                     List<HairSupport.HairAccessoryInfo> HairImport = new List<HairSupport.HairAccessoryInfo>();
                     if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo) == false)
@@ -354,6 +344,7 @@ namespace Cosplay_Academy
                         SaveAccessory = new MoreAccessories.CharAdditionalData();
                         _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
                     }
+
                     if (SaveAccessory.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> acclist) == false)
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
@@ -361,13 +352,11 @@ namespace Cosplay_Academy
 
                     var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning($"Size of input {Intermediate.Count}");
-#endif
+
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Inclusion.Contains(Intermediate[i].parentKey) || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
+                        if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
                         {
                             if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
                             {
@@ -375,13 +364,7 @@ namespace Cosplay_Academy
                                 {
                                     HairLength = -999
                                 };
-                                //ThisOutfitData.HairPluginQueue[outfitnum].Add(false);
                             }
-                            //else { ThisOutfitData.HairPluginQueue[outfitnum].Add(true); }
-                            //if (ExpandedOutfit.HairMatch.Value)
-                            //{
-                            //    ACCdata.ColorMatch = true;
-                            //}
                             ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep[outfitnum].Contains(i));
                             ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep[outfitnum].Contains(i));
                             var ColorList = MaterialColorPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
@@ -431,9 +414,6 @@ namespace Cosplay_Academy
                         }
                     }
                 }
-#if Debug
-                //ThisOutfitData.TexturePrint();
-#endif
                 #endregion
                 if (currentGameMode != GameMode.Maker)
                 {
@@ -455,12 +435,7 @@ namespace Cosplay_Academy
                     if (!ThisOutfitData.processed)//run if unprocessed
                     {
                         OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                        //OutfitDecider.ProcessedNames.Add(ChaControl.name);//character is processed
                         ThisOutfitData.processed = true;
-                        //if (!ExpandedOutfit.PermChangeOutfit.Value)
-                        //{
-                        //    ExpandedOutfit.ChangeOutfit.Value = false;
-                        //}
                     }
                 }
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.RandomizeUnderwear.Value && GameMode.Maker == currentGameMode)
@@ -470,10 +445,10 @@ namespace Cosplay_Academy
                         OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
                     }
                 }
-                ClothingLoader clothingLoader = new ClothingLoader();
+
                 //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaFileControl.loadProductNo} name {ChaFileControl.loadVersion} {ChaFileControl.facePngData}");
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
-                clothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
+                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
                 //ChaControl.SetAccessoryStateAll(true);
                 ChaInfo temp = (ChaInfo)ChaControl;
@@ -510,7 +485,15 @@ namespace Cosplay_Academy
             {
                 return;
             }//if disabled don't run
-            ClothingLoader.CoordinateLoad(ThisOutfitData, coordinate, ChaControl);
+            ThisOutfitData.ClothingLoader.CoordinateLoad(ThisOutfitData, coordinate, ChaControl);
+        }
+
+        protected override void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                ExpandedOutfit.Logger.LogWarning($"\nNotBot: {ChaControl.notBot}\nNotBra: {ChaControl.notBra}\nNotShorts: {ChaControl.notShorts}");
+            }
         }
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)

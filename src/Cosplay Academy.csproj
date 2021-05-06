@@ -90,18 +90,11 @@
       <HintPath>packages\IllusionModdingAPI.KKAPI.1.15.0\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KK_ClothingUnlocker">
-      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_ClothingUnlocker.dll</HintPath>
-    </Reference>
     <Reference Include="KK_DynamicBoneEditor">
       <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_DynamicBoneEditor.dll</HintPath>
     </Reference>
     <Reference Include="KK_MaterialEditor">
       <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_MaterialEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="KK_OverlayMods, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\OverlayMods.Koikatu.6.0.0\lib\net35\KK_OverlayMods.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="KK_Pushup">
       <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_Pushup.dll</HintPath>
@@ -121,8 +114,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetFileName)" "F:\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins" /S /Y /D
+xcopy "$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Koikatsu Party\BepInEx\plugins" /S /Y /D</PostBuildEvent>
   </PropertyGroup>
   <Import Project="packages\IllusionLibs.BepInEx.Harmony.2.2.0.1\build\IllusionLibs.BepInEx.Harmony.targets" Condition="Exists('packages\IllusionLibs.BepInEx.Harmony.2.2.0.1\build\IllusionLibs.BepInEx.Harmony.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
