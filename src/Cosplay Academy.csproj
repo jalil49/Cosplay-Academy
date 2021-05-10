@@ -47,6 +47,7 @@
     <Compile Include="Definitions.cs" />
     <Compile Include="Packers.cs" />
     <Compile Include="Support\ACC_State_Sync.cs" />
+    <Compile Include="Support\Dummy.cs" />
     <Compile Include="Support\Hair_Accessory_Support.cs" />
     <Compile Include="Support\ME_Support.cs" />
     <Compile Include="Support\Overlay_Support.cs" />

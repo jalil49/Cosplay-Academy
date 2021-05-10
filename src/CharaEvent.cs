@@ -4,6 +4,7 @@ using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI;
 using KKAPI.Chara;
+using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI.Sidebar;
 using Manager;
@@ -19,16 +20,13 @@ namespace Cosplay_Academy
     public class CharaEvent : CharaCustomFunctionController
     {
         private ChaDefault ThisOutfitData;
-        public bool ClearData;
-        public static bool finishedloading;
+        private bool ClearData;
         bool firstmakerpass = false;
 
         internal static void Initialize()
         {
             MakerAPI.RegisterCustomSubCategories += RegisterCustomSubCategories;
         }
-
-
 
         protected override void OnDestroy()
         {
@@ -66,15 +64,7 @@ namespace Cosplay_Academy
             }
             bool IsMaker = currentGameMode == GameMode.Maker;
             bool alreadyexists = false;
-            if (ThisOutfitData == null)
-            {
-                ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
-                if (ThisOutfitData != null)
-                {
-
-                }
-            }
-            if (IsMaker && firstmakerpass || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) && !alreadyexists)
+            if (IsMaker && firstmakerpass || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) || GameAPI.InsideHScene)
             {
                 if (ClearData)
                 {
@@ -311,7 +301,7 @@ namespace Cosplay_Academy
                 }
 
                 bool Cosplay_Academy_Ready = false;
-                var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
+                var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
                 if (Required_Support != null)
                 {
                     if (Required_Support.data.TryGetValue("HairAcc", out var Bytedata))
@@ -421,7 +411,7 @@ namespace Cosplay_Academy
                 }
 
             }
-            if (!ExpandedOutfit.EnableSetting.Value || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+            if (!ExpandedOutfit.EnableSetting.Value && GameMode.MainGame == currentGameMode || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
             {
                 return;
             }//if disabled don't run
@@ -446,38 +436,16 @@ namespace Cosplay_Academy
                     }
                 }
 
-                //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} chano {ChaFileControl.loadProductNo} name {ChaFileControl.loadVersion} {ChaFileControl.facePngData}");
+
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
-                //ChaControl.SetAccessoryStateAll(true);
+
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
 
         }
-        //public void HairAccessory_RePack()//original
-        //{
-        //    Dictionary<int, HairAccessoryInfo> PluginData = new Dictionary<int, HairAccessoryInfo>();
-        //    Dictionary<int, Dictionary<int, HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairAccessoryInfo>>();
-        //    Dictionary<int, HairAccessoryInfo> Temp;
-        //    for (int i = 0; i < ChaFileControl.coordinate.Length; i++)
-        //    {
-        //        var Inputdata = ExtendedSave.GetExtendedDataById(ChaFileControl.coordinate[i], "com.deathweasel.bepinex.hairaccessorycustomizer");
-        //        Temp = new Dictionary<int, HairAccessoryInfo>();
-        //        if (Inputdata != null)
-        //            if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-        //                Temp = MessagePackSerializer.Deserialize<Dictionary<int, HairAccessoryInfo>>((byte[])loadedHairAccessories);
-        //        for (int j = 0; j < Temp.Count; j++)
-        //        {
-        //            ExpandedOutfit.Logger.LogWarning($"Coordinate {i}: {Temp.ElementAt(j).Key}\t\t\t{Temp.ElementAt(j).Value}");
-        //        }
-        //        HairAccessories.Add(i, Temp);
-        //    }
-        //    var data = new PluginData();
-        //    data.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
-        //    SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", data);
-        //}
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
         {
@@ -506,11 +474,20 @@ namespace Cosplay_Academy
             {
                 int idpass = SourceClothPart[i].id;
                 TempClothPart[i].id = idpass;
-                //for (int j = 0; j < TempClothPart[i].hideOpt.Length; j++) //doesnt exist in party
-                //{
-                //    bool hideoptpass = SourceClothPart[i].hideOpt[j];
-                //    TempClothPart[i].hideOpt[j] = hideoptpass;
-                //}
+#if Party
+                    //doesnt exist in party
+
+                for (int j = 0; j < TempClothPart[i].hideOpt.Length; j++) //doesnt exist in party
+                {
+                    bool hideoptpass = SourceClothPart[i].hideOpt[j];
+                    TempClothPart[i].hideOpt[j] = hideoptpass;
+                }
+                
+                    int Emblem2 = SourceClothPart[i].emblemeId2;
+                    TempClothPart[i].emblemeId2 = Emblem2;
+                    int passsleave = SourceClothPart[i].sleevesType;
+                    TempClothPart[i].sleevesType = passsleave;                
+#endif
                 for (int j = 0; j < TempClothPart[i].colorInfo.Length; j++)
                 {
                     Color PassBaseColor = SourceClothPart[i].colorInfo[j].baseColor;
@@ -524,13 +501,6 @@ namespace Cosplay_Academy
                 }
                 int Emblem1 = SourceClothPart[i].emblemeId;
                 TempClothPart[i].emblemeId = Emblem1;
-                //{
-                //    //doesnt exist in party
-                //    int Emblem2 = SourceClothPart[i].emblemeId2;
-                //    TempClothPart[i].emblemeId2 = Emblem2;
-                //    int passsleave = SourceClothPart[i].sleevesType;
-                //    TempClothPart[i].sleevesType = passsleave;
-                //}
             }
             return Temp;
         }

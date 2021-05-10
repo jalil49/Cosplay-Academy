@@ -20,9 +20,9 @@ namespace Cosplay_Academy
         private ChaFile ChaFile;
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
         //private ME_Support Underwear_ME = new ME_Support();
-        private bool[][] Underwearbools = new bool[Constants.Outfit_Size][];
+        private readonly bool[][] Underwearbools = new bool[Constants.Outfit_Size][];
         //private int[] UnderwearAccessoryStart = new int[Constants.Outfit_Size];
-        private List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
+        private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
@@ -30,7 +30,6 @@ namespace Cosplay_Academy
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                //UnderwearAccessoryStart[i] = 0;
                 UnderwearAccessoriesLocations[i] = new List<int>();
             }
         }
@@ -61,7 +60,6 @@ namespace Cosplay_Academy
                 _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
             }
 
-
             ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.Underwear);
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[Original_Coord].accessory.parts);
             Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
@@ -71,22 +69,14 @@ namespace Cosplay_Academy
                 GeneralizedLoad(i);
                 ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
-            ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)Original_Coord);
+            //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)Original_Coord);
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
             SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
 
             ThisOutfitData.ME_Work = true;
-            ME_RePack(character, ThisOutfitData);
-            KCOX_RePack(character, ThisOutfitData);
-            KKABM_Repack(character, ThisOutfitData);
-            DynamicBone_Repack(character, ThisOutfitData);
-            PushUp_RePack(character, ThisOutfitData);
-            ClothingUnlocker_RePack(character, ThisOutfitData);
-            //Personal_Repack(character, ThisOutfitData);
-            AccessoryStateSync_Repack(character, ThisOutfitData);
-            Accessory_States_Repack(character, ThisOutfitData);
+            Run_Repacks(character, ThisOutfitData);
         }
 
         private void GeneralizedLoad(int outfitnum)
@@ -108,6 +98,7 @@ namespace Cosplay_Academy
 
             bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
             bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
+            Underwearbools[outfitnum] = new bool[] { false, false, false };
 
 
             #endregion
@@ -119,8 +110,8 @@ namespace Cosplay_Academy
             List<int> HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
-            var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Required_ACC");
-            var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
+            var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
+            var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
             if (ExpandedData != null)
             {
                 if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var S_CoordinateSaveBools) && S_CoordinateSaveBools != null)
@@ -130,6 +121,10 @@ namespace Cosplay_Academy
                 if (ExpandedData.data.TryGetValue("HairAcc", out var S_HairAcc) && S_HairAcc != null)
                 {
                     HairToColor = MessagePackSerializer.Deserialize<List<int>>((byte[])S_HairAcc);
+                }
+                if (ExpandedData.data.TryGetValue("ClothNot", out S_HairAcc) && S_HairAcc != null)
+                {
+                    Underwearbools[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])S_HairAcc);
                 }
             }
             if (PersonalData != null)
@@ -257,7 +252,7 @@ namespace Cosplay_Academy
 
             if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
             {
-                ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)outfitnum);
+                //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)outfitnum);
 
                 #region additonal ME_Data
                 List<MaterialShader> ME_MS_properties = new List<MaterialShader>();
@@ -429,17 +424,17 @@ namespace Cosplay_Academy
                     //{
                 }
 
-                Underwearbools[outfitnum] = new bool[] { ChaControl.notBra, ChaControl.notShorts, ChaControl.notBot };
+
                 if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
                 {
-                    if (!UnderClothingKeep[2] && !ChaControl.notBra && !ChaControl.notShorts && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
+                    if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
                     {
                         ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2] = Underwear.clothes.parts[2];
                         Additional_Clothing_Process(2, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                     }
-                    if (ChaControl.notBot)
+                    if (Underwearbools[outfitnum][0])
                     {
-                        if (!UnderClothingKeep[3] && !ChaControl.notShorts && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
+                        if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
                         {
                             ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
                             Additional_Clothing_Process(3, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
@@ -447,10 +442,13 @@ namespace Cosplay_Academy
                     }
                 }
 
-                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0 && !ChaControl.notBot)
+                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0 && Underwearbools[outfitnum][0])
                 {
-                    ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
-                    Additional_Clothing_Process(3, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
+                    if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
+                    {
+                        ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
+                        Additional_Clothing_Process(3, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
+                    }
                 }
 
                 if (outfitnum != 2)

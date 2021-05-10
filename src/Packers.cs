@@ -17,6 +17,49 @@ namespace Cosplay_Academy
 {
     public partial class ClothingLoader
     {
+        private void Run_Repacks(ChaControl character, ChaDefault ThisOutfitData)
+        {
+            ME_RePack(character, ThisOutfitData);
+            KCOX_RePack(character, ThisOutfitData);
+            KKABM_Repack(character, ThisOutfitData);
+            DynamicBone_Repack(character, ThisOutfitData);
+            PushUp_RePack(character, ThisOutfitData);
+            ClothingUnlocker_RePack(character, ThisOutfitData);
+            AccessoryStateSync_Repack(character, ThisOutfitData);
+            Accessory_States_Repack(character, ThisOutfitData);
+            Accessory_Themes_Repack(character, ThisOutfitData);
+            Additional_Card_Info_Repack(character, ThisOutfitData);
+            Accessory_Parents_Repack(character, ThisOutfitData);
+        }
+
+        public void Reload_RePacks(ChaControl ChaControl)
+        {
+            //ControllerReload_Loop(typeof(KoiClothesOverlayX.KoiClothesOverlayController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
+
+            //ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
+
+            //ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", false), ChaControl);
+
+            //ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KK_Plugins.Pushup+PushupController, KK_Pushup", false), ChaControl);
+
+            //ControllerReload_Loop(typeof(BoneController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KKABMX.Core.BoneController, KKABMX", false), ChaControl);
+
+            //ControllerReload_Loop(typeof(KK_Plugins.DynamicBoneEditor.CharaController), ChaControl);
+            ControllerReload_Loop(Type.GetType("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
+        }
+
+
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             ChaFile ChaFile = ChaControl.chaFile;
@@ -141,14 +184,14 @@ namespace Cosplay_Academy
             {
                 CharacterData = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
             }
-            foreach (var item in CharacterData)
-            {
-                ExpandedOutfit.Logger.LogWarning(item.Key);
-                foreach (var item2 in item.Value)
-                {
-                    ExpandedOutfit.Logger.LogWarning("\t" + item2.Key);
-                }
-            }
+            //foreach (var item in CharacterData)
+            //{
+            //    ExpandedOutfit.Logger.LogWarning(item.Key);
+            //    foreach (var item2 in item.Value)
+            //    {
+            //        ExpandedOutfit.Logger.LogWarning("\t" + item2.Key);
+            //    }
+            //}
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 if (!CharacterData.TryGetValue((CoordinateType)outfitnum, out var CurrentCharacterData))
@@ -158,8 +201,8 @@ namespace Cosplay_Academy
                 bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
                 bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
 
-                var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Required_ACC");
-                var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
+                var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
+                var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
                 if (ExpandedData != null)
                 {
                     if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var S_CoordinateSaveBools) && S_CoordinateSaveBools != null)
@@ -190,16 +233,11 @@ namespace Cosplay_Academy
                     {
                         foreach (var texData in dict)
                         {
-                            //int index = Array.IndexOf(Constants.KCOX_Cat, texData.Key);
-                            //if (CharacterClothingKeep[index])
-                            //{
-                            //    continue;
-                            //}
                             storage.Add(texData.Key, texData.Value);
                         }
                     }
                 }
-                if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null)
+                if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
                 {
                     if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
                     {
@@ -553,35 +591,32 @@ namespace Cosplay_Academy
             SetExtendedData("madevil.kk.ass", SavedData, ChaControl, ThisOutfitData);
         }
 
-        private void Personal_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void Accessory_Themes_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             PluginData SavedData = new PluginData();
 
             List<string>[] ThemeNames = new List<string>[Constants.Outfit_Size];
             List<bool>[] RelativeThemeBool = new List<bool>[Constants.Outfit_Size];
             List<Color[]>[] colors = new List<Color[]>[Constants.Outfit_Size];
-            List<int>[] AccKeep = new List<int>[Constants.Outfit_Size];
-            List<int>[] HairAcc = new List<int>[Constants.Outfit_Size];
             Dictionary<int, int>[] ACC_Theme_Dictionary = new Dictionary<int, int>[Constants.Outfit_Size];
             Dictionary<int, bool>[] ColorRelativity = new Dictionary<int, bool>[Constants.Outfit_Size];
             Dictionary<int, List<int[]>>[] Relative_ACC_Dictionary = new Dictionary<int, List<int[]>>[Constants.Outfit_Size];
             bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
             Color[] PersonalColorSkew = new Color[Constants.Outfit_Size];
             bool[] PersonalClothingBools = new bool[9];
+
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 ThemeNames[i] = new List<string>();
                 RelativeThemeBool[i] = new List<bool>();
                 colors[i] = new List<Color[]>();
-                AccKeep[i] = new List<int>();
-                HairAcc[i] = new List<int>();
                 ACC_Theme_Dictionary[i] = new Dictionary<int, int>();
                 ColorRelativity[i] = new Dictionary<int, bool>();
                 Relative_ACC_Dictionary[i] = new Dictionary<int, List<int[]>>();
             }
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
-                var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Required_ACC");
+                var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_Themes");
                 if (MyData != null)
                 {
                     if (MyData.data.TryGetValue("Theme_Names", out var S_ThemeName) && S_ThemeName != null)
@@ -613,8 +648,6 @@ namespace Cosplay_Academy
                         Relative_ACC_Dictionary[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, List<int[]>>>((byte[])S_Relative_ACC_Dictionary);
                     }
                 }
-                HairAcc[outfitnum].AddRange(ThisOutfitData.HairKeepReturn[outfitnum]);
-                AccKeep[outfitnum].AddRange(ThisOutfitData.ACCKeepReturn[outfitnum]);
                 if (ThemeNames[outfitnum].Count == 0)
                 {
                     ThemeNames[outfitnum].Add("None");
@@ -622,13 +655,11 @@ namespace Cosplay_Academy
             }
             SavedData.data.Add("Theme_Names", MessagePackSerializer.Serialize(ThemeNames));
             SavedData.data.Add("Theme_dic", MessagePackSerializer.Serialize(ACC_Theme_Dictionary));
-            SavedData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairAcc));
-            SavedData.data.Add("AccKeep", MessagePackSerializer.Serialize(AccKeep));
             SavedData.data.Add("Color_Theme_dic", MessagePackSerializer.Serialize(colors));
             SavedData.data.Add("Color_Relativity", MessagePackSerializer.Serialize(ColorRelativity));
             SavedData.data.Add("Relative_Theme_Bools", MessagePackSerializer.Serialize(RelativeThemeBool));
             SavedData.data.Add("Relative_ACC_Dictionary", MessagePackSerializer.Serialize(Relative_ACC_Dictionary));
-            var personaldata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Required_ACC");
+            var personaldata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Themes");
             if (personaldata != null)
             {
                 if (personaldata.data.TryGetValue("Personal_Clothing_Save", out var S_Clothing_Save) && S_Clothing_Save != null)
@@ -643,7 +674,178 @@ namespace Cosplay_Academy
             SavedData.data.Add("Personal_Clothing_Save", MessagePackSerializer.Serialize(PersonalClothingBools));
             SavedData.data.Add("Color_Skews", MessagePackSerializer.Serialize(PersonalColorSkew));
 
-            SetExtendedData("Required_ACC", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("Accessory_Themes", SavedData, ChaControl, ThisOutfitData);
+        }
+
+        private void Additional_Card_Info_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            bool Character_Cosplay_Ready = false;
+            bool[] PersonalClothingBools = new bool[9];
+
+            int CoordinateLength = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;
+            List<int>[] AccKeep = new List<int>[CoordinateLength];
+            List<int>[] HairAcc = new List<int>[CoordinateLength];
+            bool[][] CoordinateSaveBools = new bool[CoordinateLength][];
+            Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[CoordinateLength];
+            Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[CoordinateLength];
+            int[] HstateType_Restriction = new int[CoordinateLength];
+            int[] ClubType_Restriction = new int[CoordinateLength];
+            bool[][] Height_Restriction = new bool[CoordinateLength][];
+            bool[][] Breastsize_Restriction = new bool[CoordinateLength][];
+            int[] CoordinateType = new int[CoordinateLength];
+            int[] CoordinateSubType = new int[CoordinateLength];
+            string[] CreatorNames = new string[CoordinateLength];
+            string[] SetNames = new string[CoordinateLength];
+            string[] SubSetNames = new string[CoordinateLength];
+
+            var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
+            if (PersonalData != null)
+            {
+                if (PersonalData.data.TryGetValue("Personal_Clothing_Save", out var ByteData) && ByteData != null)
+                {
+                    PersonalClothingBools = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                }
+                if (PersonalData.data.TryGetValue("Cosplay_Academy_Ready", out ByteData) && ByteData != null)
+                {
+                    Character_Cosplay_Ready = MessagePackSerializer.Deserialize<bool>((byte[])ByteData);
+                }
+            }
+
+            for (int outfitnum = 0; outfitnum < CoordinateLength; outfitnum++)
+            {
+                AccKeep[outfitnum] = new List<int>();
+                HairAcc[outfitnum] = new List<int>();
+                CoordinateSaveBools[outfitnum] = new bool[Enum.GetNames(typeof(ChaFileDefine.ClothesKind)).Length];
+                PersonalityType_Restriction[outfitnum] = new Dictionary<int, int>();
+                TraitType_Restriction[outfitnum] = new Dictionary<int, int>();
+                HstateType_Restriction[outfitnum] = 0;
+                ClubType_Restriction[outfitnum] = 0;
+                Height_Restriction[outfitnum] = new bool[3];
+                Breastsize_Restriction[outfitnum] = new bool[3];
+                CoordinateType[outfitnum] = 0;
+                CoordinateSubType[outfitnum] = 0;
+                CreatorNames[outfitnum] = "";
+                SetNames[outfitnum] = "";
+                SubSetNames[outfitnum] = "";
+                var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
+                if (MyData != null)
+                {
+                    if (MyData.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                    {
+                        HairAcc[outfitnum] = MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("CoordinateSaveBools", out ByteData) && ByteData != null)
+                    {
+                        CoordinateSaveBools[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                    {
+                        AccKeep[outfitnum] = MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        PersonalityType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        TraitType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        HstateType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        ClubType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
+                    {
+                        Height_Restriction[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
+                    {
+                        Breastsize_Restriction[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
+                    {
+                        CoordinateType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
+                    {
+                        CoordinateSubType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Creator", out ByteData) && ByteData != null)
+                    {
+                        CreatorNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
+                    {
+                        SetNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
+                    {
+                        SubSetNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
+                    }
+                }
+            }
+            PluginData SavedData = new PluginData();
+
+            SavedData.data.Add("CoordinateSaveBools", MessagePackSerializer.Serialize(CoordinateSaveBools));
+            SavedData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairAcc));
+            SavedData.data.Add("AccKeep", MessagePackSerializer.Serialize(AccKeep));
+            SavedData.data.Add("PersonalityType_Restriction", MessagePackSerializer.Serialize(PersonalityType_Restriction));
+            SavedData.data.Add("TraitType_Restriction", MessagePackSerializer.Serialize(TraitType_Restriction));
+            SavedData.data.Add("HstateType_Restriction", MessagePackSerializer.Serialize(HstateType_Restriction));
+            SavedData.data.Add("ClubType_Restriction", MessagePackSerializer.Serialize(ClubType_Restriction));
+            SavedData.data.Add("Height_Restriction", MessagePackSerializer.Serialize(Height_Restriction));
+            SavedData.data.Add("Breastsize_Restriction", MessagePackSerializer.Serialize(Breastsize_Restriction));
+            SavedData.data.Add("CoordinateType", MessagePackSerializer.Serialize(CoordinateType));
+            SavedData.data.Add("CoordinateSubType", MessagePackSerializer.Serialize(CoordinateSubType));
+            SavedData.data.Add("Creator", MessagePackSerializer.Serialize(CreatorNames));
+            SavedData.data.Add("Set_Name", MessagePackSerializer.Serialize(SetNames));
+            SavedData.data.Add("SubSetNames", MessagePackSerializer.Serialize(SubSetNames));
+            SavedData.data.Add("Personal_Clothing_Save", MessagePackSerializer.Serialize(PersonalClothingBools));
+            SavedData.data.Add("Cosplay_Academy_Ready", MessagePackSerializer.Serialize(Character_Cosplay_Ready));
+
+            SetExtendedData("Additional_Card_Info", SavedData, ChaControl, ThisOutfitData);
+        }
+
+        private void Accessory_Parents_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            int CoordinateLength = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;
+
+            Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[CoordinateLength];
+            Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[CoordinateLength];
+            Dictionary<int, Vector3[,]>[] Relative_Data = new Dictionary<int, Vector3[,]>[CoordinateLength];
+
+            for (int outfitnum = 0; outfitnum < CoordinateLength; outfitnum++)
+            {
+                Bindings[outfitnum] = new Dictionary<int, List<int>>();
+                Custom_Names[outfitnum] = new Dictionary<string, int>();
+                Relative_Data[outfitnum] = new Dictionary<int, Vector3[,]>();
+                var Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
+                if (Data != null)
+                {
+                    if (Data.data.TryGetValue("Parenting_Data", out var ByteData) && ByteData != null)
+                    {
+                        Bindings = MessagePackSerializer.Deserialize<Dictionary<int, List<int>>[]>((byte[])ByteData);
+                    }
+                    if (Data.data.TryGetValue("Parenting_Names", out ByteData) && ByteData != null)
+                    {
+                        Custom_Names = MessagePackSerializer.Deserialize<Dictionary<string, int>[]>((byte[])ByteData);
+                    }
+                    if (Data.data.TryGetValue("Relative_Data", out ByteData) && ByteData != null)
+                    {
+                        Relative_Data = MessagePackSerializer.Deserialize<Dictionary<int, Vector3[,]>[]>((byte[])ByteData);
+                    }
+                }
+            }
+            PluginData SavedData = new PluginData();
+            SavedData.data.Add("Parenting_Data", MessagePackSerializer.Serialize(Bindings));
+            SavedData.data.Add("Parenting_Names", MessagePackSerializer.Serialize(Custom_Names));
+            SavedData.data.Add("Relative_Data", MessagePackSerializer.Serialize(Relative_Data));
+
+            SetExtendedData("Accessory_Parents", SavedData, ChaControl, ThisOutfitData);
         }
 
         private void Accessory_States_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
@@ -683,7 +885,7 @@ namespace Cosplay_Academy
                 }
                 if (ExpandedOutfit.RandomizeUnderwear.Value && ExpandedOutfit.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
-                    ExpandedOutfit.Logger.LogWarning("Creating underwear data");
+                    //ExpandedOutfit.Logger.LogWarning("Creating underwear data");
                     ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
                     Dictionary<int, int> Underwear_Binding_Dictionary = new Dictionary<int, int>();
                     Dictionary<int, int[]> Underwear_State_array = new Dictionary<int, int[]>();
@@ -712,10 +914,10 @@ namespace Cosplay_Academy
                     }
                     else
                     {
-                        foreach (var item in UnderwearAccessoriesLocations[outfitnum])
-                        {
-                            ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} Location: {item}");
-                        }
+                        //foreach (var item in UnderwearAccessoriesLocations[outfitnum])
+                        //{
+                        //    ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} Location: {item}");
+                        //}
                         int postion = 0;
                         foreach (var accessory in Underwear_PartsInfos)
                         {
@@ -834,37 +1036,6 @@ namespace Cosplay_Academy
             }
         }
 
-        public void Reload_RePacks(ChaControl ChaControl)
-        {
-            //ControllerReload_Loop(typeof(KoiClothesOverlayX.KoiClothesOverlayController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
-
-            //ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
-
-            //ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", false), ChaControl);
-            ExpandedOutfit.Logger.LogError("3");
-            //ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KK_Plugins.Pushup.PushupController, KK_Pushup", false), ChaControl);
-
-            //ControllerReload_Loop(typeof(BoneController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KKABMX.Core.BoneController, KKABMX", false), ChaControl);
-
-            //ControllerReload_Loop(typeof(KK_Plugins.DynamicBoneEditor.CharaController), ChaControl);
-            ControllerReload_Loop(Type.GetType("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", false), ChaControl);
-            ExpandedOutfit.Logger.LogError("6");
-            ControllerReload_Loop(Type.GetType("Required_Accessory_Info.Required_ACC_Controller, Required Accessory Info", false), ChaControl);
-            ExpandedOutfit.Logger.LogError("7");
-            ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
-
-            ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
-
-            ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
-
-
-        }
-
         private void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
         {
             if (Controller != null)
@@ -878,6 +1049,5 @@ namespace Cosplay_Academy
                 ExpandedOutfit.Logger.LogError("Failed ");
             }
         }
-
     }
 }

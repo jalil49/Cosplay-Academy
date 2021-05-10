@@ -6,16 +6,17 @@ using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
 using KKAPI.Maker;
-using System.Collections.Generic;
+using KKAPI.Studio;
+using System;
 using System.IO;
 namespace Cosplay_Academy
 {
-    [BepInPlugin(Guid, "Cosplay Academy", Version)]
+    [BepInPlugin(GUID, "Cosplay Academy", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency("com.joan6694.illusionplugins.moreaccessories", BepInDependency.DependencyFlags.HardDependency)]
     public class ExpandedOutfit : BaseUnityPlugin
     {
-        public const string Guid = "Cosplay_Academy";
+        public const string GUID = "Cosplay_Academy";
         public const string Version = Versions.Version;
         public static ExpandedOutfit Instance;
         internal static new ManualLogSource Logger { get; private set; }
@@ -53,9 +54,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> FullSet { get; private set; }
         public static ConfigEntry<bool> KoiClub { get; private set; }
         public static ConfigEntry<bool> ResetMaker { get; set; }
-        //public static ConfigEntry<bool> PermReset { get; set; }
+
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
-        //public static ConfigEntry<bool> PermChangeOutfit { get; set; }
+
         public static ConfigEntry<int> KoiChance { get; private set; }
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
@@ -78,14 +79,17 @@ namespace Cosplay_Academy
 
         public void Awake()
         {
+            if (StudioAPI.InsideStudio)
+            {
+                return;
+            }
             Instance = this;
-
             Logger = base.Logger;
             Hooks.Init();
             //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
-            GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
-            CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
+            GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
+            CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID);
             if (!TryfindPluginInstance("Additional_Card_Info")) //provide access to info even if plugin-doesn't exist
             {
                 CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
@@ -93,7 +97,6 @@ namespace Cosplay_Academy
             CharaEvent.Initialize();
             MakerAPI.MakerExiting += MakerAPI_Clear;
             MakerAPI.MakerStartedLoading += MakerAPI_MakerStartedLoading;
-            MakerAPI.MakerFinishedLoading += MakerAPI_MakerFinishedLoading;
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
@@ -110,7 +113,7 @@ namespace Cosplay_Academy
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
             IndividualSets = Config.Bind("Outfit Sets", "Individual Outfit Sets", false, "Don't look for other sets that are shared");
-            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Priortize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found");
+            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found");
 
 
             //match uniforms
@@ -152,21 +155,14 @@ namespace Cosplay_Academy
             }
         }
 
-        private void MakerAPI_MakerFinishedLoading(object sender, System.EventArgs e)
-        {
-            CharaEvent.finishedloading = true;
-        }
-
         private void MakerAPI_MakerStartedLoading(object sender, RegisterCustomControlsEvent e)
         {
-            CharaEvent.finishedloading = false;
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }
 
-        private void MakerAPI_Clear(object sender, System.EventArgs e)
+        private void MakerAPI_Clear(object sender, EventArgs e)
         {
-            CharaEvent.finishedloading = false;
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }

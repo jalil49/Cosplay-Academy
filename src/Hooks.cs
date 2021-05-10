@@ -98,7 +98,7 @@ namespace Cosplay_Academy
             ClothingLoader clothingLoader = new ClothingLoader();
             ChaFileParameter ChaPara = Chara.chaCtrl.fileParam;
             var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-            if (ThisOutfitData == null)
+            if (ThisOutfitData == null || !ThisOutfitData.processed)
             {
                 return;
             }
@@ -251,7 +251,7 @@ namespace Cosplay_Academy
             //change NPC's who start at club room to a koi outfit
             var ChaPara = __instance.chaCtrl.fileParam;
             var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-            if (ThisOutfitData == null)
+            if (ThisOutfitData == null || !ThisOutfitData.processed)
             {
                 return;
             }
