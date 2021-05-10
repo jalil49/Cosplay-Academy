@@ -86,6 +86,10 @@ namespace Cosplay_Academy
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
             GameAPI.RegisterExtraBehaviour<GameEvent>("Cosplay Academy");
             CharacterApi.RegisterExtraBehaviour<CharaEvent>("Cosplay Academy: Chara");
+            if (!TryfindPluginInstance("Additional_Card_Info")) //provide access to info even if plugin-doesn't exist
+            {
+                CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
+            }
             CharaEvent.Initialize();
             MakerAPI.MakerExiting += MakerAPI_Clear;
             MakerAPI.MakerStartedLoading += MakerAPI_MakerStartedLoading;
@@ -165,6 +169,19 @@ namespace Cosplay_Academy
             CharaEvent.finishedloading = false;
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
+        }
+
+        private bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
+        {
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
+            if (null != target)
+            {
+                if (target.Metadata.Version >= minimumVersion)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
