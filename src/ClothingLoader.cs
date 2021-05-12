@@ -24,7 +24,7 @@ namespace Cosplay_Academy
         //private int[] UnderwearAccessoryStart = new int[Constants.Outfit_Size];
         private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
-        private WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+        private readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
         public ClothingLoader()
         {
@@ -414,7 +414,7 @@ namespace Cosplay_Academy
                         PartsQueue.Enqueue(Underwear_PartsInfos[i]);
                         HairQueue.Enqueue(ACCdata);
                         //}
-                        ExpandedOutfit.Logger.LogWarning($"Queued new part: {i} ID: {Underwear_PartsInfos[i].id}");
+                        //ExpandedOutfit.Logger.LogWarning($"Queued new part: {i} ID: {Underwear_PartsInfos[i].id}");
 
                     }
                     ////ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");

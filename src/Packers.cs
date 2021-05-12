@@ -1044,10 +1044,10 @@ namespace Cosplay_Academy
                 object[] Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
                 Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
             }
-            else
-            {
-                ExpandedOutfit.Logger.LogError("Failed ");
-            }
+            //else
+            //{
+            //    ExpandedOutfit.Logger.LogError("Failed ");
+            //}
         }
     }
 }

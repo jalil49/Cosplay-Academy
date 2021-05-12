@@ -23,17 +23,26 @@ namespace Cosplay_Academy
         private bool ClearData;
         bool firstmakerpass = false;
 
-        internal static void Initialize()
+        public CharaEvent()
         {
             MakerAPI.RegisterCustomSubCategories += RegisterCustomSubCategories;
+            MakerAPI.MakerExiting += MakerAPI_MakerExiting;
+        }
+
+        private void MakerAPI_MakerExiting(object sender, System.EventArgs e)
+        {
+            ClearData = false;
         }
 
         protected override void OnDestroy()
         {
+            MakerAPI.MakerExiting -= MakerAPI_MakerExiting;
+            MakerAPI.RegisterCustomSubCategories -= RegisterCustomSubCategories;
+            Constants.ChaDefaults.Remove(ThisOutfitData);
             base.OnDestroy();
         }
 
-        private static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
+        private void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
             var owner = ExpandedOutfit.Instance;
             e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", ExpandedOutfit.Makerview.Value, owner)).BindToFunctionController<CharaEvent, bool>(
@@ -52,8 +61,8 @@ namespace Cosplay_Academy
                 (controller) => ExpandedOutfit.RandomizeUnderwearOnly.Value,
                 (controller, value) => ExpandedOutfit.RandomizeUnderwearOnly.Value = value);
             e.AddSidebarControl(new SidebarToggle("CA: Clear Existing", false, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => controller.ClearData,
-                (controller, value) => controller.ClearData = value);
+                (controller) => ClearData,
+                (controller, value) => ClearData = value);
         }
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
@@ -63,10 +72,9 @@ namespace Cosplay_Academy
                 return;
             }
             bool IsMaker = currentGameMode == GameMode.Maker;
-            bool alreadyexists = false;
             if (IsMaker && firstmakerpass || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) || GameAPI.InsideHScene)
             {
-                if (ClearData)
+                if (ClearData && IsMaker)
                 {
                     Constants.ChaDefaults.Clear();
                 }
@@ -76,11 +84,6 @@ namespace Cosplay_Academy
             else if (IsMaker)
             {
                 firstmakerpass = true;
-            }
-            else if (alreadyexists && ChaControl.chaFile.coordinate != ThisOutfitData.ChaControl.chaFile.coordinate)
-            {
-                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
         }
 
@@ -116,7 +119,7 @@ namespace Cosplay_Academy
             }
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher)
             {
-                ThisOutfitData.processed = true;
+                //ThisOutfitData.processed = true;
                 return;
             }
             if (GameMode.Maker == currentGameMode)
@@ -428,14 +431,6 @@ namespace Cosplay_Academy
                         ThisOutfitData.processed = true;
                     }
                 }
-                if (currentGameMode == GameMode.MainGame || ExpandedOutfit.RandomizeUnderwear.Value && GameMode.Maker == currentGameMode)
-                {
-                    if (!ThisOutfitData.processed)//run if unprocessed
-                    {
-                        OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                    }
-                }
-
 
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
@@ -444,7 +439,6 @@ namespace Cosplay_Academy
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
-
         }
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)

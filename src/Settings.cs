@@ -94,9 +94,6 @@ namespace Cosplay_Academy
             {
                 CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
             }
-            CharaEvent.Initialize();
-            MakerAPI.MakerExiting += MakerAPI_Clear;
-            MakerAPI.MakerStartedLoading += MakerAPI_MakerStartedLoading;
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
@@ -144,27 +141,15 @@ namespace Cosplay_Academy
             MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
             ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub, "Affects club outfit in FreeH and cutscene non-heroine NPCs in story mode");
             ResetMaker = Config.Bind("Maker", "Randomize Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
-            //PermReset = Config.Bind("Maker", "Keep Randomize Sets on", false, "Reset randomize Sets to disable once called");
+
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false);
-            //PermChangeOutfit = Config.Bind("Maker", "Keep change generated outit on", false, "Reset change generated outfit to disable once called");
+
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
             for (int i = 0; i < Constants.InputStrings.Length; i++)
             {
                 ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
-        }
-
-        private void MakerAPI_MakerStartedLoading(object sender, RegisterCustomControlsEvent e)
-        {
-            Constants.ChaDefaults.Clear();
-            OutfitDecider.ResetDecider();
-        }
-
-        private void MakerAPI_Clear(object sender, EventArgs e)
-        {
-            Constants.ChaDefaults.Clear();
-            OutfitDecider.ResetDecider();
         }
 
         private bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
