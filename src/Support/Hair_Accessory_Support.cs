@@ -23,11 +23,11 @@ namespace Cosplay_Academy.Hair
             public float HairLength = HairLengthDefault;
 
         }
-        private static bool ColorMatchDefault = true;
-        private static bool HairGlossDefault = true;
+        private static readonly bool ColorMatchDefault = true;
+        private static readonly bool HairGlossDefault = true;
         private static Color OutlineColorDefault = Color.black;
         private static Color AccessoryColorDefault = Color.red;
-        private static float HairLengthDefault = 0;
+        private static readonly float HairLengthDefault = 0;
         #endregion
     }
 }
