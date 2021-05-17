@@ -697,7 +697,7 @@ namespace Cosplay_Academy
             string[] CreatorNames = new string[CoordinateLength];
             string[] SetNames = new string[CoordinateLength];
             string[] SubSetNames = new string[CoordinateLength];
-
+            int[] GenderType = new int[CoordinateLength];
             var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
             if (PersonalData != null)
             {
@@ -727,6 +727,7 @@ namespace Cosplay_Academy
                 CreatorNames[outfitnum] = "";
                 SetNames[outfitnum] = "";
                 SubSetNames[outfitnum] = "";
+                GenderType[outfitnum] = 0;
                 var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
                 if (MyData != null)
                 {
@@ -786,6 +787,10 @@ namespace Cosplay_Academy
                     {
                         SubSetNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
                     }
+                    if (MyData.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
+                    {
+                        GenderType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
+                    }
                 }
             }
             PluginData SavedData = new PluginData();
@@ -806,6 +811,7 @@ namespace Cosplay_Academy
             SavedData.data.Add("SubSetNames", MessagePackSerializer.Serialize(SubSetNames));
             SavedData.data.Add("Personal_Clothing_Save", MessagePackSerializer.Serialize(PersonalClothingBools));
             SavedData.data.Add("Cosplay_Academy_Ready", MessagePackSerializer.Serialize(Character_Cosplay_Ready));
+            SavedData.data.Add("GenderType", MessagePackSerializer.Serialize(GenderType));
 
             SetExtendedData("Additional_Card_Info", SavedData, ChaControl, ThisOutfitData);
         }
@@ -991,7 +997,7 @@ namespace Cosplay_Academy
                             }
                             else
                             {
-                                ExpandedOutfit.Logger.LogWarning("always show");
+                                //ExpandedOutfit.Logger.LogWarning("always show");
                                 binder = 0;
                             }
                             Underwear_Binding_Dictionary[location] = binder;
@@ -1025,7 +1031,7 @@ namespace Cosplay_Academy
             }
             if (ACC_Binding_Dictionary.Any(x => x.Count > 0))
             {
-                ExpandedOutfit.Logger.LogWarning("Setting state data");
+                //ExpandedOutfit.Logger.LogWarning("Setting state data");
 
                 SavedData.data.Add("ACC_Binding_Dictionary", MessagePackSerializer.Serialize(ACC_Binding_Dictionary));
                 SavedData.data.Add("ACC_State_array", MessagePackSerializer.Serialize(ACC_State_array));
