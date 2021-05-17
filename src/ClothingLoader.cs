@@ -2,10 +2,12 @@
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
 using HarmonyLib;
+using KKAPI.Maker;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System;
 using System.Collections.Generic;
+//using System.Diagnostics;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
@@ -24,8 +26,8 @@ namespace Cosplay_Academy
         //private int[] UnderwearAccessoryStart = new int[Constants.Outfit_Size];
         private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
-        private readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-
+        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+        //private static Stopwatch FullTime = new Stopwatch();
         public ClothingLoader()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -51,7 +53,7 @@ namespace Cosplay_Academy
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
             Underwear.LoadFile(ThisOutfitData.Underwear);
-
+            //ExpandedOutfit.Logger.LogWarning($"underwear is {ThisOutfitData.Underwear}");
             int Original_Coord = ChaControl.fileStatus.coordinateType;
 
             if (_accessoriesByChar.TryGetValue(ChaFile, out var SaveAccessory) == false)
@@ -63,12 +65,14 @@ namespace Cosplay_Academy
             ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.Underwear);
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[Original_Coord].accessory.parts);
             Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
-
+            //FullTime.Start();
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 GeneralizedLoad(i);
                 ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
+            //FullTime.Stop();
+            //ExpandedOutfit.Logger.LogWarning($"Total Generalized load time {FullTime.ElapsedMilliseconds}");
             //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)Original_Coord);
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
@@ -252,8 +256,6 @@ namespace Cosplay_Academy
 
             if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
             {
-                //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)outfitnum);
-
                 #region additonal ME_Data
                 List<MaterialShader> ME_MS_properties = new List<MaterialShader>();
                 List<RendererProperty> ME_R_properties = new List<RendererProperty>();
@@ -417,17 +419,12 @@ namespace Cosplay_Academy
                         //ExpandedOutfit.Logger.LogWarning($"Queued new part: {i} ID: {Underwear_PartsInfos[i].id}");
 
                     }
-                    ////ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                    //if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Inclusion.Contains(Intermediate[i].parentKey) /*&& !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i)*/)
-                    //{
-                    //if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
-                    //{
                 }
 
 
                 if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
                 {
-                    if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
+                    if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
                     {
                         ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2] = Underwear.clothes.parts[2];
                         Additional_Clothing_Process(2, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
@@ -442,7 +439,7 @@ namespace Cosplay_Academy
                     }
                 }
 
-                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0 && Underwearbools[outfitnum][0])
+                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0 && !Underwearbools[outfitnum][0])
                 {
                     if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
                     {
@@ -481,7 +478,7 @@ namespace Cosplay_Academy
             List<MaterialColorProperty> Original_ME_MC_properties = new List<MaterialColorProperty>();
             List<MaterialFloatProperty> Original_ME_MF_properties = new List<MaterialFloatProperty>();
             List<MaterialTextureProperty> Original_ME_MT_properties = new List<MaterialTextureProperty>();
-            //Dictionary<int, byte[]> importDict = new Dictionary<int, byte[]>();
+
             if (Original_ME_Data?.data != null)
             {
                 //    List<ObjectType> objectTypesToLoad = new List<ObjectType>
@@ -576,141 +573,122 @@ namespace Cosplay_Academy
                 Additional_Clothing_Process(i, outfitnum, Original_ME_MC_properties, Original_ME_MS_properties, Original_ME_R_properties, Original_ME_MF_properties, Original_ME_MT_properties);
             }
 
-            if (ExpandedOutfit.HairMatch.Value)
+            Color[] haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
+            if (ExpandedOutfit.HairMatch.Value && !MakerAPI.InsideMaker)
             {
-                Color[] haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
-
                 foreach (var item in HairToColor)
                 {
-                    if (item < 20)
-                    {
-                        ChaControl.chaFile.coordinate[outfitnum].accessory.parts[item].color = haircolor;
-                    }
-                    else
-                    {
-                        NewRAW[item - 20].color = haircolor;
-                    }
-                    var haircomponent = ThisOutfitData.ReturnMaterialColor.FindAll(x => x.CoordinateIndex == outfitnum && x.Slot == item && x.ObjectType == ObjectType.Accessory);
-                    for (int i = 0; i < haircomponent.Count; i++)
-                    {
-                        if (haircomponent[i].Property == "Color")
-                        {
-                            haircomponent[i].Value = ChaControl.fileHair.parts[1].baseColor;
-                        }
-                        else if (haircomponent[i].Property == "Color2")
-                        {
-                            haircomponent[i].Value = ChaControl.fileHair.parts[1].startColor;
-                        }
-                        else if (haircomponent[i].Property == "Color3")
-                        {
-                            haircomponent[i].Value = ChaControl.fileHair.parts[1].endColor;
-                        }
-                        else if (haircomponent[i].Property == "ShadowColor")
-                        {
-                            haircomponent[i].Value = ChaControl.fileHair.parts[1].outlineColor;
-                        }
-                    }
+                    HairMatchProcess(outfitnum, item, haircolor, NewRAW);
                 }
             }
-
             int insert = 0;
             int ACCpostion = 0;
             bool Empty;
-            //Normal
-            for (int n = ChaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
+            bool print = false;
+            if (MakerAPI.InsideMaker)
             {
-                Empty = ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
-                if (Empty) //120 is empty/default
+                //Normal
+                for (int n = ChaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
                 {
-                    if (insert++ >= UnderwearAccessoryStart)
+                    Empty = ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
+                    if (Empty) //120 is empty/default
                     {
-                        UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
+                        if (insert++ >= UnderwearAccessoryStart)
+                        {
+                            UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
+                        }
+                        ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                        {
+                            HairAccInfo[ACCpostion] = HairQueue.Dequeue();
+                        }
+                        else
+                        {
+                            HairQueue.Dequeue();
+                        }
+
+                        if (HairKeepQueue.Dequeue())
+                        {
+                            ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
+                        }
+                        if (ACCKeepqueue.Dequeue())
+                        {
+                            ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
+                        }
+
+                        ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
+
+                        ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
+
+                        ME_Texture_Loop(TextureQueue, ACCpostion, MaterialTexture, ThisOutfitData);
+
+                        ME_Float_Loop(FloatQueue, ACCpostion, MaterialFloat);
+
+                        ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
                     }
-                    ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                    if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
-                        HairAccInfo[ACCpostion] = HairQueue.Dequeue();
+                        info.ColorMatch = true;
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
                     }
-                    else
-                    {
-                        HairQueue.Dequeue();
-                    }
-
-                    if (HairKeepQueue.Dequeue())
-                    {
-                        ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
-                    }
-                    if (ACCKeepqueue.Dequeue())
-                    {
-                        ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
-                    }
-
-                    ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
-
-                    ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
-
-                    ME_Texture_Loop(TextureQueue, ACCpostion, MaterialTexture, ThisOutfitData);
-
-                    ME_Float_Loop(FloatQueue, ACCpostion, MaterialFloat);
-
-                    ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
-                }
-                if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
-                {
-                    info.ColorMatch = true;
-                }
 #if Debug
                 //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
 #endif
+                }
+                //MoreAccessories
+                for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
+                {
+                    Empty = NewRAW[ACCpostion - 20].type == 120;
+                    if (Empty) //120 is empty/default
+                    {
+                        if (insert++ >= UnderwearAccessoryStart)
+                        {
+                            UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
+                        }
+
+                        NewRAW[ACCpostion - 20] = PartsQueue.Dequeue();
+
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                        {
+                            HairAccInfo[ACCpostion] = HairQueue.Dequeue();
+                        }
+                        else
+                        {
+                            HairQueue.Dequeue();
+                        }
+
+                        if (HairKeepQueue.Dequeue())
+                        {
+                            ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
+                        }
+                        if (ACCKeepqueue.Dequeue())
+                        {
+                            ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
+                        }
+
+                        ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
+
+                        ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
+
+                        ME_Texture_Loop(TextureQueue, ACCpostion, MaterialTexture, ThisOutfitData);
+
+                        ME_Float_Loop(FloatQueue, ACCpostion, MaterialFloat);
+
+                        ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
+                    }
+                    if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
+                    {
+                        info.ColorMatch = true;
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
+                    }
+                }
+                print = true;
             }
-            //MoreAccessories
-            for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
+            else
             {
-                Empty = NewRAW[ACCpostion - 20].type == 120;
-                if (Empty) //120 is empty/default
-                {
-                    if (insert++ >= UnderwearAccessoryStart)
-                    {
-                        UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
-                    }
-
-                    NewRAW[ACCpostion - 20] = PartsQueue.Dequeue();
-
-                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
-                    {
-                        HairAccInfo[ACCpostion] = HairQueue.Dequeue();
-                    }
-                    else
-                    {
-                        HairQueue.Dequeue();
-                    }
-
-                    if (HairKeepQueue.Dequeue())
-                    {
-                        ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
-                    }
-                    if (ACCKeepqueue.Dequeue())
-                    {
-                        ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
-                    }
-
-                    ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
-
-                    ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
-
-                    ME_Texture_Loop(TextureQueue, ACCpostion, MaterialTexture, ThisOutfitData);
-
-                    ME_Float_Loop(FloatQueue, ACCpostion, MaterialFloat);
-
-                    ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
-                }
-                if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
-                {
-                    info.ColorMatch = true;
-                }
+                ACCpostion = 20 + NewRAW.Count;
             }
 
-            bool print = true;
             //original accessories
             while (PartsQueue.Count != 0)
             {
@@ -727,6 +705,11 @@ namespace Cosplay_Academy
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                 {
                     var HairInfo = HairQueue.Dequeue();
+                    if (ExpandedOutfit.HairMatch.Value)
+                    {
+                        HairInfo.ColorMatch = true;
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
+                    }
                     HairAccInfo[ACCpostion] = HairInfo;
                 }
                 else
@@ -755,7 +738,6 @@ namespace Cosplay_Academy
 
                 ACCpostion++;
             }
-            //data.rawAccessoriesInfos[outfitnum] = NewRAW;
 
             HairAccessories.Add(outfitnum, HairAccInfo);
             while (data.infoAccessory.Count < data.nowAccessories.Count)
@@ -1120,7 +1102,6 @@ namespace Cosplay_Academy
             }
         }
 
-
         #region ME_Loops
         private static void ME_Float_Loop(Queue<MaterialFloatProperty> FloatQueue, int ACCpostion, List<MaterialFloatProperty> MaterialFloat)
         {
@@ -1263,5 +1244,36 @@ namespace Cosplay_Academy
             ThisOutfitData.ReturnMaterialTexture.AddRange(ME_MT_properties.Where(x => x.Slot == index).ToList());
         }
 
+        private void HairMatchProcess(int outfitnum, int ACCPosition, Color[] haircolor, List<ChaFileAccessory.PartsInfo> NewRAW)
+        {
+            if (ACCPosition < 20)
+            {
+                ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCPosition].color = haircolor;
+            }
+            else
+            {
+                NewRAW[ACCPosition - 20].color = haircolor;
+            }
+            var haircomponent = ThisOutfitData.ReturnMaterialColor.FindAll(x => x.CoordinateIndex == outfitnum && x.Slot == ACCPosition && x.ObjectType == ObjectType.Accessory);
+            for (int i = 0; i < haircomponent.Count; i++)
+            {
+                if (haircomponent[i].Property == "Color")
+                {
+                    haircomponent[i].Value = ChaControl.fileHair.parts[1].baseColor;
+                }
+                else if (haircomponent[i].Property == "Color2")
+                {
+                    haircomponent[i].Value = ChaControl.fileHair.parts[1].startColor;
+                }
+                else if (haircomponent[i].Property == "Color3")
+                {
+                    haircomponent[i].Value = ChaControl.fileHair.parts[1].endColor;
+                }
+                else if (haircomponent[i].Property == "ShadowColor")
+                {
+                    haircomponent[i].Value = ChaControl.fileHair.parts[1].outlineColor;
+                }
+            }
+        }
     }
 }
