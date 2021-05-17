@@ -150,6 +150,8 @@ namespace Cosplay_Academy
                 ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
+            MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
+            MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
         }
 
         private bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)

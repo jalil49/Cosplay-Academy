@@ -11,6 +11,7 @@ using Manager;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System.Collections.Generic;
+//using System.Diagnostics;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
@@ -20,29 +21,21 @@ namespace Cosplay_Academy
     public class CharaEvent : CharaCustomFunctionController
     {
         private ChaDefault ThisOutfitData;
-        private bool ClearData;
+        private static bool ClearData;
         bool firstmakerpass = false;
 
-        public CharaEvent()
-        {
-            MakerAPI.RegisterCustomSubCategories += RegisterCustomSubCategories;
-            MakerAPI.MakerExiting += MakerAPI_MakerExiting;
-        }
-
-        private void MakerAPI_MakerExiting(object sender, System.EventArgs e)
+        public static void MakerAPI_MakerExiting()
         {
             ClearData = false;
         }
 
         protected override void OnDestroy()
         {
-            MakerAPI.MakerExiting -= MakerAPI_MakerExiting;
-            MakerAPI.RegisterCustomSubCategories -= RegisterCustomSubCategories;
             Constants.ChaDefaults.Remove(ThisOutfitData);
             base.OnDestroy();
         }
 
-        private void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
+        public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
             var owner = ExpandedOutfit.Instance;
             e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", ExpandedOutfit.Makerview.Value, owner)).BindToFunctionController<CharaEvent, bool>(
@@ -67,6 +60,8 @@ namespace Cosplay_Academy
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
+            //Time.Start();
+
             if (currentGameMode == GameMode.Studio)
             {
                 return;
@@ -78,13 +73,20 @@ namespace Cosplay_Academy
                 {
                     Constants.ChaDefaults.Clear();
                 }
+
                 Process(currentGameMode);
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
+                if (IsMaker || GameAPI.InsideHScene)
+                {
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
+                }
             }
             else if (IsMaker)
             {
                 firstmakerpass = true;
             }
+            //Time.Stop();
+
+            //ExpandedOutfit.Logger.LogWarning($"Time is {Time.ElapsedMilliseconds}");
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -431,11 +433,9 @@ namespace Cosplay_Academy
                         ThisOutfitData.processed = true;
                     }
                 }
-
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
-
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
