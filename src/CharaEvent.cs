@@ -75,10 +75,7 @@ namespace Cosplay_Academy
                 }
 
                 Process(currentGameMode);
-                if (IsMaker || GameAPI.InsideHScene)
-                {
-                    ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
-                }
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
             else if (IsMaker)
             {
