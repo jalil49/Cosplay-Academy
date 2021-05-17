@@ -295,7 +295,7 @@ namespace Cosplay_Academy
         }
         private static void UnderwearChoice()
         {
-            ThisOutfitData.Underwear = outfitData[12].RandomSet(HExperience, ExpandedOutfit.MatchNightwear.Value);
+            ThisOutfitData.Underwear = outfitData[12].RandomSet(HExperience, ExpandedOutfit.MatchUnderwear.Value);
         }
         private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
