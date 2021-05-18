@@ -30,12 +30,6 @@ namespace Cosplay_Academy
             Firstpass = true;
         }
 
-        protected override void OnDestroy()
-        {
-            Constants.ChaDefaults.Remove(ThisOutfitData);
-            base.OnDestroy();
-        }
-
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
             var owner = ExpandedOutfit.Instance;
