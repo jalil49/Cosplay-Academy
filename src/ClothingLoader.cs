@@ -787,16 +787,7 @@ namespace Cosplay_Academy
             Queue<MaterialColorProperty> ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.MaterialColorPropertyQueue[outfitnum]);
             Queue<MaterialTextureProperty> TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.MaterialTexturePropertyQueue[outfitnum]);
             Queue<MaterialShader> ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
-#if Debug
 
-            ExpandedOutfit.Logger.LogWarning($"Parts: {PartsQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"Hair: {HairQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"Render: {RenderQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"Float: {FloatQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"tColor: {ColorQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"Texture: {TextureQueue.Count}");
-            ExpandedOutfit.Logger.LogWarning($"Shader: {ShaderQueue.Count}");
-#endif
             #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor");
             //for (int i = 0; i < MaterialEditorData.data.Count; i++)
@@ -957,9 +948,6 @@ namespace Cosplay_Academy
 #endif
 
             }
-#if Debug
-            ExpandedOutfit.Logger.LogWarning($"Start extra accessories at {ACCpostion} {MoreACCData.Count}");
-#endif
             for (int n = MoreACCData.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
             {
                 Empty = MoreACCData[ACCpostion - 20].type == 120;
@@ -991,9 +979,6 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
             }
-#if Debug
-            ExpandedOutfit.Logger.LogWarning($"Start making extra accessories at {ACCpostion}");
-#endif
 
             bool print = true;
 
@@ -1042,14 +1027,6 @@ namespace Cosplay_Academy
                 data.cusAcsCmp.Add(null);
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
-#if Debug
-            //ExpandedOutfit.Logger.LogWarning("add range");
-#endif
-
-#if Debug
-            ExpandedOutfit.Logger.LogWarning("finished coordinate load main process");
-#endif
-
             #endregion
 
             //Traverse.Create(MoreAccessories._self).Method("UpdateUI").GetValue();
@@ -1091,6 +1068,7 @@ namespace Cosplay_Academy
 
 
             #endregion
+
             ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
 
             if (Settings.HairMatch.Value)
