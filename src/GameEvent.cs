@@ -41,11 +41,11 @@ namespace Cosplay_Academy
 
         protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
         {
-            if (freeH && ExpandedOutfit.EnableSetting.Value)
+            if (ExpandedOutfit.EnableSetting.Value)
             {
-                foreach (var item in Constants.ChaDefaults)
+                foreach (var Heroine in hSceneProc.dataH.lstFemale)
                 {
-                    item.ChaControl.ChangeCoordinateTypeAndReload();
+                    Heroine.chaCtrl.ChangeCoordinateTypeAndReload();
                 }
             }
         }
