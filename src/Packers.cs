@@ -59,7 +59,6 @@ namespace Cosplay_Academy
             ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
         }
 
-
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
             ChaFile ChaFile = ChaControl.chaFile;
@@ -1029,17 +1028,13 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            if (ACC_Binding_Dictionary.Any(x => x.Count > 0))
-            {
-                //ExpandedOutfit.Logger.LogWarning("Setting state data");
 
-                SavedData.data.Add("ACC_Binding_Dictionary", MessagePackSerializer.Serialize(ACC_Binding_Dictionary));
-                SavedData.data.Add("ACC_State_array", MessagePackSerializer.Serialize(ACC_State_array));
-                SavedData.data.Add("ACC_Name_Dictionary", MessagePackSerializer.Serialize(ACC_Name_Dictionary));
-                SavedData.data.Add("ACC_Parented_Dictionary", MessagePackSerializer.Serialize(ACC_Parented_Dictionary));
+            SavedData.data.Add("ACC_Binding_Dictionary", MessagePackSerializer.Serialize(ACC_Binding_Dictionary));
+            SavedData.data.Add("ACC_State_array", MessagePackSerializer.Serialize(ACC_State_array));
+            SavedData.data.Add("ACC_Name_Dictionary", MessagePackSerializer.Serialize(ACC_Name_Dictionary));
+            SavedData.data.Add("ACC_Parented_Dictionary", MessagePackSerializer.Serialize(ACC_Parented_Dictionary));
 
-                SetExtendedData("Accessory_States", SavedData, ChaControl, ThisOutfitData);
-            }
+            SetExtendedData("Accessory_States", SavedData, ChaControl, ThisOutfitData);
         }
 
         private void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
