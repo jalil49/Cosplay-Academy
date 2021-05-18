@@ -22,11 +22,12 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool ClearData;
-        bool firstmakerpass = false;
+        private static bool Firstpass = true;
 
         public static void MakerAPI_MakerExiting()
         {
             ClearData = false;
+            Firstpass = true;
         }
 
         protected override void OnDestroy()
@@ -67,7 +68,7 @@ namespace Cosplay_Academy
                 return;
             }
             bool IsMaker = currentGameMode == GameMode.Maker;
-            if (IsMaker && firstmakerpass || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) || GameAPI.InsideHScene)
+            if (IsMaker || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) || GameAPI.InsideHScene)
             {
                 if (ClearData && IsMaker)
                 {
@@ -76,10 +77,11 @@ namespace Cosplay_Academy
 
                 Process(currentGameMode);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
-            }
-            else if (IsMaker)
-            {
-                firstmakerpass = true;
+                if (IsMaker && Firstpass)
+                {
+                    ChaControl.ChangeCoordinateTypeAndReload();
+                    Firstpass = false;
+                }
             }
             //Time.Stop();
 
@@ -445,14 +447,6 @@ namespace Cosplay_Academy
                 return;
             }//if disabled don't run
             ThisOutfitData.ClothingLoader.CoordinateLoad(ThisOutfitData, coordinate, ChaControl);
-        }
-
-        protected override void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                ExpandedOutfit.Logger.LogWarning($"\nNotBot: {ChaControl.notBot}\nNotBra: {ChaControl.notBra}\nNotShorts: {ChaControl.notShorts}");
-            }
         }
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)
