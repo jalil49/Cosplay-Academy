@@ -385,10 +385,41 @@ namespace Cosplay_Academy
         {
             PluginData SavedData;
             List<BoneModifier> Modifiers = new List<BoneModifier>();
+            SavedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KKABMPlugin.ABMData");
+            if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes != null)
+            {
+                List<BoneModifier> newModifiers = new List<BoneModifier>();
+                try
+                {
+                    switch (SavedData.version)
+                    {
+                        case 2:
+                            newModifiers = LZ4MessagePackSerializer.Deserialize<List<BoneModifier>>((byte[])bytes);
+                            break;
+
+                        case 1:
+                            Settings.Logger.LogDebug($"[Cosplay Academy][KKABMX] Loading legacy embedded ABM data from card: {ChaFile.parameter?.fullname}");
+                            newModifiers = KKAMBX_Migrate.MigrateOldExtData(SavedData);
+                            break;
+
+                        default:
+                            throw new NotSupportedException($"Save version {SavedData.version} is not supported");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Settings.Logger.LogError("[Cosplay Academy][KKABMX] Failed to load extended data - " + ex);
+                }
+                if (newModifiers == null)
+                {
+                    newModifiers = new List<BoneModifier>();
+                }
+                Modifiers = newModifiers.Where(x => !x.IsCoordinateSpecific()).ToList();
+            }
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
-                if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes is byte[] byteArr)
+                if (SavedData != null && SavedData.data.TryGetValue("boneData", out bytes) && bytes != null)
                 {
                     Dictionary<string, BoneModifierData> import;
                     try
@@ -396,7 +427,7 @@ namespace Cosplay_Academy
                         if (SavedData.version != 2)
                             throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
 
-                        import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, BoneModifierData>>(byteArr);
+                        import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, BoneModifierData>>((byte[])bytes);
                         if (import != null)
                         {
                             foreach (var modifier in import)
@@ -423,14 +454,6 @@ namespace Cosplay_Academy
             var data = new PluginData { version = 2 };
             data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
             SetExtendedData("KKABMPlugin.ABMData", data, ChaControl, ThisOutfitData);
-            //var KoiOverlay = typeof(KoiClothesOverlayController);
-            //if (KoiOverlay != null)
-            //{
-            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-            //    var temp = ChaControl.GetComponent(KoiOverlay);
-            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            //}
         }
 
         private void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)

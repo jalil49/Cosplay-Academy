@@ -49,6 +49,7 @@
     <Compile Include="Support\ACC_State_Sync.cs" />
     <Compile Include="Support\Dummy.cs" />
     <Compile Include="Support\Hair_Accessory_Support.cs" />
+    <Compile Include="Support\KKAMBX_Migrate.cs" />
     <Compile Include="Support\ME_Support.cs" />
     <Compile Include="Support\Overlay_Support.cs" />
     <Compile Include="Versions.cs" />
