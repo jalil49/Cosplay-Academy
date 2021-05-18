@@ -632,9 +632,6 @@ namespace Cosplay_Academy
                         info.ColorMatch = true;
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
                     }
-#if Debug
-                //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
-#endif
                 }
 
                 //MoreAccessories
@@ -752,9 +749,6 @@ namespace Cosplay_Academy
                 data.cusAcsCmp.Add(null);
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
-#if Debug
-            //ExpandedOutfit.Logger.LogWarning("add range");
-#endif
 
             ThisOutfitData.ReturnMaterialColor.AddRange(MaterialColor);
 
@@ -765,10 +759,6 @@ namespace Cosplay_Academy
             ThisOutfitData.ReturnMaterialTexture.AddRange(MaterialTexture);
 
             ThisOutfitData.ReturnRenderer.AddRange(Renderer);
-#if Debug
-            ExpandedOutfit.Logger.LogWarning("finish");
-#endif
-
             #endregion
 
         }
@@ -943,10 +933,6 @@ namespace Cosplay_Academy
                 {
                     info.ColorMatch = true;
                 }
-#if Debug
-                //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
-#endif
-
             }
             for (int n = MoreACCData.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
             {

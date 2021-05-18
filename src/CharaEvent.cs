@@ -174,9 +174,6 @@ namespace Cosplay_Academy
                         }
 
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended TextureDictionary Pass");
-#endif
                     if (MaterialEditorData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
@@ -189,9 +186,6 @@ namespace Cosplay_Academy
                             }
                         }
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended MaterialShaderList Pass");
-#endif
 
                     if (MaterialEditorData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
                     {
@@ -206,9 +200,6 @@ namespace Cosplay_Academy
                             }
                         }
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended RendererPropertyList Pass");
-#endif
 
                     if (MaterialEditorData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
                     {
@@ -222,9 +213,6 @@ namespace Cosplay_Academy
                             }
                         }
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended MaterialFloatPropertyList Pass");
-#endif
 
                     if (MaterialEditorData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
                     {
@@ -238,9 +226,6 @@ namespace Cosplay_Academy
                             }
                         }
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended MaterialColorPropertyList Pass");
-#endif
 
                     if (MaterialEditorData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
                     {
@@ -258,9 +243,6 @@ namespace Cosplay_Academy
                                         ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
                                     }
                                     //texID = ImportDictionary[(int)loadedProperty.TexID];
-#if Debug
-                                    ExpandedOutfit.Logger.LogWarning($"Name: {loadedProperty.MaterialName}\tcoordin: {loadedProperty.CoordinateIndex}\tLoaded:{(int)loadedProperty.TexID}\tMatName:\t{loadedProperty.MaterialName}\tSlot:{loadedProperty.Slot}");
-#endif
                                 }
 
                                 MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
@@ -268,9 +250,6 @@ namespace Cosplay_Academy
                             }
                         }
                     }
-#if Debug
-                    ExpandedOutfit.Logger.LogWarning("Ended MaterialTexturePropertyList Pass");
-#endif
                 }
                 #endregion
 
