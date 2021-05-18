@@ -44,8 +44,6 @@ namespace Cosplay_Academy
             var HairPlugin = new PluginData();
             ThisOutfitData.Soft_Clear_ME();
 
-
-
             HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 
             bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_inH").GetValue();
@@ -53,6 +51,8 @@ namespace Cosplay_Academy
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
             Underwear.LoadFile(ThisOutfitData.Underwear);
+            ExpandedOutfit.Logger.LogDebug($"loaded underwear " + ThisOutfitData.Underwear);
+
             //ExpandedOutfit.Logger.LogWarning($"underwear is {ThisOutfitData.Underwear}");
             int Original_Coord = ChaControl.fileStatus.coordinateType;
 
@@ -68,6 +68,7 @@ namespace Cosplay_Academy
             //FullTime.Start();
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
+                UnderwearAccessoriesLocations[i].Clear();
                 GeneralizedLoad(i);
                 ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
@@ -635,6 +636,7 @@ namespace Cosplay_Academy
                 //ExpandedOutfit.Logger.LogWarning("Force Color Pass");
 #endif
                 }
+
                 //MoreAccessories
                 for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
                 {
@@ -1218,8 +1220,6 @@ namespace Cosplay_Academy
             ChaFile ChaFile = ChaControl.chaFile;
             ExtendedSave.SetExtendedDataById(ChaFile, IDtoSET, data);
             ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
-
-            //object[] Reload = new object[1] { KoikatuAPI.GetCurrentGameMode() };
 
             if (ThisOutfitData.heroine != null && ChaControl.sex == 1)
             {
