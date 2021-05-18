@@ -99,8 +99,6 @@ namespace Cosplay_Academy
                 ThisOutfitData.FullName = ChaControl.fileParam.fullname;
                 ThisOutfitData.BirthDay = ChaControl.fileParam.strBirthDay;
                 ThisOutfitData.Personality = ChaControl.fileParam.personality;
-                ThisOutfitData.ChaControl = ChaControl;
-                ThisOutfitData.Chafile = ChaFileControl;
                 ThisOutfitData.CharaEvent = this;
                 Game _gamemgr = Game.Instance;
                 foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
@@ -117,11 +115,11 @@ namespace Cosplay_Academy
                 //ThisOutfitData.processed = true;
                 return;
             }
+            ThisOutfitData.ChaControl = ChaControl;
+            ThisOutfitData.Chafile = ChaFileControl;
             if (GameMode.Maker == currentGameMode)
             {
-                ThisOutfitData.ChaControl = ChaControl;
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
-                //ThisOutfitData.firstpass = true;
                 if (ExpandedOutfit.ResetMaker.Value)
                 {
                     OutfitDecider.ResetDecider();
@@ -404,7 +402,6 @@ namespace Cosplay_Academy
             //use Chacontrol.name instead of ChaControl.fileParam.fullname to probably avoid same name conflicts
             if (ChaControl.sex == 1)//run the following if female
             {
-
                 if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
                     if (!ThisOutfitData.processed)//run if unprocessed
