@@ -10,14 +10,12 @@ namespace Cosplay_Academy
         private static readonly OutfitData[] outfitData;
         private static bool IsInitialized;
 
-        public static bool Reset;
         private static ChaDefault ThisOutfitData;
         private static int HExperience;
         private static int LastHeroineClub = -1;
         static OutfitDecider()
         {
             IsInitialized = false;
-            Reset = true;
             outfitData = new OutfitData[Constants.InputStrings.Length];
             for (int i = 0, n = outfitData.Length; i < n; i++)
             {
@@ -27,7 +25,6 @@ namespace Cosplay_Academy
 
         public static void ResetDecider()
         {
-            Reset = false;
             if (IsInitialized)
             {
                 foreach (OutfitData data in outfitData)
@@ -35,6 +32,7 @@ namespace Cosplay_Academy
                     data.Clear();
                 }
             }
+            Constants.ChaDefaults.ForEach(x => x.processed = false);
             IsInitialized = false;
             LastHeroineClub = -1;
             ExpandedOutfit.Logger.LogInfo("Reset has occured");

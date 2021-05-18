@@ -130,23 +130,10 @@ namespace Cosplay_Academy
                 //ThisOutfitData.firstpass = true;
                 if (ExpandedOutfit.ResetMaker.Value)
                 {
-                    OutfitDecider.Reset = true;
-                    //if (!ExpandedOutfit.PermReset.Value)
-                    //{
-                    //    ExpandedOutfit.ResetMaker.Value = false;
-                    //}
+                    OutfitDecider.ResetDecider();
                 }
             }
-            if (OutfitDecider.Reset)
-            {
-                //OutfitList.Clear();
-                Constants.ChaDefaults.ForEach(x => x.processed = false);
-                ExpandedOutfit.Logger.LogDebug("Reset passed");
-                OutfitDecider.ResetDecider();
-            }
-#if Debug
-            ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} Started First Pass");
-#endif
+
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
                 ThisOutfitData.Clear_ME();
