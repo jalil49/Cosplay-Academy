@@ -14,11 +14,11 @@ namespace Cosplay_Academy
     [BepInPlugin(GUID, "Cosplay Academy", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency("com.joan6694.illusionplugins.moreaccessories", BepInDependency.DependencyFlags.HardDependency)]
-    public class ExpandedOutfit : BaseUnityPlugin
+    public class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
         public const string Version = Versions.Version;
-        public static ExpandedOutfit Instance;
+        public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
         public static ConfigEntry<bool> EnableSetting { get; private set; }

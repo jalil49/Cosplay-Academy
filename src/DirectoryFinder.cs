@@ -32,7 +32,7 @@ namespace Cosplay_Academy
                     {
                         if (!Directory.Exists(coordinatepath + "coordinate" + input + input2 + input3))
                         {
-                            ExpandedOutfit.Logger.LogWarning("Folder not found, creating directory at " + "coordinate" + input + input2 + input3);
+                            Settings.Logger.LogWarning("Folder not found, creating directory at " + "coordinate" + input + input2 + input3);
                             Directory.CreateDirectory(coordinatepath + "coordinate" + input + input2 + input3);
                         }
                     }
@@ -50,7 +50,7 @@ namespace Cosplay_Academy
             int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
             FolderLists.RemoveAt(index);
             FoldersPath.AddRange(FolderLists);
-            if (ExpandedOutfit.NonMatchWeight.Value)
+            if (Settings.NonMatchWeight.Value)
             {
                 List<string> append = new List<string>();
                 foreach (var item in FoldersPath)
@@ -115,9 +115,9 @@ namespace Cosplay_Academy
             if (Choosen.Count == 0)
             {
                 Choosen.Add("Default");
-                ExpandedOutfit.Logger.LogWarning("No files found in :" + FilePath);
+                Settings.Logger.LogWarning("No files found in :" + FilePath);
             }
-            ExpandedOutfit.Logger.LogDebug($"Files found in : {FilePath} + {Choosen.Count}");
+            Settings.Logger.LogDebug($"Files found in : {FilePath} + {Choosen.Count}");
             return Choosen;
         }
     }

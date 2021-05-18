@@ -32,22 +32,22 @@ namespace Cosplay_Academy
 
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
-            var owner = ExpandedOutfit.Instance;
-            e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", ExpandedOutfit.Makerview.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ExpandedOutfit.Makerview.Value,
-                (controller, value) => ExpandedOutfit.Makerview.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand outfits", ExpandedOutfit.ChangeOutfit.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ExpandedOutfit.ChangeOutfit.Value,
-                (controller, value) => ExpandedOutfit.ChangeOutfit.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", ExpandedOutfit.RandomizeUnderwear.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ExpandedOutfit.RandomizeUnderwear.Value,
-                (controller, value) => ExpandedOutfit.RandomizeUnderwear.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Reset Process", ExpandedOutfit.ResetMaker.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ExpandedOutfit.ResetMaker.Value,
-                (controller, value) => ExpandedOutfit.ResetMaker.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", ExpandedOutfit.RandomizeUnderwearOnly.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ExpandedOutfit.RandomizeUnderwearOnly.Value,
-                (controller, value) => ExpandedOutfit.RandomizeUnderwearOnly.Value = value);
+            var owner = Settings.Instance;
+            e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", Settings.Makerview.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+                (controller) => Settings.Makerview.Value,
+                (controller, value) => Settings.Makerview.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Rand outfits", Settings.ChangeOutfit.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+                (controller) => Settings.ChangeOutfit.Value,
+                (controller, value) => Settings.ChangeOutfit.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+                (controller) => Settings.RandomizeUnderwear.Value,
+                (controller, value) => Settings.RandomizeUnderwear.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Reset Process", Settings.ResetMaker.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+                (controller) => Settings.ResetMaker.Value,
+                (controller, value) => Settings.ResetMaker.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+                (controller) => Settings.RandomizeUnderwearOnly.Value,
+                (controller, value) => Settings.RandomizeUnderwearOnly.Value = value);
             e.AddSidebarControl(new SidebarToggle("CA: Clear Existing", false, owner)).BindToFunctionController<CharaEvent, bool>(
                 (controller) => ClearData,
                 (controller, value) => ClearData = value);
@@ -120,7 +120,7 @@ namespace Cosplay_Academy
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
-                if (ExpandedOutfit.ResetMaker.Value)
+                if (Settings.ResetMaker.Value)
                 {
                     OutfitDecider.ResetDecider();
                 }
@@ -329,7 +329,7 @@ namespace Cosplay_Academy
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (ExpandedOutfit.ExtremeAccKeeper.Value || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
+                        if (Settings.ExtremeAccKeeper.Value || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
                         {
                             if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
                             {
@@ -394,7 +394,7 @@ namespace Cosplay_Academy
                 }
 
             }
-            if (!ExpandedOutfit.EnableSetting.Value && GameMode.MainGame == currentGameMode || !ExpandedOutfit.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+            if (!Settings.EnableSetting.Value && GameMode.MainGame == currentGameMode || !Settings.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
             {
                 return;
             }//if disabled don't run
@@ -402,7 +402,7 @@ namespace Cosplay_Academy
             //use Chacontrol.name instead of ChaControl.fileParam.fullname to probably avoid same name conflicts
             if (ChaControl.sex == 1)//run the following if female
             {
-                if (currentGameMode == GameMode.MainGame || ExpandedOutfit.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
+                if (currentGameMode == GameMode.MainGame || Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
                     if (!ThisOutfitData.processed)//run if unprocessed
                     {
@@ -420,7 +420,7 @@ namespace Cosplay_Academy
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
         {
-            if (!ExpandedOutfit.AccKeeper.Value)
+            if (!Settings.AccKeeper.Value)
             {
                 return;
             }//if disabled don't run

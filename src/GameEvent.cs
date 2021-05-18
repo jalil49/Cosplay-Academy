@@ -6,7 +6,7 @@ namespace Cosplay_Academy
     {
         protected override void OnPeriodChange(Cycle.Type period)
         {
-            if (period == Cycle.Type.Morning && ExpandedOutfit.UpdateFrequency.Value == OutfitUpdate.Daily)
+            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily)
             {
                 OutfitDecider.ResetDecider();
             }
@@ -18,7 +18,7 @@ namespace Cosplay_Academy
 
         protected override void OnDayChange(Cycle.Week day)
         {
-            if ((Cycle.Week.Monday == day && ExpandedOutfit.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && ExpandedOutfit.SundayDate.Value)
+            if ((Cycle.Week.Monday == day && Settings.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && Settings.SundayDate.Value)
             {
                 //Constants.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
@@ -29,19 +29,19 @@ namespace Cosplay_Academy
         {
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
-            ExpandedOutfit.Logger.LogInfo("Reset has applied");
+            Settings.Logger.LogInfo("Reset has applied");
         }
 
         protected override void OnNewGame()
         {
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
-            ExpandedOutfit.Logger.LogInfo("Reset has applied");
+            Settings.Logger.LogInfo("Reset has applied");
         }
 
         protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
         {
-            if (ExpandedOutfit.EnableSetting.Value)
+            if (Settings.EnableSetting.Value)
             {
                 foreach (var Heroine in hSceneProc.dataH.lstFemale)
                 {

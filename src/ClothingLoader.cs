@@ -51,7 +51,7 @@ namespace Cosplay_Academy
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
             Underwear.LoadFile(ThisOutfitData.Underwear);
-            ExpandedOutfit.Logger.LogDebug($"loaded underwear " + ThisOutfitData.Underwear);
+            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.Underwear);
 
             //ExpandedOutfit.Logger.LogWarning($"underwear is {ThisOutfitData.Underwear}");
             int Original_Coord = ChaControl.fileStatus.coordinateType;
@@ -70,7 +70,7 @@ namespace Cosplay_Academy
             {
                 UnderwearAccessoriesLocations[i].Clear();
                 GeneralizedLoad(i);
-                ExpandedOutfit.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
+                Settings.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
             //FullTime.Stop();
             //ExpandedOutfit.Logger.LogWarning($"Total Generalized load time {FullTime.ElapsedMilliseconds}");
@@ -255,7 +255,7 @@ namespace Cosplay_Academy
             }
             #endregion
 
-            if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
+            if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
             {
                 #region additonal ME_Data
                 List<MaterialShader> ME_MS_properties = new List<MaterialShader>();
@@ -359,7 +359,7 @@ namespace Cosplay_Academy
                         {
                             HairLength = -999
                         };
-                        if (ExpandedOutfit.HairMatch.Value)
+                        if (Settings.HairMatch.Value)
                         {
                             ACCdata.ColorMatch = true;
                         }
@@ -575,7 +575,7 @@ namespace Cosplay_Academy
             }
 
             Color[] haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
-            if (ExpandedOutfit.HairMatch.Value && !MakerAPI.InsideMaker)
+            if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
             {
                 foreach (var item in HairToColor)
                 {
@@ -627,7 +627,7 @@ namespace Cosplay_Academy
 
                         ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
                     }
-                    if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
+                    if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
                         info.ColorMatch = true;
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
@@ -678,7 +678,7 @@ namespace Cosplay_Academy
 
                         ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
                     }
-                    if (ExpandedOutfit.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
+                    if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
                         info.ColorMatch = true;
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
@@ -696,7 +696,7 @@ namespace Cosplay_Academy
             {
                 if (print)
                 {
-                    ExpandedOutfit.Logger.LogDebug($"Ran out of space in new coordinate adding {PartsQueue.Count}");
+                    Settings.Logger.LogDebug($"Ran out of space in new coordinate adding {PartsQueue.Count}");
                     print = false;
                 }
                 if (insert++ >= UnderwearAccessoryStart)
@@ -707,7 +707,7 @@ namespace Cosplay_Academy
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                 {
                     var HairInfo = HairQueue.Dequeue();
-                    if (ExpandedOutfit.HairMatch.Value)
+                    if (Settings.HairMatch.Value)
                     {
                         HairInfo.ColorMatch = true;
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
@@ -948,7 +948,7 @@ namespace Cosplay_Academy
 
                     ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
                 }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
@@ -986,7 +986,7 @@ namespace Cosplay_Academy
                     ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
 
                 }
-                if (ExpandedOutfit.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
@@ -1001,14 +1001,14 @@ namespace Cosplay_Academy
             {
                 if (print)
                 {
-                    ExpandedOutfit.Logger.LogDebug($"Ran out of space in new coordiante adding {PartsQueue.Count}");
+                    Settings.Logger.LogDebug($"Ran out of space in new coordiante adding {PartsQueue.Count}");
                     print = false;
                 }
                 MoreACCData.Add(PartsQueue.Dequeue());
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
                 {
                     var HairInfo = HairQueue.Dequeue();
-                    if (ExpandedOutfit.HairMatch.Value)
+                    if (Settings.HairMatch.Value)
                     {
                         HairInfo.ColorMatch = true;
                     }
@@ -1093,7 +1093,7 @@ namespace Cosplay_Academy
             #endregion
             ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
 
-            if (ExpandedOutfit.HairMatch.Value)
+            if (Settings.HairMatch.Value)
             {
                 var Plugdata = new PluginData();
 

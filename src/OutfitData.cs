@@ -104,7 +104,7 @@ namespace Cosplay_Academy
         }
         private string Random(int level)//get any random outfit according to experience
         {
-            if (ExpandedOutfit.SumRandom.Value)
+            if (Settings.SumRandom.Value)
             {
                 string result;
                 List<string> temp = Sum(level);

@@ -236,7 +236,7 @@ namespace Cosplay_Academy
                         }
                     }
                 }
-                if (ExpandedOutfit.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
+                if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
                 {
                     if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
                     {
@@ -410,7 +410,7 @@ namespace Cosplay_Academy
                     }
                     catch (Exception ex)
                     {
-                        ExpandedOutfit.Logger.LogError("[Cosplay Academy] =>[KKABMX] Failed to load extended data - " + ex);
+                        Settings.Logger.LogError("[Cosplay Academy] =>[KKABMX] Failed to load extended data - " + ex);
                     }
                 }
             }
@@ -501,7 +501,7 @@ namespace Cosplay_Academy
                             CharaVirtualGroupInfo[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<string, AccStateSync.VirtualGroupInfo>>((byte[])loadedOutfitVirtualGroupInfo);
                     }
                 }
-                if (ExpandedOutfit.RandomizeUnderwear.Value && ExpandedOutfit.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
+                if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     int postion = 0;
                     ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
@@ -888,7 +888,7 @@ namespace Cosplay_Academy
                         ACC_Parented_Dictionary[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])ByteData);
                     }
                 }
-                if (ExpandedOutfit.RandomizeUnderwear.Value && ExpandedOutfit.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
+                if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     //ExpandedOutfit.Logger.LogWarning("Creating underwear data");
                     ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;

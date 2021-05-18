@@ -20,11 +20,11 @@ namespace Cosplay_Academy
         }
         private static void ShowTypeInfo(Type t)
         {
-            ExpandedOutfit.Logger.LogWarning($"Name: {t.Name}");
-            ExpandedOutfit.Logger.LogWarning($"Full Name: {t.FullName}");
-            ExpandedOutfit.Logger.LogWarning($"ToString:  {t}");
-            ExpandedOutfit.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
-            ExpandedOutfit.Logger.LogWarning("");
+            Settings.Logger.LogWarning($"Name: {t.Name}");
+            Settings.Logger.LogWarning($"Full Name: {t.FullName}");
+            Settings.Logger.LogWarning($"ToString:  {t}");
+            Settings.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
+            Settings.Logger.LogWarning("");
         }
         //private static bool CheckEndFinally(CodeInstruction instruction) => instruction.opcode == OpCodes.Endfinally;
         //[HarmonyPatch]
@@ -91,7 +91,7 @@ namespace Cosplay_Academy
         private static void ChangeOutfitAtWaitPoint(WaitPoint __instance)
         {
             Base Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
-            if (Chara == null || Chara.chaCtrl == null || !ExpandedOutfit.StoryModeChange.Value)
+            if (Chara == null || Chara.chaCtrl == null || !Settings.StoryModeChange.Value)
             {
                 return;
             }
@@ -166,7 +166,7 @@ namespace Cosplay_Academy
             public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp"), "SetWaitPoint");//Assembly Name because it hates me now that I didn't want to use it
             static void Postfix(WaitPoint wp, NPC _npc)
             {
-                if (wp == null || _npc == null || !ExpandedOutfit.StoryModeChange.Value)
+                if (wp == null || _npc == null || !Settings.StoryModeChange.Value)
                 {
                     return;
                 }
@@ -198,7 +198,7 @@ namespace Cosplay_Academy
                             //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
                             //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
                             //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
-                            if (UnityEngine.Random.Range(1, 101) <= ExpandedOutfit.KoiChance.Value)
+                            if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                             {
                                 ThisOutfitData.ChangeClubToKoi = true;
                             }
@@ -239,9 +239,9 @@ namespace Cosplay_Academy
         [HarmonyPatch(typeof(NPC), "ReStart")]
         private static void NPCRestart(NPC __instance)
         {
-            if (!ExpandedOutfit.StoryModeChange.Value)
+            if (!Settings.StoryModeChange.Value)
             {
-                if (ExpandedOutfit.ChangeToClubatKoi.Value && __instance.mapNo == 22)
+                if (Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
                 {
                     __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     __instance.heroine.coordinates[0] = 4;
@@ -257,7 +257,7 @@ namespace Cosplay_Academy
             }
             ThisOutfitData.ChangeKoiToClub = false;
             ThisOutfitData.ChangeClubToKoi = false;
-            if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= ExpandedOutfit.KoiChance.Value)
+            if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
             {
                 ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
                 ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
