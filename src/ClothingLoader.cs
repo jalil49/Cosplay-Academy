@@ -901,10 +901,10 @@ namespace Cosplay_Academy
             #region Reassign Exisiting Accessories
 
             var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            var Temp = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+            var HairACCDictionary = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                    Temp = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+                    HairACCDictionary = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
 
             int ACCpostion = 0;
             bool Empty;
@@ -916,7 +916,7 @@ namespace Cosplay_Academy
                     OriginalData[ACCpostion] = PartsQueue.Dequeue();
                     if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                     {
-                        Temp[ACCpostion] = HairQueue.Dequeue();
+                        HairACCDictionary[ACCpostion] = HairQueue.Dequeue();
                     }
                     else
                     {
@@ -941,7 +941,7 @@ namespace Cosplay_Academy
                         ACCKeepResult.Add(ACCpostion);
                     }
                 }
-                if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (Settings.HairMatch.Value && HairACCDictionary.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
@@ -954,7 +954,7 @@ namespace Cosplay_Academy
                     MoreACCData[ACCpostion - 20] = PartsQueue.Dequeue();
                     if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                     {
-                        Temp[ACCpostion] = HairQueue.Dequeue();
+                        HairACCDictionary[ACCpostion] = HairQueue.Dequeue();
                     }
                     else
                     {
@@ -980,7 +980,7 @@ namespace Cosplay_Academy
                         ACCKeepResult.Add(ACCpostion);
                     }
                 }
-                if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
+                if (Settings.HairMatch.Value && HairACCDictionary.TryGetValue(ACCpostion, out var info))
                 {
                     info.ColorMatch = true;
                 }
@@ -1003,7 +1003,7 @@ namespace Cosplay_Academy
                     {
                         HairInfo.ColorMatch = true;
                     }
-                    Temp[ACCpostion] = HairInfo;
+                    HairACCDictionary[ACCpostion] = HairInfo;
                 }
                 else
                 {
@@ -1080,7 +1080,74 @@ namespace Cosplay_Academy
             ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
 
             SaveData = new PluginData();
-
+            Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
+            if (Inputdata != null)
+            {
+                if (Inputdata.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                {
+                    HairKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
+                }
+                if (Inputdata.data.ContainsKey("CoordinateSaveBools"))
+                {
+                    SaveData.data.Add("CoordinateSaveBools", Inputdata.data["CoordinateSaveBools"]);
+                }
+                if (Inputdata.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                {
+                    ACCKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
+                }
+                if (Inputdata.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("PersonalityType_Restriction", Inputdata.data["PersonalityType_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("TraitType_Restriction", Inputdata.data["TraitType_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("HstateType_Restriction", Inputdata.data["HstateType_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("ClubType_Restriction", Inputdata.data["ClubType_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("Height_Restriction", Inputdata.data["Height_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("Breastsize_Restriction", Inputdata.data["Breastsize_Restriction"]);
+                }
+                if (Inputdata.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("CoordinateType", Inputdata.data["CoordinateType"]);
+                }
+                if (Inputdata.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("CoordinateSubType", Inputdata.data["CoordinateSubType"]);
+                }
+                if (Inputdata.data.TryGetValue("Creator", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("Creator", Inputdata.data["Creator"]);
+                }
+                if (Inputdata.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("Set_Name", Inputdata.data["Set_Name"]);
+                }
+                if (Inputdata.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("SubSetNames", Inputdata.data["SubSetNames"]);
+                }
+                if (Inputdata.data.TryGetValue("ClothNot", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("ClothNot", Inputdata.data["ClothNot"]);
+                }
+                if (Inputdata.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
+                {
+                    SaveData.data.Add("GenderType", Inputdata.data["GenderType"]);
+                }
+            }
             SaveData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairKeepResult));
             SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
 
@@ -1096,7 +1163,7 @@ namespace Cosplay_Academy
             {
                 var Plugdata = new PluginData();
 
-                Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
+                Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(HairACCDictionary));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
                 ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
