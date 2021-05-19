@@ -913,7 +913,7 @@ namespace Cosplay_Academy
                 if (Empty) //120 is empty/default
                 {
                     OriginalData[ACCpostion] = PartsQueue.Dequeue();
-                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                     {
                         Temp[ACCpostion] = HairQueue.Dequeue();
                     }
@@ -943,7 +943,7 @@ namespace Cosplay_Academy
                 if (Empty) //120 is empty/default
                 {
                     MoreACCData[ACCpostion - 20] = PartsQueue.Dequeue();
-                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                     {
                         Temp[ACCpostion] = HairQueue.Dequeue();
                     }
@@ -979,7 +979,7 @@ namespace Cosplay_Academy
                     print = false;
                 }
                 MoreACCData.Add(PartsQueue.Dequeue());
-                if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                 {
                     var HairInfo = HairQueue.Dequeue();
                     if (Settings.HairMatch.Value)
