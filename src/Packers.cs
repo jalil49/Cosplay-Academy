@@ -57,6 +57,12 @@ namespace Cosplay_Academy
             ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
 
             ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
+
+            ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
         }
 
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
