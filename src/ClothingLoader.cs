@@ -770,10 +770,16 @@ namespace Cosplay_Academy
         {
             ChaFile ChaFile = ChaControl.chaFile;
             #region Queue accessories to keep
+
             int outfitnum = ChaControl.fileStatus.coordinateType;
 
             Queue<ChaFileAccessory.PartsInfo> PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             Queue<HairSupport.HairAccessoryInfo> HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+
+            Queue<bool> HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
+            Queue<bool> ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+            List<int> HairKeepResult = new List<int>();
+            List<int> ACCKeepResult = new List<int>();
 
             Queue<RendererProperty> RenderQueue = new Queue<RendererProperty>(ThisOutfitData.RendererPropertyQueue[outfitnum]);
             Queue<MaterialFloatProperty> FloatQueue = new Queue<MaterialFloatProperty>(ThisOutfitData.MaterialFloatPropertyQueue[outfitnum]);
@@ -783,10 +789,6 @@ namespace Cosplay_Academy
 
             #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor");
-            //for (int i = 0; i < MaterialEditorData.data.Count; i++)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning($"Key: {MaterialEditorData.data.ElementAt(i).Key} Value: {MaterialEditorData.data.ElementAt(i).Value}");
-            //}
             List<RendererProperty> Renderer = new List<RendererProperty>();
             List<MaterialFloatProperty> MaterialFloat = new List<MaterialFloatProperty>();
             List<MaterialColorProperty> MaterialColor = new List<MaterialColorProperty>();
@@ -873,7 +875,6 @@ namespace Cosplay_Academy
             }
             #endregion
 
-
             #endregion
 
             //Apply pre-existing Accessories in any open slot or final slots.
@@ -931,6 +932,14 @@ namespace Cosplay_Academy
                     ME_Float_Loop(FloatQueue, ACCpostion, MaterialFloat);
 
                     ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
+                    if (HairKeepQueue.Dequeue())
+                    {
+                        HairKeepResult.Add(ACCpostion);
+                    }
+                    if (ACCKeepQueue.Dequeue())
+                    {
+                        ACCKeepResult.Add(ACCpostion);
+                    }
                 }
                 if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
                 {
@@ -962,6 +971,14 @@ namespace Cosplay_Academy
 
                     ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
 
+                    if (HairKeepQueue.Dequeue())
+                    {
+                        HairKeepResult.Add(ACCpostion);
+                    }
+                    if (ACCKeepQueue.Dequeue())
+                    {
+                        ACCKeepResult.Add(ACCpostion);
+                    }
                 }
                 if (Settings.HairMatch.Value && Temp.TryGetValue(ACCpostion, out var info))
                 {
@@ -993,6 +1010,15 @@ namespace Cosplay_Academy
                     HairQueue.Dequeue();
                 }
 
+                if (HairKeepQueue.Dequeue())
+                {
+                    HairKeepResult.Add(ACCpostion);
+                }
+                if (ACCKeepQueue.Dequeue())
+                {
+                    ACCKeepResult.Add(ACCpostion);
+                }
+
                 ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
 
                 ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
@@ -1017,8 +1043,6 @@ namespace Cosplay_Academy
             while (data.showAccessories.Count < data.nowAccessories.Count)
                 data.showAccessories.Add(true);
             #endregion
-
-            //Traverse.Create(MoreAccessories._self).Method("UpdateUI").GetValue();
 
             #region Pack
             var SaveData = new PluginData();
@@ -1055,10 +1079,18 @@ namespace Cosplay_Academy
 
             ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
 
+            SaveData = new PluginData();
+
+            SaveData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairKeepResult));
+            SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
+
+            ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
+
 
             #endregion
+            ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
 
-            ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
+            ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
 
             if (Settings.HairMatch.Value)
             {
@@ -1067,7 +1099,7 @@ namespace Cosplay_Academy
                 Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(Temp));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
-                ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
+                ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
             }
         }
 

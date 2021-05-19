@@ -820,6 +820,8 @@ namespace Cosplay_Academy
                         GenderType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
                 }
+                AccKeep[outfitnum].AddRange(ThisOutfitData.ACCKeepReturn[outfitnum]);
+                HairAcc[outfitnum].AddRange(ThisOutfitData.HairKeepReturn[outfitnum]);
             }
             PluginData SavedData = new PluginData();
 
@@ -1074,10 +1076,16 @@ namespace Cosplay_Academy
                 object[] Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
                 Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
             }
-            //else
-            //{
-            //    ExpandedOutfit.Logger.LogError("Failed ");
-            //}
+        }
+
+        private void ControllerCoordReload_Loop(Type Controller, ChaControl ChaControl, ChaFileCoordinate coordinate)
+        {
+            if (Controller != null)
+            {
+                var temp = ChaControl.GetComponent(Controller);
+                object[] Input_Parameter = new object[2] { coordinate, false };
+                Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
+            }
         }
     }
 }
