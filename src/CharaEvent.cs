@@ -172,8 +172,8 @@ namespace Cosplay_Academy
                             importedTextDic.Add(x.Key, x.Value);
                             //ImportDictionary[x.Key] = ME_Support.SetAndGetTextureID(x.Value);
                         }
-
                     }
+
                     if (MaterialEditorData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
@@ -327,33 +327,26 @@ namespace Cosplay_Academy
                             if (ColorList.Count == 0)
                             {
                                 Color color = new Color(0, 0, 0);
-                                ColorList.Add(new MaterialColorProperty(ObjectType.Unknown, outfitnum, -1, "", "", color, color));
-                                //ColorList.Add(null);
-                                //ExpandedOutfit.Logger.LogWarning("Color null");
+                                ColorList.Add(new MaterialColorProperty(ObjectType.Unknown, outfitnum, i, "", "", color, color));
                             }
                             if (FloatList.Count == 0)
                             {
-                                FloatList.Add(new MaterialFloatProperty(ObjectType.Unknown, outfitnum, -1, "", "", "", ""));
-                                //FloatList.Add(null);
-                                //ExpandedOutfit.Logger.LogWarning("FloatList null");
+                                FloatList.Add(new MaterialFloatProperty(ObjectType.Unknown, outfitnum, i, "", "", "", ""));
                             }
                             if (ShaderList.Count == 0)
                             {
                                 ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, -1, "", 0, 0));
-                                //ShaderList.Add(null);
-                                //ExpandedOutfit.Logger.LogWarning("ShaderList null");
+                                ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, i, "", 0, 0));
                             }
                             if (TextureList.Count == 0)
                             {
                                 TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, -1, "", ""));
-                                //TextureList.Add(null);
-                                //ExpandedOutfit.Logger.LogWarning("TextureList null");
+                                TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, i, "", ""));
                             }
                             if (RenderList.Count == 0)
                             {
                                 RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, -1, "", RendererProperties.Enabled, "", ""));
-                                //RenderList.Add(null);
-                                //ExpandedOutfit.Logger.LogWarning("Render null");
+                                RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, i, "", RendererProperties.Enabled, "", ""));
                             }
 
                             ThisOutfitData.MaterialColorPropertyQueue[outfitnum].AddRange(ColorList);
