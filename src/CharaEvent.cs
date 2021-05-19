@@ -335,17 +335,14 @@ namespace Cosplay_Academy
                             }
                             if (ShaderList.Count == 0)
                             {
-                                ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, -1, "", 0, 0));
                                 ShaderList.Add(new MaterialShader(ObjectType.Unknown, outfitnum, i, "", 0, 0));
                             }
                             if (TextureList.Count == 0)
                             {
-                                TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, -1, "", ""));
                                 TextureList.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, i, "", ""));
                             }
                             if (RenderList.Count == 0)
                             {
-                                RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, -1, "", RendererProperties.Enabled, "", ""));
                                 RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, i, "", RendererProperties.Enabled, "", ""));
                             }
 
