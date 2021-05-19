@@ -52,7 +52,6 @@
     <Compile Include="Support\KKAMBX_Migrate.cs" />
     <Compile Include="Support\ME_Support.cs" />
     <Compile Include="Support\Overlay_Support.cs" />
-    <Compile Include="Versions.cs" />
     <Compile Include="CharaEvent.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="OutfitDecider.cs" />

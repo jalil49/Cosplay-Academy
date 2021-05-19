@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using Common;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
@@ -17,7 +16,7 @@ namespace Cosplay_Academy
     public class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = Versions.Version;
+        public const string Version = "0.7.1";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
