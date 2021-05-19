@@ -599,12 +599,13 @@ namespace Cosplay_Academy
                             UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
                         }
                         ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
-                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                         {
                             HairAccInfo[ACCpostion] = HairQueue.Dequeue();
                         }
                         else
                         {
+                            HairAccInfo.Remove(ACCpostion);
                             HairQueue.Dequeue();
                         }
 
@@ -647,12 +648,13 @@ namespace Cosplay_Academy
 
                         NewRAW[ACCpostion - 20] = PartsQueue.Dequeue();
 
-                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                         {
                             HairAccInfo[ACCpostion] = HairQueue.Dequeue();
                         }
                         else
                         {
+                            HairAccInfo.Remove(ACCpostion);
                             HairQueue.Dequeue();
                         }
 
@@ -701,7 +703,7 @@ namespace Cosplay_Academy
                     UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
                 }
                 NewRAW.Add(PartsQueue.Dequeue());
-                if (HairQueue.Peek() != null && HairQueue.Peek().HairLength != -999)
+                if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                 {
                     var HairInfo = HairQueue.Dequeue();
                     if (Settings.HairMatch.Value)
@@ -713,6 +715,7 @@ namespace Cosplay_Academy
                 }
                 else
                 {
+                    HairAccInfo.Remove(ACCpostion);
                     HairQueue.Dequeue();
                 }
 
@@ -1071,7 +1074,12 @@ namespace Cosplay_Academy
         #region ME_Loops
         private static void ME_Float_Loop(Queue<MaterialFloatProperty> FloatQueue, int ACCpostion, List<MaterialFloatProperty> MaterialFloat)
         {
-            if (FloatQueue.Count != 0 && FloatQueue.Peek().ObjectType != ObjectType.Unknown)
+            if (FloatQueue.Count == 0)
+            {
+                return;
+            }
+
+            if (FloatQueue.Peek().ObjectType != ObjectType.Unknown)
             {
                 int slot = FloatQueue.Peek().Slot;
                 while (FloatQueue.Count != 0)
@@ -1085,7 +1093,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            else if (FloatQueue.Count != 0)
+            else
             {
                 FloatQueue.Dequeue();
             }
@@ -1093,7 +1101,11 @@ namespace Cosplay_Academy
 
         private static void ME_Color_Loop(Queue<MaterialColorProperty> ColorQueue, int ACCpostion, List<MaterialColorProperty> MaterialColor)
         {
-            if (ColorQueue.Count != 0 && ColorQueue.Peek().ObjectType != ObjectType.Unknown)
+            if (ColorQueue.Count == 0)
+            {
+                return;
+            }
+            if (ColorQueue.Peek().ObjectType != ObjectType.Unknown)
             {
                 int slot = ColorQueue.Peek().Slot;
                 while (ColorQueue.Count != 0)
@@ -1107,7 +1119,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            else if (ColorQueue.Count != 0)
+            else
             {
                 ColorQueue.Dequeue();
             }
@@ -1115,20 +1127,33 @@ namespace Cosplay_Academy
 
         private static void ME_Texture_Loop(Queue<MaterialTextureProperty> TextureQueue, int ACCpostion, List<MaterialTextureProperty> MaterialTexture, ChaDefault ThisOutfitData)
         {
-            if (TextureQueue.Count != 0 && TextureQueue.Peek().ObjectType != ObjectType.Unknown)
+            if (TextureQueue.Count == 0)
             {
-                MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                if (!ThisOutfitData.ME_Work && ME_Info.TexID != null)
+                return;
+            }
+
+            if (TextureQueue.Peek().ObjectType != ObjectType.Unknown)
+            {
+                int slot = TextureQueue.Peek().Slot;
+                while (TextureQueue.Count != 0)
                 {
-                    if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                    MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
+                    if (!ThisOutfitData.ME_Work)
                     {
-                        ME_Info.TexID = ThisOutfitData.ME.SetAndGetTextureID(imgbyte);
+                        if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
+                        {
+                            ME_Info.TexID = ThisOutfitData.ME.SetAndGetTextureID(imgbyte);
+                        }
+                    }
+                    ME_Info.Slot = ACCpostion;
+                    MaterialTexture.Add(ME_Info);
+                    if (TextureQueue.Count == 0 || TextureQueue.Peek().Slot != slot)
+                    {
+                        break;
                     }
                 }
-                ME_Info.Slot = ACCpostion;
-                MaterialTexture.Add(ME_Info);
             }
-            else if (TextureQueue.Count != 0)
+            else
             {
                 TextureQueue.Dequeue();
             }
@@ -1136,7 +1161,12 @@ namespace Cosplay_Academy
 
         private static void ME_Shader_Loop(Queue<MaterialShader> ShaderQueue, int ACCpostion, List<MaterialShader> MaterialShader)
         {
-            if (ShaderQueue.Count != 0 && ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
+            if (ShaderQueue.Count == 0)
+            {
+                return;
+            }
+
+            if (ShaderQueue.Peek().ObjectType != ObjectType.Unknown)
             {
                 int slot = ShaderQueue.Peek().Slot;
                 while (ShaderQueue.Count != 0)
@@ -1150,7 +1180,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            else if (ShaderQueue.Count != 0)
+            else
             {
                 ShaderQueue.Dequeue();
             }
@@ -1158,7 +1188,12 @@ namespace Cosplay_Academy
 
         private static void ME_Render_Loop(Queue<RendererProperty> RendererQueue, int ACCpostion, List<RendererProperty> Renderer)
         {
-            if (RendererQueue.Count != 0 && RendererQueue.Peek() != null && RendererQueue.Peek().ObjectType != ObjectType.Unknown)
+            if (RendererQueue.Count == 0)
+            {
+                return;
+            }
+
+            if (RendererQueue.Peek().ObjectType != ObjectType.Unknown)
             {
                 int slot = RendererQueue.Peek().Slot;
                 while (RendererQueue.Count != 0)
@@ -1172,7 +1207,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            else if (RendererQueue.Count != 0)
+            else
             {
                 RendererQueue.Dequeue();
             }
