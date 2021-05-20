@@ -2,7 +2,7 @@
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
 using System.Collections.Generic;
-using CoordinateType = ChaFileDefine.CoordinateType;
+
 namespace Cosplay_Academy
 {
     public class OutfitData
@@ -222,14 +222,14 @@ namespace Cosplay_Academy
         internal string BirthDay;
         internal string FullName;
         internal SaveData.Heroine heroine;
-        internal string Koipath;
-        internal string PreviousPath;
+        internal string KoiOutfitpath;
+        internal string ClubOutfitPath;
         internal bool ChangeKoiToClub;
         internal bool ChangeClubToKoi;
         internal bool Changestate = false;
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
-        internal CharaEvent CharaEvent;
+        //internal CharaEvent CharaEvent;
         internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.Outfit_Size];
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
         internal ClothingLoader ClothingLoader = new ClothingLoader();
@@ -239,7 +239,6 @@ namespace Cosplay_Academy
 
         #region hair accessories
         public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.Outfit_Size];
-        public ChaControl ThisControl;
         #endregion
 
         #region Material Editor Save

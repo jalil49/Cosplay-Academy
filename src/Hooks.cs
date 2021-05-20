@@ -5,6 +5,7 @@ using Illusion.Extensions;
 using Manager;
 using System;
 using System.Reflection;
+
 namespace Cosplay_Academy
 {
     internal static class Hooks
@@ -106,27 +107,17 @@ namespace Cosplay_Academy
             {
                 if (ThisOutfitData.ChangeKoiToClub)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.PreviousPath;
+                    ThisOutfitData.outfitpath[4] = ThisOutfitData.ClubOutfitPath;
                     clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                     ThisOutfitData.ChangeKoiToClub = false;
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
                     Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    //Chara.chaCtrl.SetAccessoryStateAll(true);
                 }
-                //else if (ThisOutfitData != null && ThisOutfitData.ChangeClubToKoi)
-                //{
-                //    ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
-                //    ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
-                //    clothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
-                //    Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                //    Chara.chaCtrl.SetAccessoryStateAll(true);
-                //    ThisOutfitData.ChangeClubToKoi = false;
-                //}
             }
             else if (ThisOutfitData.ChangeClubToKoi && __instance.MapNo == 22)
             {
-                ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
-                ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
+                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpath[4];
+                ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
                 int num = ThisOutfitData.heroine.isDresses.Check(false);
                 if (num == -1)
                 {
@@ -144,7 +135,7 @@ namespace Cosplay_Academy
                 int remainThreshold = (ThisOutfitData.heroine.lewdness / (4 - (int)ThisOutfitData.heroine.HExperience));
                 if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.PreviousPath;
+                    ThisOutfitData.outfitpath[4] = ThisOutfitData.ClubOutfitPath;
                     int num = ThisOutfitData.heroine.isDresses.Check(false);
                     if (num == -1)
                     {
@@ -259,8 +250,8 @@ namespace Cosplay_Academy
             ThisOutfitData.ChangeClubToKoi = false;
             if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
             {
-                ThisOutfitData.PreviousPath = ThisOutfitData.outfitpath[4];
-                ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
+                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpath[4];
+                ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
                 ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
                 ThisOutfitData.heroine.coordinates[0] = 4;
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;

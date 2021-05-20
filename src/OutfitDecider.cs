@@ -274,12 +274,12 @@ namespace Cosplay_Academy
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.outfitpath[0];
                     break;
             }
-            ThisOutfitData.Koipath = outfitData[11].RandomSet(HExperience, Settings.MatchKoiClub.Value);
+            ThisOutfitData.KoiOutfitpath = outfitData[11].RandomSet(HExperience, Settings.MatchKoiClub.Value);
             if (ThisOutfitData.heroine == null ? Settings.KoiClub.Value : ThisOutfitData.heroine.isStaff && Settings.KeepOldBehavior.Value)
             {
                 if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.Koipath;
+                    ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
                 }
             }
         }
