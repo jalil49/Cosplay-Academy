@@ -28,6 +28,11 @@ namespace Cosplay_Academy
         {
             ClearData = false;
             Firstpass = true;
+            if (!MakerAPI.IsInsideClassMaker())
+            {
+                Constants.ChaDefaults.Clear();
+                OutfitDecider.ResetDecider();
+            }
         }
 
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
