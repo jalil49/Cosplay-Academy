@@ -11,7 +11,6 @@ using Manager;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System.Collections.Generic;
-//using System.Diagnostics;
 using System.Linq;
 using ToolBox;
 using UnityEngine;
@@ -60,8 +59,6 @@ namespace Cosplay_Academy
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
-            //Time.Start();
-
             if (currentGameMode == GameMode.Studio)
             {
                 return;
@@ -104,7 +101,6 @@ namespace Cosplay_Academy
                 ThisOutfitData.FullName = ChaControl.fileParam.fullname;
                 ThisOutfitData.BirthDay = ChaControl.fileParam.strBirthDay;
                 ThisOutfitData.Personality = ChaControl.fileParam.personality;
-                ThisOutfitData.CharaEvent = this;
                 Game _gamemgr = Game.Instance;
                 foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
                 {
@@ -115,9 +111,8 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher)
+            if (ChaControl.sex != 0 && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
-                //ThisOutfitData.processed = true;
                 return;
             }
             ThisOutfitData.ChaControl = ChaControl;

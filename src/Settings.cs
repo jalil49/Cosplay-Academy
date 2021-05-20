@@ -29,6 +29,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
         public static ConfigEntry<bool> NonMatchWeight { get; private set; }
+        public static ConfigEntry<bool> TeacherDress { get; private set; }
 
 
         public static ConfigEntry<bool> MatchUniform { get; private set; }
@@ -112,6 +113,8 @@ namespace Cosplay_Academy
             StoryModeChange = Config.Bind("Story Mode", "KoiKatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behaviour", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
             ChangeToClubatKoi = Config.Bind("Story Mode", "Change at Koikatsu Start", false, "Change Heroine to club outfit when they start in Koikatsu room");
+            TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, "Teachers probably would like to dress up if everyone does it.");
+
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
             IndividualSets = Config.Bind("Outfit Sets", "Individual Outfit Sets", false, "Don't look for other sets that are shared");
