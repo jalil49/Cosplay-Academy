@@ -779,10 +779,12 @@ namespace Cosplay_Academy
             Queue<ChaFileAccessory.PartsInfo> PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             Queue<HairSupport.HairAccessoryInfo> HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
 
-            Queue<bool> HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
-            Queue<bool> ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+            Queue<bool> ACCKeepQueue = new Queue<bool>();
+            Queue<bool> HairKeepQueue = new Queue<bool>();
             if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
             {
+                HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
+                ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
             }
             List<int> HairKeepResult = new List<int>();
             List<int> ACCKeepResult = new List<int>();
@@ -1016,15 +1018,6 @@ namespace Cosplay_Academy
                     HairQueue.Dequeue();
                 }
 
-                if (HairKeepQueue.Dequeue())
-                {
-                    HairKeepResult.Add(ACCpostion);
-                }
-                if (ACCKeepQueue.Dequeue())
-                {
-                    ACCKeepResult.Add(ACCpostion);
-                }
-
                 ME_Render_Loop(RenderQueue, ACCpostion, Renderer);
 
                 ME_Color_Loop(ColorQueue, ACCpostion, MaterialColor);
@@ -1037,6 +1030,14 @@ namespace Cosplay_Academy
 
                 if (InsideMaker)
                 {
+                    if (HairKeepQueue.Dequeue())
+                    {
+                        HairKeepResult.Add(ACCpostion);
+                    }
+                    if (ACCKeepQueue.Dequeue())
+                    {
+                        ACCKeepResult.Add(ACCpostion);
+                    }
                 }
                 ACCpostion++;
             }
@@ -1088,85 +1089,85 @@ namespace Cosplay_Academy
 
             ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
 
-            SaveData = new PluginData();
-            Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
-            if (Inputdata != null)
             if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
             {
-                if (Inputdata.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                SaveData = new PluginData();
+                Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
+                if (Inputdata != null)
                 {
-                    HairKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
+                    if (Inputdata.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                    {
+                        HairKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
+                    }
+                    if (Inputdata.data.ContainsKey("CoordinateSaveBools"))
+                    {
+                        SaveData.data.Add("CoordinateSaveBools", Inputdata.data["CoordinateSaveBools"]);
+                    }
+                    if (Inputdata.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                    {
+                        ACCKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
+                    }
+                    if (Inputdata.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("PersonalityType_Restriction", Inputdata.data["PersonalityType_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("TraitType_Restriction", Inputdata.data["TraitType_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("HstateType_Restriction", Inputdata.data["HstateType_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("ClubType_Restriction", Inputdata.data["ClubType_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("Height_Restriction", Inputdata.data["Height_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("Breastsize_Restriction", Inputdata.data["Breastsize_Restriction"]);
+                    }
+                    if (Inputdata.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("CoordinateType", Inputdata.data["CoordinateType"]);
+                    }
+                    if (Inputdata.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("CoordinateSubType", Inputdata.data["CoordinateSubType"]);
+                    }
+                    if (Inputdata.data.TryGetValue("Creator", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("Creator", Inputdata.data["Creator"]);
+                    }
+                    if (Inputdata.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("Set_Name", Inputdata.data["Set_Name"]);
+                    }
+                    if (Inputdata.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("SubSetNames", Inputdata.data["SubSetNames"]);
+                    }
+                    if (Inputdata.data.TryGetValue("ClothNot", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("ClothNot", Inputdata.data["ClothNot"]);
+                    }
+                    if (Inputdata.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
+                    {
+                        SaveData.data.Add("GenderType", Inputdata.data["GenderType"]);
+                    }
                 }
-                if (Inputdata.data.ContainsKey("CoordinateSaveBools"))
-                {
-                    SaveData.data.Add("CoordinateSaveBools", Inputdata.data["CoordinateSaveBools"]);
-                }
-                if (Inputdata.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
-                {
-                    ACCKeepResult.AddRange(MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData));
-                }
-                if (Inputdata.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("PersonalityType_Restriction", Inputdata.data["PersonalityType_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("TraitType_Restriction", Inputdata.data["TraitType_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("HstateType_Restriction", Inputdata.data["HstateType_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("ClubType_Restriction", Inputdata.data["ClubType_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("Height_Restriction", Inputdata.data["Height_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("Breastsize_Restriction", Inputdata.data["Breastsize_Restriction"]);
-                }
-                if (Inputdata.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("CoordinateType", Inputdata.data["CoordinateType"]);
-                }
-                if (Inputdata.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("CoordinateSubType", Inputdata.data["CoordinateSubType"]);
-                }
-                if (Inputdata.data.TryGetValue("Creator", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("Creator", Inputdata.data["Creator"]);
-                }
-                if (Inputdata.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("Set_Name", Inputdata.data["Set_Name"]);
-                }
-                if (Inputdata.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("SubSetNames", Inputdata.data["SubSetNames"]);
-                }
-                if (Inputdata.data.TryGetValue("ClothNot", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("ClothNot", Inputdata.data["ClothNot"]);
-                }
-                if (Inputdata.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
-                {
-                    SaveData.data.Add("GenderType", Inputdata.data["GenderType"]);
-                }
-            }
-            SaveData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairKeepResult));
-            SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
+                SaveData.data.Add("HairAcc", MessagePackSerializer.Serialize(HairKeepResult));
+                SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
 
-            ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
-
+                ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
+                ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
             }
 
             #endregion
-            ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
 
             ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
 
