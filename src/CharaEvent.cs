@@ -20,12 +20,10 @@ namespace Cosplay_Academy
     public class CharaEvent : CharaCustomFunctionController
     {
         private ChaDefault ThisOutfitData;
-        private static bool ClearData;
         private static bool Firstpass = true;
 
         public static void MakerAPI_MakerExiting()
         {
-            ClearData = false;
             Firstpass = true;
             if (!MakerAPI.IsInsideClassMaker())
             {
@@ -52,9 +50,6 @@ namespace Cosplay_Academy
             e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).BindToFunctionController<CharaEvent, bool>(
                 (controller) => Settings.RandomizeUnderwearOnly.Value,
                 (controller, value) => Settings.RandomizeUnderwearOnly.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Clear Existing", false, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => ClearData,
-                (controller, value) => ClearData = value);
         }
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
@@ -66,11 +61,6 @@ namespace Cosplay_Academy
             bool IsMaker = currentGameMode == GameMode.Maker;
             if (IsMaker || ThisOutfitData == null || !ThisOutfitData.processed)
             {
-                if (ClearData && IsMaker)
-                {
-                    Constants.ChaDefaults.Clear();
-                }
-
                 Process(currentGameMode);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
