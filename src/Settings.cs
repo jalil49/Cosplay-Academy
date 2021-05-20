@@ -7,6 +7,7 @@ using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Studio;
 using System;
+using System.Collections;
 using System.IO;
 namespace Cosplay_Academy
 {
@@ -85,14 +86,19 @@ namespace Cosplay_Academy
             Instance = this;
             Logger = base.Logger;
             Hooks.Init();
-            //Hooks.CharaFinallyFinished += HairAccessory.Attempt;
+            StartCoroutine(Wait());
+            IEnumerator Wait()
+            {
+                yield return null;
+                Constants.PluginCheck();
+                if (!Constants.PluginResults["Additional_Card_Info"]) //provide access to info even if plugin-doesn't exist
+                {
+                    CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
+                }
+            }
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
             GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID);
-            if (!TryfindPluginInstance("Additional_Card_Info")) //provide access to info even if plugin-doesn't exist
-            {
-                CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
-            }
             UpdateFrequency = Config.Bind("Main Game", "Update Frequency", OutfitUpdate.Daily);
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
@@ -110,7 +116,6 @@ namespace Cosplay_Academy
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
             IndividualSets = Config.Bind("Outfit Sets", "Individual Outfit Sets", false, "Don't look for other sets that are shared");
             FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found");
-
 
             //match uniforms
             MatchUniform = Config.Bind("Match Outfit", "Coordinated Uniforms", true, "Everyone wears same uniform");
@@ -153,7 +158,7 @@ namespace Cosplay_Academy
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
         }
 
-        private bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
+        internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
         {
             BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
             if (null != target)

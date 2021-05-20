@@ -17,7 +17,7 @@ namespace Cosplay_Academy
 {
     public partial class ClothingLoader
     {
-        private void Run_Repacks(ChaControl character, ChaDefault ThisOutfitData)
+        public void Run_Repacks(ChaControl character, ChaDefault ThisOutfitData)
         {
             ME_RePack(character, ThisOutfitData);
             KCOX_RePack(character, ThisOutfitData);
@@ -25,44 +25,59 @@ namespace Cosplay_Academy
             DynamicBone_Repack(character, ThisOutfitData);
             PushUp_RePack(character, ThisOutfitData);
             ClothingUnlocker_RePack(character, ThisOutfitData);
-            AccessoryStateSync_Repack(character, ThisOutfitData);
-            Accessory_States_Repack(character, ThisOutfitData);
-            Accessory_Themes_Repack(character, ThisOutfitData);
-            Additional_Card_Info_Repack(character, ThisOutfitData);
-            Accessory_Parents_Repack(character, ThisOutfitData);
+
+            if (Constants.PluginResults["Additional_Card_Info"])
+            {
+                Additional_Card_Info_Repack(character, ThisOutfitData);
+            }
+            if (Constants.PluginResults["Accessory_States"])
+            {
+                Accessory_States_Repack(character, ThisOutfitData);
+            }
+            if (Constants.PluginResults["madevil.kk.ass"])
+            {
+                AccessoryStateSync_Repack(character, ThisOutfitData);
+            }
+            if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
+            {
+                Accessory_Parents_Repack(character, ThisOutfitData);
+            }
+            if (Constants.PluginResults["Accessory_Themes"] && InsideMaker)
+            {
+                Accessory_Themes_Repack(character, ThisOutfitData);
+            }
         }
 
         public void Reload_RePacks(ChaControl ChaControl)
         {
-            //ControllerReload_Loop(typeof(KoiClothesOverlayX.KoiClothesOverlayController), ChaControl);
             ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
 
-            //ControllerReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl);
             ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
 
-            //ControllerReload_Loop(typeof(ClothingUnlockerController), ChaControl);
             ControllerReload_Loop(Type.GetType("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", false), ChaControl);
 
-            //ControllerReload_Loop(typeof(Pushup.PushupController), ChaControl);
             ControllerReload_Loop(Type.GetType("KK_Plugins.Pushup+PushupController, KK_Pushup", false), ChaControl);
 
-            //ControllerReload_Loop(typeof(BoneController), ChaControl);
             ControllerReload_Loop(Type.GetType("KKABMX.Core.BoneController, KKABMX", false), ChaControl);
 
-            //ControllerReload_Loop(typeof(KK_Plugins.DynamicBoneEditor.CharaController), ChaControl);
             ControllerReload_Loop(Type.GetType("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", false), ChaControl);
-
-            ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
 
             ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
 
-            ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
+            if (Constants.PluginResults["madevil.kk.ass"])
+                ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
 
-            ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
+            if (Constants.PluginResults["Accessory_States"])
+                ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
 
-            ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
+            if (Constants.PluginResults["Additional_Card_Info"])
+                ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
 
-            ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
+            if (Constants.PluginResults["Accessory_Themes"] && InsideMaker)
+                ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
+
+            if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
+                ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
         }
 
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
@@ -189,14 +204,6 @@ namespace Cosplay_Academy
             {
                 CharacterData = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
             }
-            //foreach (var item in CharacterData)
-            //{
-            //    ExpandedOutfit.Logger.LogWarning(item.Key);
-            //    foreach (var item2 in item.Value)
-            //    {
-            //        ExpandedOutfit.Logger.LogWarning("\t" + item2.Key);
-            //    }
-            //}
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 if (!CharacterData.TryGetValue((CoordinateType)outfitnum, out var CurrentCharacterData))
@@ -891,7 +898,7 @@ namespace Cosplay_Academy
             Dictionary<int, int[]>[] ACC_State_array = new Dictionary<int, int[]>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
             Dictionary<int, string>[] ACC_Name_Dictionary = new Dictionary<int, string>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
             Dictionary<int, bool>[] ACC_Parented_Dictionary = new Dictionary<int, bool>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
-            //var underwear = Underwear.clothes.parts;
+
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 ACC_Binding_Dictionary[outfitnum] = new Dictionary<int, int>();

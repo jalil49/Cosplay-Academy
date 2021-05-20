@@ -28,6 +28,7 @@ namespace Cosplay_Academy
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
         //private static Stopwatch FullTime = new Stopwatch();
+        private static bool InsideMaker = false;
         public ClothingLoader()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -38,6 +39,7 @@ namespace Cosplay_Academy
 
         public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
         {
+            InsideMaker = MakerAPI.InsideMaker;
             ChaControl = character;
             ChaFile = file;
             ThisOutfitData = InputOutfitData;
@@ -768,6 +770,7 @@ namespace Cosplay_Academy
 
         public void CoordinateLoad(ChaDefault ThisOutfitData, ChaFileCoordinate coordinate, ChaControl ChaControl, bool Raw = false)
         {
+            InsideMaker = MakerAPI.InsideMaker;
             ChaFile ChaFile = ChaControl.chaFile;
             #region Queue accessories to keep
 
@@ -778,6 +781,9 @@ namespace Cosplay_Academy
 
             Queue<bool> HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
             Queue<bool> ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+            if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
+            {
+            }
             List<int> HairKeepResult = new List<int>();
             List<int> ACCKeepResult = new List<int>();
 
@@ -1029,6 +1035,9 @@ namespace Cosplay_Academy
 
                 ME_Shader_Loop(ShaderQueue, ACCpostion, MaterialShade);
 
+                if (InsideMaker)
+                {
+                }
                 ACCpostion++;
             }
 
@@ -1082,6 +1091,7 @@ namespace Cosplay_Academy
             SaveData = new PluginData();
             Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
             if (Inputdata != null)
+            if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
             {
                 if (Inputdata.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
                 {
@@ -1153,6 +1163,7 @@ namespace Cosplay_Academy
 
             ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
 
+            }
 
             #endregion
             ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
