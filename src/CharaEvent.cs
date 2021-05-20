@@ -64,7 +64,7 @@ namespace Cosplay_Academy
                 return;
             }
             bool IsMaker = currentGameMode == GameMode.Maker;
-            if (IsMaker || !IsMaker && (ThisOutfitData == null || !ThisOutfitData.processed) || GameAPI.InsideHScene)
+            if (IsMaker || ThisOutfitData == null || !ThisOutfitData.processed)
             {
                 if (ClearData && IsMaker)
                 {
@@ -73,12 +73,19 @@ namespace Cosplay_Academy
 
                 Process(currentGameMode);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
-                if (IsMaker && Firstpass)
-                {
-                    ChaControl.ChangeCoordinateTypeAndReload();
-                    Firstpass = false;
-                }
             }
+            else if (ThisOutfitData.processed || GameAPI.InsideHScene)
+            {
+                ThisOutfitData.Chafile = ChaFileControl;
+                ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl, ThisOutfitData);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
+            }
+            if (IsMaker && Firstpass)
+            {
+                ChaControl.ChangeCoordinateTypeAndReload();
+                Firstpass = false;
+            }
+
             //Time.Stop();
 
             //ExpandedOutfit.Logger.LogWarning($"Time is {Time.ElapsedMilliseconds}");
