@@ -118,7 +118,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            if (ChaControl.sex != 0 && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
+            if (ChaControl.sex != 0 && ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
