@@ -822,6 +822,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
+                        HairACCDictionary.Remove(ACCpostion);
                         HairQueue.Dequeue();
                     }
 
@@ -860,6 +861,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
+                        HairACCDictionary.Remove(ACCpostion);
                         HairQueue.Dequeue();
                     }
 
