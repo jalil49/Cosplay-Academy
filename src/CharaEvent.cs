@@ -395,42 +395,10 @@ namespace Cosplay_Academy
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)
         {
-            ChaFileCoordinate Temp = new ChaFileCoordinate();
-            var TempClothPart = Temp.clothes.parts;
-            var SourceClothPart = OriginalCoordinate.clothes.parts;
-
-            for (int i = 0; i < TempClothPart.Length; i++)
+            ChaFileCoordinate Temp = new ChaFileCoordinate
             {
-                int idpass = SourceClothPart[i].id;
-                TempClothPart[i].id = idpass;
-#if Party
-                    //doesnt exist in party
-
-                for (int j = 0; j < TempClothPart[i].hideOpt.Length; j++) //doesnt exist in party
-                {
-                    bool hideoptpass = SourceClothPart[i].hideOpt[j];
-                    TempClothPart[i].hideOpt[j] = hideoptpass;
-                }
-                
-                    int Emblem2 = SourceClothPart[i].emblemeId2;
-                    TempClothPart[i].emblemeId2 = Emblem2;
-                    int passsleave = SourceClothPart[i].sleevesType;
-                    TempClothPart[i].sleevesType = passsleave;                
-#endif
-                for (int j = 0; j < TempClothPart[i].colorInfo.Length; j++)
-                {
-                    Color PassBaseColor = SourceClothPart[i].colorInfo[j].baseColor;
-                    TempClothPart[i].colorInfo[j].baseColor = PassBaseColor;
-                    Color PassPatColor = SourceClothPart[i].colorInfo[j].patternColor;
-                    TempClothPart[i].colorInfo[j].patternColor = PassPatColor;
-                    int PassPattern = SourceClothPart[j].colorInfo[j].pattern;
-                    TempClothPart[i].colorInfo[j].pattern = PassPattern;
-                    Vector2 Passtiling = SourceClothPart[j].colorInfo[j].tiling;
-                    TempClothPart[i].colorInfo[j].tiling = Passtiling;
-                }
-                int Emblem1 = SourceClothPart[i].emblemeId;
-                TempClothPart[i].emblemeId = Emblem1;
-            }
+                clothes = OriginalCoordinate.clothes,
+            };
             return Temp;
         }
     }
