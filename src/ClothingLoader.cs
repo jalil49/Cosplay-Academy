@@ -34,10 +34,17 @@ namespace Cosplay_Academy
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i] = new List<int>();
+                CharacterClothingKeep_Coordinate[i] = new bool[9];
             }
         }
 
+        #region ACI_Data
+        private bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
+        private bool[][] CharacterClothingKeep_Coordinate = new bool[Constants.Outfit_Size][];
         private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
+        public bool Character_Cosplay_Ready = false;
+        #endregion
+
         public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
         {
             InsideMaker = MakerAPI.InsideMaker;
@@ -46,6 +53,8 @@ namespace Cosplay_Academy
             ThisOutfitData = InputOutfitData;
             var HairPlugin = new PluginData();
             ThisOutfitData.Soft_Clear_ME();
+
+            Extract_Personal_Data();
 
             HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 
@@ -105,9 +114,7 @@ namespace Cosplay_Academy
             var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.MaterialShaderQueue[outfitnum]);
 
             bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
-            bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
             Underwearbools[outfitnum] = new bool[] { false, false, false };
-
 
             #endregion
             //Load new outfit
@@ -126,7 +133,6 @@ namespace Cosplay_Academy
             List<int> HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
-            var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
             var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
             if (ExpandedData != null)
             {
@@ -143,21 +149,14 @@ namespace Cosplay_Academy
                     Underwearbools[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])S_HairAcc);
                 }
             }
-            if (PersonalData != null)
+
+            for (int i = 0; i < 9; i++)
             {
-                if (PersonalData.data.TryGetValue("Personal_Clothing_Save", out var S_Clothing_Save) && S_Clothing_Save != null)
+                if (CharacterClothingKeep[i])
                 {
-                    CharacterClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])S_Clothing_Save);
-                    for (int i = 0; i < 9; i++)
-                    {
-                        if (CharacterClothingKeep[i])
-                        {
-                            UnderClothingKeep[i] = true;
-                        }
-                    }
+                    UnderClothingKeep[i] = true;
                 }
             }
-
 
             if (_accessoriesByChar.TryGetValue(ChaFile, out MoreAccessories.CharAdditionalData data) == false)
             {
@@ -1391,6 +1390,26 @@ namespace Cosplay_Academy
                 else if (haircomponent[i].Property == "ShadowColor")
                 {
                     haircomponent[i].Value = ChaControl.fileHair.parts[1].outlineColor;
+                }
+            }
+        }
+
+        private void Extract_Personal_Data()
+        {
+            var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
+            if (PersonalData != null)
+            {
+                if (PersonalData.data.TryGetValue("Personal_Clothing_Save", out var ByteData) && ByteData != null)
+                {
+                    CharacterClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                }
+                if (PersonalData.data.TryGetValue("MakeUpKeep", out ByteData) && ByteData != null)
+                {
+                    MakeUpKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
+                }
+                if (PersonalData.data.TryGetValue("Personal_Coordinate_Clothing_Save", out ByteData) && ByteData != null)
+                {
+                    CharacterClothingKeep_Coordinate = MessagePackSerializer.Deserialize<bool[][]>((byte[])ByteData);
                 }
             }
         }

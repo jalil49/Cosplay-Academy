@@ -279,9 +279,10 @@ namespace Cosplay_Academy
                     }
                     if (Required_Support.data.TryGetValue("Cosplay_Academy_Ready", out Bytedata))
                     {
-                        Cosplay_Academy_Ready = MessagePackSerializer.Deserialize<bool>((byte[])Bytedata);
+                        ThisOutfitData.ClothingLoader.Character_Cosplay_Ready = Cosplay_Academy_Ready = MessagePackSerializer.Deserialize<bool>((byte[])Bytedata);
                     }
                 }
+                #endregion 
 
                 for (int outfitnum = 0, n = Constants.Outfit_Size; outfitnum < n; outfitnum++)
                 {
