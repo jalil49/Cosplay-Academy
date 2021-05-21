@@ -88,7 +88,8 @@ namespace Cosplay_Academy
 
         public void Process(GameMode currentGameMode)
         {
-            //ExpandedOutfit.Logger.LogWarning("Started process for " + ChaControl.fileParam.fullname);
+            #region ThisOutfitData Assignment
+
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
@@ -114,6 +115,8 @@ namespace Cosplay_Academy
             }
             ThisOutfitData.ChaControl = ChaControl;
             ThisOutfitData.Chafile = ChaFileControl;
+            #endregion
+
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
@@ -136,6 +139,7 @@ namespace Cosplay_Academy
 
                 if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                     CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
+
                 PluginData MaterialEditorData;
                 MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
@@ -251,6 +255,8 @@ namespace Cosplay_Academy
                 #endregion
 
                 #region Queue accessories to keep
+
+                #region ACI Data
                 List<int>[] HairKeep = new List<int>[Constants.Outfit_Size];
                 List<int>[] ACCKeep = new List<int>[Constants.Outfit_Size];
                 for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -314,8 +320,8 @@ namespace Cosplay_Academy
                                     HairLength = -999
                                 };
                             }
-                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep[outfitnum].Contains(i));
-                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep[outfitnum].Contains(i));
+
+                            #region ME_Data
                             var ColorList = MaterialColorPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var FloatList = MaterialFloatPropertyQueue[outfitnum].FindAll(x => x.Slot == i);
                             var ShaderList = MaterialShaderQueue[outfitnum].FindAll(x => x.Slot == i);
@@ -342,14 +348,20 @@ namespace Cosplay_Academy
                             {
                                 RenderList.Add(new RendererProperty(ObjectType.Unknown, outfitnum, i, "", RendererProperties.Enabled, "", ""));
                             }
-
                             ThisOutfitData.MaterialColorPropertyQueue[outfitnum].AddRange(ColorList);
                             ThisOutfitData.MaterialFloatPropertyQueue[outfitnum].AddRange(FloatList);
                             ThisOutfitData.MaterialShaderQueue[outfitnum].AddRange(ShaderList);
                             ThisOutfitData.MaterialTexturePropertyQueue[outfitnum].AddRange(TextureList);
                             ThisOutfitData.RendererPropertyQueue[outfitnum].AddRange(RenderList);
+                            #endregion
+
                             ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
+
+                            #region ACI_Data
+                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep[outfitnum].Contains(i));
+                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep[outfitnum].Contains(i));
+                            #endregion
                         }
                     }
                 }
@@ -365,7 +377,6 @@ namespace Cosplay_Academy
                 return;
             }//if disabled don't run
 
-            //use Chacontrol.name instead of ChaControl.fileParam.fullname to probably avoid same name conflicts
             if (ChaControl.sex == 1)//run the following if female
             {
                 if (currentGameMode == GameMode.MainGame || Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
