@@ -37,6 +37,7 @@ namespace Cosplay_Academy
             }
         }
 
+        private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
         public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
         {
             InsideMaker = MakerAPI.InsideMaker;
@@ -114,7 +115,13 @@ namespace Cosplay_Academy
             var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
             ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
 
-            ChaControl.chaFile.coordinate[outfitnum].LoadFile(ThisOutfitData.outfitpath[outfitnum]);
+            #region MakeUp
+            if (MakeUpKeep[outfitnum])
+            {
+                ThisCoordinate.enableMakeup = ThisOutfitData.Original_Coordinates[outfitnum].enableMakeup;
+                ThisCoordinate.makeup = ThisOutfitData.Original_Coordinates[outfitnum].makeup;
+            }
+            #endregion
 
             List<int> HairToColor = new List<int>();
             #region Reassign Existing Accessories

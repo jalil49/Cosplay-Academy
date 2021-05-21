@@ -398,6 +398,8 @@ namespace Cosplay_Academy
             ChaFileCoordinate Temp = new ChaFileCoordinate
             {
                 clothes = OriginalCoordinate.clothes,
+                makeup = OriginalCoordinate.makeup,
+                enableMakeup = OriginalCoordinate.enableMakeup
             };
             return Temp;
         }
