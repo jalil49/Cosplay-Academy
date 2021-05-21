@@ -111,14 +111,16 @@ namespace Cosplay_Academy
             #endregion
             //Load new outfit
             ChaControl.fileStatus.coordinateType = outfitnum;
+            var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
+            ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
 
             ChaControl.chaFile.coordinate[outfitnum].LoadFile(ThisOutfitData.outfitpath[outfitnum]);
 
             List<int> HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
-            var ExpandedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
             var PersonalData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
+            var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
             if (ExpandedData != null)
             {
                 if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var S_CoordinateSaveBools) && S_CoordinateSaveBools != null)
@@ -160,7 +162,7 @@ namespace Cosplay_Academy
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
-            var Inputdata = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
@@ -174,7 +176,7 @@ namespace Cosplay_Academy
 
 
             #region ME Acc Import
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
 
             if (MaterialEditorData?.data != null)
             {
@@ -425,51 +427,51 @@ namespace Cosplay_Academy
                 }
 
 
-                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
+                if (ThisCoordinate.clothes.parts[0].id != 0)
                 {
-                    if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2].id != 0)
+                    if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && !Underwearbools[outfitnum][2] && ThisCoordinate.clothes.parts[2].id != 0)
                     {
-                        ChaControl.chaFile.coordinate[outfitnum].clothes.parts[2] = Underwear.clothes.parts[2];
+                        ThisCoordinate.clothes.parts[2] = Underwear.clothes.parts[2];
                         Additional_Clothing_Process(2, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                     }
                     if (Underwearbools[outfitnum][0])
                     {
-                        if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
+                        if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ThisCoordinate.clothes.parts[3].id != 0)
                         {
-                            ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
+                            ThisCoordinate.clothes.parts[3] = Underwear.clothes.parts[3];
                             Additional_Clothing_Process(3, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                         }
                     }
                 }
 
-                if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[1].id != 0 && !Underwearbools[outfitnum][0])
+                if (ThisCoordinate.clothes.parts[1].id != 0 && !Underwearbools[outfitnum][0])
                 {
-                    if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3].id != 0)
+                    if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ThisCoordinate.clothes.parts[3].id != 0)
                     {
-                        ChaControl.chaFile.coordinate[outfitnum].clothes.parts[3] = Underwear.clothes.parts[3];
+                        ThisCoordinate.clothes.parts[3] = Underwear.clothes.parts[3];
                         Additional_Clothing_Process(3, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                     }
                 }
 
                 if (outfitnum != 2)
                 {
-                    if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[5].id != 0)
+                    if (ThisCoordinate.clothes.parts[5].id != 0)
                     {
                         if (!UnderClothingKeep[5])
                         {
-                            ChaControl.chaFile.coordinate[outfitnum].clothes.parts[5] = Underwear.clothes.parts[5];
+                            ThisCoordinate.clothes.parts[5] = Underwear.clothes.parts[5];
                             Additional_Clothing_Process(5, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                         }
                         if (!UnderClothingKeep[6])
                         {
-                            ChaControl.chaFile.coordinate[outfitnum].clothes.parts[6] = Underwear.clothes.parts[6];
+                            ThisCoordinate.clothes.parts[6] = Underwear.clothes.parts[6];
                             Additional_Clothing_Process(6, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                         }
                     }
 
-                    if (!UnderClothingKeep[6] && ChaControl.chaFile.coordinate[outfitnum].clothes.parts[6].id != 0)
+                    if (!UnderClothingKeep[6] && ThisCoordinate.clothes.parts[6].id != 0)
                     {
-                        ChaControl.chaFile.coordinate[outfitnum].clothes.parts[6] = Underwear.clothes.parts[6];
+                        ThisCoordinate.clothes.parts[6] = Underwear.clothes.parts[6];
                         Additional_Clothing_Process(6, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                     }
                 }
@@ -572,7 +574,7 @@ namespace Cosplay_Academy
                 {
                     continue;
                 }
-                ChaControl.chaFile.coordinate[outfitnum].clothes.parts[i] = ThisOutfitData.Original_Coordinates[outfitnum].clothes.parts[i];
+                ThisCoordinate.clothes.parts[i] = ThisOutfitData.Original_Coordinates[outfitnum].clothes.parts[i];
                 Additional_Clothing_Process(i, outfitnum, Original_ME_MC_properties, Original_ME_MS_properties, Original_ME_R_properties, Original_ME_MF_properties, Original_ME_MT_properties);
             }
 
@@ -591,16 +593,16 @@ namespace Cosplay_Academy
             if (MakerAPI.InsideMaker)
             {
                 //Normal
-                for (int n = ChaControl.chaFile.coordinate[outfitnum].accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
+                for (int n = ThisCoordinate.accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
                 {
-                    Empty = ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion].type == 120;
+                    Empty = ThisCoordinate.accessory.parts[ACCpostion].type == 120;
                     if (Empty) //120 is empty/default
                     {
                         if (insert++ >= UnderwearAccessoryStart)
                         {
                             UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
                         }
-                        ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCpostion] = PartsQueue.Dequeue();
+                        ThisCoordinate.accessory.parts[ACCpostion] = PartsQueue.Dequeue();
                         if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                         {
                             HairAccInfo[ACCpostion] = HairQueue.Dequeue();
