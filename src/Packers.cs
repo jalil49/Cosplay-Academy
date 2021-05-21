@@ -25,6 +25,7 @@ namespace Cosplay_Academy
             DynamicBone_Repack(character, ThisOutfitData);
             PushUp_RePack(character, ThisOutfitData);
             ClothingUnlocker_RePack(character, ThisOutfitData);
+            HairACC_Repack(character, ThisOutfitData);
 
             if (Constants.PluginResults["Additional_Card_Info"])
             {
@@ -78,6 +79,13 @@ namespace Cosplay_Academy
 
             if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
                 ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
+        }
+
+        private void HairACC_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        {
+            var HairPlugin = new PluginData();
+            HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
+            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
         }
 
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)

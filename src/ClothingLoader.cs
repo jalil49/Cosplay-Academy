@@ -51,7 +51,6 @@ namespace Cosplay_Academy
             ChaControl = character;
             ChaFile = file;
             ThisOutfitData = InputOutfitData;
-            var HairPlugin = new PluginData();
             ThisOutfitData.Soft_Clear_ME();
 
             Extract_Personal_Data();
@@ -91,8 +90,6 @@ namespace Cosplay_Academy
             //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)Original_Coord);
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
-            HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
-            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
 
             ThisOutfitData.ME_Work = true;
             Run_Repacks(character, ThisOutfitData);
