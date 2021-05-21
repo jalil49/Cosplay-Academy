@@ -84,6 +84,8 @@ namespace Cosplay_Academy
                 GeneralizedLoad(i);
                 Settings.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
             }
+
+            Original_ME_Data(); //Load existing where applicable
             //FullTime.Stop();
             //ExpandedOutfit.Logger.LogWarning($"Total Generalized load time {FullTime.ElapsedMilliseconds}");
             //ChaControl.ChangeCoordinateTypeAndReload((ChaFileDefine.CoordinateType)Original_Coord);
@@ -295,7 +297,6 @@ namespace Cosplay_Academy
                             importDictionaryList[x.Key + offset] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
                     }
 
-
                     if (Underwear_ME_Data.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
@@ -306,7 +307,6 @@ namespace Cosplay_Academy
                                 ME_MS_properties.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
                         }
                     }
-
 
                     if (Underwear_ME_Data.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
                     {
@@ -319,7 +319,6 @@ namespace Cosplay_Academy
                         }
                     }
 
-
                     if (Underwear_ME_Data.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
@@ -330,7 +329,6 @@ namespace Cosplay_Academy
                                 ME_MF_properties.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
                     }
-
 
                     if (Underwear_ME_Data.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
                     {
@@ -432,8 +430,7 @@ namespace Cosplay_Academy
                     }
                 }
 
-
-                if (ThisCoordinate.clothes.parts[0].id != 0)
+                if (ThisCoordinate.clothes.parts[0].id != 0 && !CharacterClothingKeep_Coordinate[outfitnum][2])
                 {
                     if (!UnderClothingKeep[2] && !Underwearbools[outfitnum][1] && !Underwearbools[outfitnum][2] && ThisCoordinate.clothes.parts[2].id != 0)
                     {
@@ -450,7 +447,7 @@ namespace Cosplay_Academy
                     }
                 }
 
-                if (ThisCoordinate.clothes.parts[1].id != 0 && !Underwearbools[outfitnum][0])
+                if (ThisCoordinate.clothes.parts[1].id != 0 && !Underwearbools[outfitnum][0] && !CharacterClothingKeep_Coordinate[outfitnum][3])
                 {
                     if (!UnderClothingKeep[3] && !Underwearbools[outfitnum][2] && ThisCoordinate.clothes.parts[3].id != 0)
                     {
@@ -461,21 +458,21 @@ namespace Cosplay_Academy
 
                 if (outfitnum != 2)
                 {
-                    if (ThisCoordinate.clothes.parts[5].id != 0)
+                    if (ThisCoordinate.clothes.parts[5].id != 0 && !CharacterClothingKeep_Coordinate[outfitnum][5])
                     {
                         if (!UnderClothingKeep[5])
                         {
                             ThisCoordinate.clothes.parts[5] = Underwear.clothes.parts[5];
                             Additional_Clothing_Process(5, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                         }
-                        if (!UnderClothingKeep[6])
+                        if (!UnderClothingKeep[6] && !CharacterClothingKeep_Coordinate[outfitnum][6])
                         {
                             ThisCoordinate.clothes.parts[6] = Underwear.clothes.parts[6];
                             Additional_Clothing_Process(6, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
                         }
                     }
 
-                    if (!UnderClothingKeep[6] && ThisCoordinate.clothes.parts[6].id != 0)
+                    if (!UnderClothingKeep[6] && ThisCoordinate.clothes.parts[6].id != 0 && !CharacterClothingKeep_Coordinate[outfitnum][6])
                     {
                         ThisCoordinate.clothes.parts[6] = Underwear.clothes.parts[6];
                         Additional_Clothing_Process(6, outfitnum, ME_MC_properties, ME_MS_properties, ME_R_properties, ME_MF_properties, ME_MT_properties);
