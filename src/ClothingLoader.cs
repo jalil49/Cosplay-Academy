@@ -20,15 +20,25 @@ namespace Cosplay_Academy
         private ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
+
+        private static bool InsideMaker = false;
+
+        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+
+        #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
-        //private ME_Support Underwear_ME = new ME_Support();
         private readonly bool[][] Underwearbools = new bool[Constants.Outfit_Size][];
-        //private int[] UnderwearAccessoryStart = new int[Constants.Outfit_Size];
         private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
-        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-        //private static Stopwatch FullTime = new Stopwatch();
-        private static bool InsideMaker = false;
+        #endregion
+
+        #region ACI_Data
+        private bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
+        private bool[][] CharacterClothingKeep_Coordinate = new bool[Constants.Outfit_Size][];
+        private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
+        public bool Character_Cosplay_Ready = false;
+        #endregion
+
         public ClothingLoader()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -38,12 +48,6 @@ namespace Cosplay_Academy
             }
         }
 
-        #region ACI_Data
-        private bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
-        private bool[][] CharacterClothingKeep_Coordinate = new bool[Constants.Outfit_Size][];
-        private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
-        public bool Character_Cosplay_Ready = false;
-        #endregion
 
         public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
         {
@@ -669,7 +673,7 @@ namespace Cosplay_Academy
 
         }
 
-        public void CoordinateLoad(ChaDefault ThisOutfitData, ChaFileCoordinate coordinate, ChaControl ChaControl, bool Raw = false)
+        public void CoordinateLoad(ChaDefault ThisOutfitData, ChaFileCoordinate coordinate, ChaControl ChaControl)
         {
             InsideMaker = MakerAPI.InsideMaker;
             ChaFile ChaFile = ChaControl.chaFile;
@@ -793,21 +797,10 @@ namespace Cosplay_Academy
                 data = new MoreAccessories.CharAdditionalData();
                 _accessoriesByChar.Add(ChaFile, data);
             }
-            List<ChaFileAccessory.PartsInfo> MoreACCData;
-            ChaFileAccessory.PartsInfo[] OriginalData;
-            if (Raw)
-            {
-                MoreACCData = data.rawAccessoriesInfos[ChaFile.status.coordinateType];
-                OriginalData = ChaFile.coordinate[ChaFile.status.coordinateType].accessory.parts;
+            List<ChaFileAccessory.PartsInfo> MoreACCData = data.nowAccessories;
+            ChaFileAccessory.PartsInfo[] OriginalData = ChaControl.nowCoordinate.accessory.parts;
 
-            }
-            else
-            {
-                MoreACCData = data.nowAccessories;
-                OriginalData = ChaControl.nowCoordinate.accessory.parts;
-            }
-
-            #region Reassign Exisiting Accessories
+            #region Reassign Existing Accessories
 
             var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairACCDictionary = new Dictionary<int, HairSupport.HairAccessoryInfo>();
