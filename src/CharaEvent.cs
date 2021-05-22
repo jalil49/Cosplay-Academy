@@ -64,7 +64,7 @@ namespace Cosplay_Academy
                 Process(currentGameMode);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
-            else if (ThisOutfitData.processed || GameAPI.InsideHScene)
+            else if (ThisOutfitData.processed && GameAPI.InsideHScene)
             {
                 ThisOutfitData.Chafile = ChaFileControl;
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl, ThisOutfitData);
@@ -125,7 +125,6 @@ namespace Cosplay_Academy
                     OutfitDecider.ResetDecider();
                 }
             }
-
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
                 ThisOutfitData.Clear_Firstpass();
@@ -134,14 +133,12 @@ namespace Cosplay_Academy
 
                 Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 
-                PluginData HairExtendedData;
-                HairExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+                PluginData HairExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
 
                 if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                     CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
 
-                PluginData MaterialEditorData;
-                MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
+                PluginData MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
                 #region ME Acc Import
                 var Chafile_ME_Data = new ME_List(MaterialEditorData, ThisOutfitData);
@@ -152,6 +149,7 @@ namespace Cosplay_Academy
                 #region ACI Data
                 List<int>[] HairKeep = new List<int>[Constants.Outfit_Size];
                 List<int>[] ACCKeep = new List<int>[Constants.Outfit_Size];
+
                 for (int i = 0; i < Constants.Outfit_Size; i++)
                 {
                     HairKeep[i] = new List<int>();
@@ -175,7 +173,8 @@ namespace Cosplay_Academy
                         ThisOutfitData.ClothingLoader.Character_Cosplay_Ready = Cosplay_Academy_Ready = MessagePackSerializer.Deserialize<bool>((byte[])Bytedata);
                     }
                 }
-                #endregion 
+                #endregion
+
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
                 for (int outfitnum = 0, n = Constants.Outfit_Size; outfitnum < n; outfitnum++)
                 {
@@ -234,6 +233,7 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+
                 #endregion
                 if (currentGameMode != GameMode.Maker)
                 {
@@ -241,7 +241,8 @@ namespace Cosplay_Academy
                 }
 
             }
-            if (!Settings.EnableSetting.Value && GameMode.MainGame == currentGameMode || !Settings.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode /*|| !ExpandedOutfit.Makerview.Value && GameMode.Unknown == currentGameMode*/)
+
+            if (!Settings.EnableSetting.Value && GameMode.MainGame == currentGameMode || !Settings.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode)
             {
                 return;
             }//if disabled don't run
