@@ -25,10 +25,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> EnableSets { get; private set; }
         public static ConfigEntry<bool> IndividualSets { get; private set; }
         public static ConfigEntry<bool> EnableDefaults { get; private set; }
-        public static ConfigEntry<bool> SumRandom { get; private set; }
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
-        public static ConfigEntry<bool> NonMatchWeight { get; private set; }
+
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 
 
@@ -59,7 +58,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
         public static ConfigEntry<int> KoiChance { get; private set; }
+        public static ConfigEntry<int>[] HStateWeights { get; private set; } = new ConfigEntry<int>[Enum.GetValues(typeof(HStates)).Length];
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
+        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
 
         public static ConfigEntry<bool> AccKeeper { get; private set; }
@@ -107,12 +108,13 @@ namespace Cosplay_Academy
 
             //Main Game
             EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
-            SumRandom = Config.Bind("Main Game", "Use Sum random", false, "Tables are added together and drawn from based on experience. This probably makes lewd outfits rarer. \nDefault based on Random with a cap of heroine experience lewd rolls are guaranteed if heroine lands on lewd roll.");
             AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, "Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Academy Ready character marked by Additional Card Info");
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
             RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Don't load new outfits");
             UnderwearStates = Config.Bind("Main Game", "Randomize Underwear: ACC_States", false, "");
-            NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
+            //NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
+
+            //StoryMode
             StoryModeChange = Config.Bind("Story Mode", "KoiKatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behaviour", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
             ChangeToClubatKoi = Config.Bind("Story Mode", "Change at Koikatsu Start", false, "Change Heroine to club outfit when they start in Koikatsu room");
@@ -143,8 +145,13 @@ namespace Cosplay_Academy
 
             //Probability
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
+            H_EXP_Choice = Config.Bind("Probability", "Constant ", Hexp.Randomize, "Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?");
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
+            for (int i = 0; i < HStateWeights.Length; i++)
+            {
+                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 1, new ConfigDescription($"Weight of {(HStates)i} category", new AcceptableValueRange<int>(0, 100)));
+            }
 
             //Additional Outfits
             AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");

@@ -98,7 +98,12 @@ namespace Cosplay_Academy
         public static Dictionary<string, bool> PluginResults = new Dictionary<string, bool>();
         private static string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
     }
-
+    public enum Hexp
+    {
+        Randomize,
+        RandConstant,
+        Maximize,
+    }
     public enum HStates
     {
         FirstTime, //0

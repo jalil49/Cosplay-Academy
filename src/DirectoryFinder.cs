@@ -50,21 +50,6 @@ namespace Cosplay_Academy
             int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
             FolderLists.RemoveAt(index);
             FoldersPath.AddRange(FolderLists);
-            if (Settings.NonMatchWeight.Value)
-            {
-                List<string> append = new List<string>();
-                foreach (var item in FoldersPath)
-                {
-                    if (!item.Contains(@"\Sets\"))
-                    {
-                        for (int i = 1; i < Directory.GetFiles(item, "*.png").Length; i++)
-                        {
-                            append.Add(item);
-                        }
-                    }
-                }
-                FoldersPath.AddRange(append);
-            }
 
             //ExpandedOutfit.Logger.LogWarning("\n\n");
 
@@ -83,7 +68,6 @@ namespace Cosplay_Academy
             {
                 if (folder.Contains(Narrow))
                 { Choosen.Add(folder); }
-
             }
             return Choosen;
         }

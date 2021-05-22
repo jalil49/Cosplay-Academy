@@ -12,7 +12,9 @@ namespace Cosplay_Academy
 
         private static ChaDefault ThisOutfitData;
         private static int HExperience;
+        private static int RandHExperience;
         private static int LastHeroineClub = -1;
+
         static OutfitDecider()
         {
             IsInitialized = false;
@@ -46,24 +48,24 @@ namespace Cosplay_Academy
             {
                 Get_Outfits();
                 IsInitialized = true;
-                foreach (OutfitData data in outfitData)
+                foreach (var data in outfitData)
                 {
                     data.Coordinate();
                 }
             }
             if (person != null)
             {
-                for (int i = 0; i < outfitData.Length; i++)
-                {
-                    outfitData[i].Anger = person.isAnger;
-                }
+                OutfitData.Anger = person.isAnger;
                 HExperience = (int)person.HExperience;
             }
             else
             {
                 HExperience = (int)Settings.MakerHstate.Value;
             }
+            RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
             UnderwearChoice();
+            Settings.Logger.LogDebug("Underwear completed");
+
             if (Settings.RandomizeUnderwearOnly.Value)
             {
                 if (person != null)
@@ -74,7 +76,6 @@ namespace Cosplay_Academy
             }
 
             //Set up Normal uniform
-            Settings.Logger.LogDebug("Uniform");
             UniformOutfit();
             Settings.Logger.LogDebug("Uniform completed");
 
@@ -127,6 +128,7 @@ namespace Cosplay_Academy
                 Settings.Logger.LogDebug(name + " is processed.");
             }
         }
+
         private static void Get_Outfits()
         {
             List<string> temp2;
@@ -184,6 +186,7 @@ namespace Cosplay_Academy
                 }
             }
         }
+
         private static void Setsfunction(string[] result)
         {
             foreach (string item in result)
@@ -224,10 +227,12 @@ namespace Cosplay_Academy
                 }
             }
         }
+
         private static void UniformOutfit()
         {
             Generalized_Assignment(Settings.MatchUniform.Value, 0, 0);
         }
+
         private static void AfterSchoolOutfit()
         {
             if (Settings.AfterUniform.Value /*|| ExpandedOutfit.EnableSets.Value && Constants.outfitpath[1].Contains(@"\Sets\")*/)
@@ -239,14 +244,17 @@ namespace Cosplay_Academy
                 ThisOutfitData.outfitpath[1] = ThisOutfitData.outfitpath[0];
             }
         }
+
         private static void GymOutfit()
         {
             Generalized_Assignment(Settings.MatchGym.Value, 2, 2);
         }
+
         private static void SwimOutfit()
         {
             Generalized_Assignment(Settings.MatchSwim.Value, 3, 3);
         }
+
         private static void ClubOutfit(int club)
         {
             switch (club)
@@ -270,6 +278,7 @@ namespace Cosplay_Academy
                 case 5:
                     Generalized_Assignment(Settings.MatchTrackClub.Value, 4, 8);
                     break;
+
                 default:
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.outfitpath[0];
                     break;
@@ -283,22 +292,35 @@ namespace Cosplay_Academy
                 }
             }
         }
+
         private static void CasualOutfit()
         {
             Generalized_Assignment(Settings.MatchCasual.Value, 5, 9);
         }
+
         private static void NightOutfit()
         {
             Generalized_Assignment(Settings.MatchNightwear.Value, 6, 10);
         }
+
         private static void UnderwearChoice()
         {
-            ThisOutfitData.Underwear = outfitData[12].RandomSet(HExperience, Settings.MatchUnderwear.Value);
+            Generalized_Assignment(Settings.MatchUnderwear.Value, Constants.Outfit_Size + 1, 12);
         }
+
         private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
-            return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+            switch (Settings.H_EXP_Choice.Value)
+            {
+                case Hexp.RandConstant:
+                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type);
+                case Hexp.Maximize:
+                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type);
+                default:
+                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+            }
         }
+
         private static string Grabber(string Input1, string result)
         {
             if (Input1 == @"\AfterSchool")
@@ -334,6 +356,7 @@ namespace Cosplay_Academy
             }
             return Input1;
         }
+
     }
 }
 

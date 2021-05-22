@@ -65,8 +65,9 @@ namespace Cosplay_Academy
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(false);
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
-            Underwear.LoadFile(ThisOutfitData.Underwear);
-            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.Underwear);
+            Underwear.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
+            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
+
             Underwear_ME_Data = new ME_List(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, true);
             //ExpandedOutfit.Logger.LogWarning($"underwear is {ThisOutfitData.Underwear}");
             int Original_Coord = ChaControl.fileStatus.coordinateType;
