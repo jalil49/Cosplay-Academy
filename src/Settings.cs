@@ -98,7 +98,6 @@ namespace Cosplay_Academy
                     CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
                 }
             }
-            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
             GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID);
 
@@ -112,6 +111,8 @@ namespace Cosplay_Academy
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
             RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Don't load new outfits");
             UnderwearStates = Config.Bind("Main Game", "Randomize Underwear: ACC_States", false, "");
+            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
+
             //NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
 
             //StoryMode
@@ -123,7 +124,7 @@ namespace Cosplay_Academy
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
-            IndividualSets = Config.Bind("Outfit Sets", "Don't Find Matching Sets", false, "Don't look for other sets that are shared per coordinate type");
+            IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, "Don't look for other sets that are shared per coordinate type");
             FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found");
 
             //match uniforms
@@ -145,17 +146,17 @@ namespace Cosplay_Academy
 
             //Probability
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
-            H_EXP_Choice = Config.Bind("Probability", "Constant ", Hexp.Randomize, "Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?");
-            KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
+            H_EXP_Choice = Config.Bind("Probability", "Constant", Hexp.Randomize, "Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?");
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
             for (int i = 0; i < HStateWeights.Length; i++)
             {
-                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 1, new ConfigDescription($"Weight of {(HStates)i} category", new AcceptableValueRange<int>(0, 100)));
+                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 1, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100)));
             }
 
             //Additional Outfits
             AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");
             SundayDate = Config.Bind("Additional Outfit", "Sunday Date Special", true, "Date will wear something different on Sunday");
+            Settings.Logger.LogWarning("2");
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable maker view", false, "View in creator mode\ndoesn't load School Uniform upon entering maker from Main Menu swap uniform type to view");
