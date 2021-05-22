@@ -10,8 +10,6 @@ namespace Cosplay_Academy
 {
     internal static class Hooks
     {
-        //static bool HairACC_firstPass = false;
-        //static Harmony _instance;
         public static void Init()
         {
             //Harmony _instance = new Harmony("Cosplay_Academy");
@@ -19,6 +17,7 @@ namespace Cosplay_Academy
             Harmony.CreateAndPatchAll(typeof(SetNextOutfitAtMove));
             //ShowTypeInfo(typeof(HairAccessoryCustomizer.HairAccessoryController));
         }
+
         private static void ShowTypeInfo(Type t)
         {
             Settings.Logger.LogWarning($"Name: {t.Name}");
@@ -27,6 +26,7 @@ namespace Cosplay_Academy
             Settings.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
             Settings.Logger.LogWarning("");
         }
+
         //private static bool CheckEndFinally(CodeInstruction instruction) => instruction.opcode == OpCodes.Endfinally;
         //[HarmonyPatch]
         //static class HairAccessoryPatch
@@ -44,7 +44,6 @@ namespace Cosplay_Academy
         //        //}
         //        return newInstructionSet;
         //    }
-
         //}
         //public delegate void FinishedLoadingHandler();
         //public static event FinishedLoadingHandler CharaFinallyFinished;
@@ -87,12 +86,13 @@ namespace Cosplay_Academy
         //    }
         //    _coordinate = temp;
         //}
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(WaitPoint), "SetWait")]
         private static void ChangeOutfitAtWaitPoint(WaitPoint __instance)
         {
             Base Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
-            if (Chara == null || Chara.chaCtrl == null || !Settings.StoryModeChange.Value)
+            if (Chara == null || Chara.chaCtrl || Chara.heroine == null || !Settings.StoryModeChange.Value || Chara.heroine.isTeacher)
             {
                 return;
             }
@@ -151,6 +151,7 @@ namespace Cosplay_Academy
             }
             //ExpandedOutfit.Logger.LogWarning($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
         }
+
         [HarmonyPatch]
         static class SetNextOutfitAtMove
         {
@@ -214,6 +215,7 @@ namespace Cosplay_Academy
                 }
             }
         }
+
         //[HarmonyPatch]
         //static class FirstActionPatch
         //{
@@ -226,25 +228,25 @@ namespace Cosplay_Academy
         //        }
         //    }
         //}
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(NPC), "ReStart")]
         private static void NPCRestart(NPC __instance)
         {
-            if (!Settings.StoryModeChange.Value)
-            {
-                if (Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
-                {
-                    __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    __instance.heroine.coordinates[0] = 4;
-                }
-                return;
-            }
             //change NPC's who start at club room to a koi outfit
             var ChaPara = __instance.chaCtrl.fileParam;
             var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-            if (ThisOutfitData == null || !ThisOutfitData.processed)
+            if (ThisOutfitData == null || !ThisOutfitData.processed || __instance.heroine.isTeacher)
             {
-                return;
+                if (!Settings.StoryModeChange.Value)
+                {
+                    if (Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
+                    {
+                        __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                        __instance.heroine.coordinates[0] = 4;
+                    }
+                    return;
+                }
             }
             ThisOutfitData.ChangeKoiToClub = false;
             ThisOutfitData.ChangeClubToKoi = false;
@@ -261,6 +263,7 @@ namespace Cosplay_Academy
                 //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
             }
         }
+
         //[HarmonyPrefix]
         //[HarmonyPatch(typeof(KK_Plugins.HairAccessoryCustomizer.HairAccessoryController), "OnCoordinateBeingLoaded")]
         //private static bool StopCustom()
