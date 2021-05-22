@@ -118,7 +118,6 @@ namespace Cosplay_Academy
             for (var i = 0; i < IDsToPurge.Count; i++)
             {
                 int texID = IDsToPurge[i];
-                if (ThisOutfitData.ME.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
                 ThisOutfitData.ME.TextureDictionary.Remove(texID);
             }
 

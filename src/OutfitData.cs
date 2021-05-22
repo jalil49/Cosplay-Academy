@@ -208,11 +208,14 @@ namespace Cosplay_Academy
 
     public class ChaDefault
     {
+        internal ChaControl ChaControl;
+        internal ChaFile Chafile;
+
         const int Number_Of_Extra_Outfits = 1; //underwear
 
         internal bool firstpass = true;
         internal bool processed = false;
-        //public string ChaName;//not actual name but ChaControl.Name
+
         internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.Outfit_Size];
         internal string[] outfitpath = new string[Constants.Outfit_Size + Number_Of_Extra_Outfits];
         internal string Underwear = "";
@@ -227,13 +230,12 @@ namespace Cosplay_Academy
         internal bool Changestate = false;
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
-        //internal CharaEvent CharaEvent;
+
         internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.Outfit_Size];
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
         internal ClothingLoader ClothingLoader = new ClothingLoader();
         internal List<bool>[] HairKeepQueue = new List<bool>[Constants.Outfit_Size];
         internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.Outfit_Size];
-        //internal List<bool>[] HairPluginQueue = new List<bool>[Constants.outfitpath];
 
         #region hair accessories
         public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.Outfit_Size];
@@ -241,15 +243,10 @@ namespace Cosplay_Academy
 
         #region Material Editor Save
         public ME_List[] Original_Accessory_Data = new ME_List[Constants.Outfit_Size];
-        //public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.Outfit_Size];
         #endregion
 
         #region Material Editor Return
-        public bool ME_Work = false;
         public ME_List Finished = new ME_List();
-        internal ChaControl ChaControl;
-        internal ChaFile Chafile;
-
         #endregion
 
         internal List<int>[] HairKeepReturn = new List<int>[Constants.Outfit_Size];
@@ -259,7 +256,6 @@ namespace Cosplay_Academy
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                //importDictionaryQueue[i] = new Dictionary<int, byte[]>();
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
                 outfitpath[i] = " ";
@@ -268,8 +264,6 @@ namespace Cosplay_Academy
                 HairKeepReturn[i] = new List<int>();
                 ACCKeepReturn[i] = new List<int>();
                 Original_Accessory_Data[i] = new ME_List();
-                //HairPluginQueue[i] = new List<bool>();
-                //ExtendedCharacterData[i] = new Dictionary<string, PluginData>();
             }
         }
 
@@ -282,15 +276,10 @@ namespace Cosplay_Academy
                 HairKeepReturn[i].Clear();
                 ACCKeepReturn[i].Clear();
                 Original_Accessory_Data[i].Clear();
-                //importDictionaryQueue[i].Clear();
                 HairAccQueue[i].Clear();
                 CoordinatePartsQueue[i].Clear();
             }
             ME.TextureDictionary.Clear();
-        }
-        public void Soft_Clear_ME()
-        {
-            ME_Work = false;
             Finished.Clear();
         }
     }

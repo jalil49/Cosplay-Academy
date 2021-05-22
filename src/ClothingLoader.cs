@@ -16,7 +16,7 @@ namespace Cosplay_Academy
 {
     public partial class ClothingLoader
     {
-        private Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> HairAccessories;
+        private Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
         private ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
@@ -55,11 +55,8 @@ namespace Cosplay_Academy
             ChaControl = character;
             ChaFile = file;
             ThisOutfitData = InputOutfitData;
-            ThisOutfitData.Soft_Clear_ME();
 
             Extract_Personal_Data();
-
-            HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 
             bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_inH").GetValue();
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(false);
@@ -84,7 +81,6 @@ namespace Cosplay_Academy
             //FullTime.Start();
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                UnderwearAccessoriesLocations[i].Clear();
                 ValidOutfits[i] = ThisOutfitData.outfitpath[i].EndsWith(".png");
                 if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
                 {
@@ -109,17 +105,21 @@ namespace Cosplay_Academy
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
 
-            ThisOutfitData.ME_Work = true;
             Run_Repacks(character, ThisOutfitData);
         }
 
         private void GeneralizedLoad(int outfitnum, bool load)
         {
+            UnderwearAccessoriesLocations[outfitnum].Clear();
+            HairAccessories.Remove(outfitnum);
+
             #region Queue accessories to keep
 
             var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             var HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+
             var UnderwearAccessoryStart = PartsQueue.Count();
+
             var HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
             var ACCKeepqueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
 
@@ -133,6 +133,7 @@ namespace Cosplay_Academy
             Underwearbools[outfitnum] = new bool[] { false, false, false };
 
             #endregion
+
             //Load new outfit
             ChaControl.fileStatus.coordinateType = outfitnum;
             var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
