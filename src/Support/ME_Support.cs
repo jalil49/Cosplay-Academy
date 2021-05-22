@@ -27,7 +27,7 @@ namespace Cosplay_Academy.ME
             if (pluginData?.data != null)
             {
                 Dictionary<int, byte[]> importedTextDic = new Dictionary<int, byte[]>();
-
+                var ObjectTypeList = new List<ObjectType> { ObjectType.Character, ObjectType.Hair };
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
                     Dictionary<int, byte[]> Des = MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic);
@@ -47,6 +47,10 @@ namespace Cosplay_Academy.ME
                         {
                             MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
                         }
+                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        {
+                            ThisOutfitData.Finished.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                        }
                     }
                 }
 
@@ -61,6 +65,10 @@ namespace Cosplay_Academy.ME
                             //ExpandedOutfit.Logger.LogWarning($"Renderer index: {loadedProperty.CoordinateIndex},\tSlot: {loadedProperty.Slot},\tName: {loadedProperty.RendererName}");
                             RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
+                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        {
+                            ThisOutfitData.Finished.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                        }
                     }
                 }
 
@@ -74,6 +82,10 @@ namespace Cosplay_Academy.ME
                         {
                             MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
+                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        {
+                            ThisOutfitData.Finished.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                        }
                     }
                 }
 
@@ -86,6 +98,10 @@ namespace Cosplay_Academy.ME
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
                             MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                        }
+                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        {
+                            ThisOutfitData.Finished.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
                     }
                 }
@@ -109,6 +125,19 @@ namespace Cosplay_Academy.ME
                             }
 
                             MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
+                        }
+                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        {
+                            //int? texID = null;
+                            if (loadedProperty.TexID != null)
+                            {
+                                if (!ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].ContainsKey((int)loadedProperty.TexID))
+                                {
+                                    ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
+                                }
+                                //texID = ImportDictionary[(int)loadedProperty.TexID];
+                            }
+                            ThisOutfitData.Finished.MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
                         }
                     }
                 }
@@ -453,7 +482,7 @@ namespace Cosplay_Academy.ME
                     {
                         var loadedProperty = properties[i];
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
-                            ThisOutfitData.ReturnMaterialShade.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                            ThisOutfitData.Finished.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
                     }
                 }
 
@@ -464,7 +493,7 @@ namespace Cosplay_Academy.ME
                     {
                         var loadedProperty = properties[i];
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
-                            ThisOutfitData.ReturnRenderer.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            ThisOutfitData.Finished.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                     }
                 }
 
@@ -475,7 +504,7 @@ namespace Cosplay_Academy.ME
                     {
                         var loadedProperty = properties[i];
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
-                            ThisOutfitData.ReturnMaterialFloat.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            ThisOutfitData.Finished.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                     }
                 }
 
@@ -486,7 +515,7 @@ namespace Cosplay_Academy.ME
                     {
                         var loadedProperty = properties[i];
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
-                            ThisOutfitData.ReturnMaterialColor.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            ThisOutfitData.Finished.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                     }
                 }
 
@@ -503,15 +532,24 @@ namespace Cosplay_Academy.ME
                                 texID = importDictionaryList[(int)loadedProperty.TexID];
 
                             MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
-                            ThisOutfitData.ReturnMaterialTexture.Add(newTextureProperty);
+                            ThisOutfitData.Finished.MaterialTextureProperty.Add(newTextureProperty);
                         }
                     }
                 }
             }
         }
 
+        public void Clear()
+        {
+            MaterialShader.Clear();
+            RendererProperty.Clear();
+            MaterialColorProperty.Clear();
+            MaterialFloatProperty.Clear();
+            MaterialTextureProperty.Clear();
+        }
+
         #region Return List of Properties
-        public List<RendererProperty> R_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
+        public List<RendererProperty> Render_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
             var List = RendererProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
             if (List.Count == 0)
@@ -520,7 +558,7 @@ namespace Cosplay_Academy.ME
             }
             return List;
         }
-        public List<MaterialFloatProperty> F_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
+        public List<MaterialFloatProperty> Float_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
             var List = MaterialFloatProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
             if (List.Count == 0)
@@ -529,7 +567,7 @@ namespace Cosplay_Academy.ME
             }
             return List;
         }
-        public List<MaterialColorProperty> C_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
+        public List<MaterialColorProperty> Color_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
             var List = MaterialColorProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
             if (List.Count == 0)
@@ -539,7 +577,7 @@ namespace Cosplay_Academy.ME
             }
             return List;
         }
-        public List<MaterialTextureProperty> T_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
+        public List<MaterialTextureProperty> Texture_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
             var List = MaterialTextureProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
             if (List.Count == 0)
@@ -548,7 +586,7 @@ namespace Cosplay_Academy.ME
             }
             return List;
         }
-        public List<MaterialShader> S_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
+        public List<MaterialShader> Shader_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
             var List = MaterialShader.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
             if (List.Count == 0)

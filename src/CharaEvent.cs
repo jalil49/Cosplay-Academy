@@ -128,7 +128,7 @@ namespace Cosplay_Academy
 
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
-                ThisOutfitData.Clear_ME();
+                ThisOutfitData.Clear_Firstpass();
 
                 WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
@@ -202,6 +202,7 @@ namespace Cosplay_Academy
                     var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
 
+                    var ME_ACC_Storage = ThisOutfitData.Original_Accessory_Data[outfitnum];
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
@@ -216,11 +217,11 @@ namespace Cosplay_Academy
                             }
 
                             #region ME_Data
-                            ThisOutfitData.MaterialColorPropertyQueue[outfitnum].AddRange(Chafile_ME_Data.C_FindAll(ObjectTypeList, i, outfitnum));
-                            ThisOutfitData.MaterialFloatPropertyQueue[outfitnum].AddRange(Chafile_ME_Data.F_FindAll(ObjectTypeList, i, outfitnum));
-                            ThisOutfitData.MaterialShaderQueue[outfitnum].AddRange(Chafile_ME_Data.S_FindAll(ObjectTypeList, i, outfitnum));
-                            ThisOutfitData.MaterialTexturePropertyQueue[outfitnum].AddRange(Chafile_ME_Data.T_FindAll(ObjectTypeList, i, outfitnum));
-                            ThisOutfitData.RendererPropertyQueue[outfitnum].AddRange(Chafile_ME_Data.R_FindAll(ObjectTypeList, i, outfitnum));
+                            ME_ACC_Storage.MaterialColorProperty.AddRange(Chafile_ME_Data.Color_FindAll(ObjectTypeList, i, outfitnum));
+                            ME_ACC_Storage.MaterialFloatProperty.AddRange(Chafile_ME_Data.Float_FindAll(ObjectTypeList, i, outfitnum));
+                            ME_ACC_Storage.MaterialShader.AddRange(Chafile_ME_Data.Shader_FindAll(ObjectTypeList, i, outfitnum));
+                            ME_ACC_Storage.MaterialTextureProperty.AddRange(Chafile_ME_Data.Texture_FindAll(ObjectTypeList, i, outfitnum));
+                            ME_ACC_Storage.RendererProperty.AddRange(Chafile_ME_Data.Render_FindAll(ObjectTypeList, i, outfitnum));
                             #endregion
 
                             ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);

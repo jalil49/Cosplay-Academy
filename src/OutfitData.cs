@@ -242,21 +242,13 @@ namespace Cosplay_Academy
         #endregion
 
         #region Material Editor Save
-        public List<RendererProperty>[] RendererPropertyQueue = new List<RendererProperty>[Constants.Outfit_Size];
-        public List<MaterialFloatProperty>[] MaterialFloatPropertyQueue = new List<MaterialFloatProperty>[Constants.Outfit_Size];
-        public List<MaterialColorProperty>[] MaterialColorPropertyQueue = new List<MaterialColorProperty>[Constants.Outfit_Size];
-        public List<MaterialTextureProperty>[] MaterialTexturePropertyQueue = new List<MaterialTextureProperty>[Constants.Outfit_Size];
-        public List<MaterialShader>[] MaterialShaderQueue = new List<MaterialShader>[Constants.Outfit_Size];
+        public ME_List[] Original_Accessory_Data = new ME_List[Constants.Outfit_Size];
         public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.Outfit_Size];
         #endregion
 
         #region Material Editor Return
         public bool ME_Work = false;
-        public List<RendererProperty> ReturnRenderer = new List<RendererProperty>();
-        public List<MaterialFloatProperty> ReturnMaterialFloat = new List<MaterialFloatProperty>();
-        public List<MaterialColorProperty> ReturnMaterialColor = new List<MaterialColorProperty>();
-        public List<MaterialTextureProperty> ReturnMaterialTexture = new List<MaterialTextureProperty>();
-        public List<MaterialShader> ReturnMaterialShade = new List<MaterialShader>();
+        public ME_List Finished = new ME_List();
         internal ChaControl ChaControl;
         internal ChaFile Chafile;
 
@@ -269,11 +261,6 @@ namespace Cosplay_Academy
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                RendererPropertyQueue[i] = new List<RendererProperty>();
-                MaterialFloatPropertyQueue[i] = new List<MaterialFloatProperty>();
-                MaterialColorPropertyQueue[i] = new List<MaterialColorProperty>();
-                MaterialTexturePropertyQueue[i] = new List<MaterialTextureProperty>();
-                MaterialShaderQueue[i] = new List<MaterialShader>();
                 importDictionaryQueue[i] = new Dictionary<int, byte[]>();
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
@@ -282,41 +269,30 @@ namespace Cosplay_Academy
                 ACCKeepQueue[i] = new List<bool>();
                 HairKeepReturn[i] = new List<int>();
                 ACCKeepReturn[i] = new List<int>();
+                Original_Accessory_Data[i] = new ME_List();
                 //HairPluginQueue[i] = new List<bool>();
                 //ExtendedCharacterData[i] = new Dictionary<string, PluginData>();
             }
         }
-        public void Clear_ME()
+        public void Clear_Firstpass()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                RendererPropertyQueue[i].Clear();
-                MaterialFloatPropertyQueue[i].Clear();
-                MaterialColorPropertyQueue[i].Clear();
-                MaterialTexturePropertyQueue[i].Clear();
-                MaterialShaderQueue[i].Clear();
+                HairKeepQueue[i].Clear();
+                ACCKeepQueue[i].Clear();
+                HairKeepReturn[i].Clear();
+                ACCKeepReturn[i].Clear();
+                Original_Accessory_Data[i].Clear();
                 importDictionaryQueue[i].Clear();
                 HairAccQueue[i].Clear();
                 CoordinatePartsQueue[i].Clear();
-                //outfitpath[i] = " ";
             }
             ME.TextureDictionary.Clear();
-            //ME_Work = false;
-            //ReturnRenderer.Clear();
-            //ReturnMaterialFloat.Clear();
-            //ReturnMaterialColor.Clear();
-            //ReturnMaterialTexture.Clear();
-            //ReturnMaterialShade.Clear();
-            Soft_Clear_ME();
         }
         public void Soft_Clear_ME()
         {
             ME_Work = false;
-            ReturnRenderer.Clear();
-            ReturnMaterialFloat.Clear();
-            ReturnMaterialColor.Clear();
-            ReturnMaterialTexture.Clear();
-            ReturnMaterialShade.Clear();
+            Finished.Clear();
         }
     }
 }

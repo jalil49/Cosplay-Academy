@@ -94,7 +94,7 @@ namespace Cosplay_Academy
 
             List<int> IDsToPurge = new List<int>();
             foreach (int texID in ThisOutfitData.ME.TextureDictionary.Keys)
-                if (ThisOutfitData.ReturnMaterialTexture.All(x => x.TexID != texID))
+                if (ThisOutfitData.Finished.MaterialTextureProperty.All(x => x.TexID != texID))
                     IDsToPurge.Add(texID);
 
             for (var i = 0; i < IDsToPurge.Count; i++)
@@ -105,28 +105,28 @@ namespace Cosplay_Academy
             else
                 SaveData.data.Add("TextureDictionary", null);
 
-            if (ThisOutfitData.ReturnRenderer.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnRenderer));
+            if (ThisOutfitData.Finished.RendererProperty.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.RendererProperty));
             else
                 SaveData.data.Add("RendererPropertyList", null);
 
-            if (ThisOutfitData.ReturnMaterialFloat.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialFloat));
+            if (ThisOutfitData.Finished.MaterialFloatProperty.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialFloatProperty));
             else
                 SaveData.data.Add("MaterialFloatPropertyList", null);
 
-            if (ThisOutfitData.ReturnMaterialColor.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialColor));
+            if (ThisOutfitData.Finished.MaterialColorProperty.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialColorProperty));
             else
                 SaveData.data.Add("MaterialColorPropertyList", null);
 
-            if (ThisOutfitData.ReturnMaterialTexture.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialTexture));
+            if (ThisOutfitData.Finished.MaterialTextureProperty.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialTextureProperty));
             else
                 SaveData.data.Add("MaterialTexturePropertyList", null);
 
-            if (ThisOutfitData.ReturnMaterialShade.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialShade));
+            if (ThisOutfitData.Finished.MaterialShader.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialShader));
             else
                 SaveData.data.Add("MaterialShaderList", null);
 
