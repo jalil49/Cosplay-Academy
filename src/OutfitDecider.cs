@@ -305,7 +305,7 @@ namespace Cosplay_Academy
 
         private static void UnderwearChoice()
         {
-            Generalized_Assignment(Settings.MatchUnderwear.Value, Constants.Outfit_Size + 1, 12);
+            Generalized_Assignment(Settings.MatchUnderwear.Value, Constants.Outfit_Size, 12);
         }
 
         private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)

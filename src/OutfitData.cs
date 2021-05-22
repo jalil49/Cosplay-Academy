@@ -73,7 +73,7 @@ namespace Cosplay_Academy
                     {
                         EXP--;
                         Tries = 0;
-                        while (Outfits_Per_State[EXP].Length < 2)
+                        while (EXP > -1 && Outfits_Per_State[EXP].Length < 2)
                         {
                             EXP--;
                         }
@@ -115,7 +115,7 @@ namespace Cosplay_Academy
 
             if (Weight > 0)
             {
-                var RandResult = UnityEngine.Random.Range(0, Weight + 1);
+                var RandResult = UnityEngine.Random.Range(0, Weight);
                 for (int i = 0; i < level; i++)
                 {
                     if (RandResult < Settings.HStateWeights[i].Value)
@@ -130,12 +130,12 @@ namespace Cosplay_Academy
                                 Result = Outfits_Per_State[EXP][UnityEngine.Random.Range(0, Outfits_Per_State[EXP].Length)];
                             }
                             else
-                            { Result = Match_Outfit_Paths[EXP]; }
+                                Result = Match_Outfit_Paths[EXP];
                             if (Tries++ == 3 || Match)
                             {
                                 EXP--;
                                 Tries = 0;
-                                while (Outfits_Per_State[EXP].Length < 2)
+                                while (EXP > -1 && Outfits_Per_State[EXP].Length < 1)
                                 {
                                     EXP--;
                                 }
@@ -241,7 +241,7 @@ namespace Cosplay_Academy
 
         #region Material Editor Save
         public ME_List[] Original_Accessory_Data = new ME_List[Constants.Outfit_Size];
-        public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.Outfit_Size];
+        //public Dictionary<int, byte[]>[] importDictionaryQueue = new Dictionary<int, byte[]>[Constants.Outfit_Size];
         #endregion
 
         #region Material Editor Return
@@ -259,7 +259,7 @@ namespace Cosplay_Academy
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                importDictionaryQueue[i] = new Dictionary<int, byte[]>();
+                //importDictionaryQueue[i] = new Dictionary<int, byte[]>();
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
                 outfitpath[i] = " ";
@@ -272,6 +272,7 @@ namespace Cosplay_Academy
                 //ExtendedCharacterData[i] = new Dictionary<string, PluginData>();
             }
         }
+
         public void Clear_Firstpass()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -281,7 +282,7 @@ namespace Cosplay_Academy
                 HairKeepReturn[i].Clear();
                 ACCKeepReturn[i].Clear();
                 Original_Accessory_Data[i].Clear();
-                importDictionaryQueue[i].Clear();
+                //importDictionaryQueue[i].Clear();
                 HairAccQueue[i].Clear();
                 CoordinatePartsQueue[i].Clear();
             }
