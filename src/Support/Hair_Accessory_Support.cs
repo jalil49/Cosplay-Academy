@@ -12,22 +12,16 @@ namespace Cosplay_Academy.Hair
         public class HairAccessoryInfo
         {
             [Key("HairGloss")]
-            public bool HairGloss = ColorMatchDefault;
+            public bool HairGloss;
             [Key("ColorMatch")]
-            public bool ColorMatch = HairGlossDefault;
+            public bool ColorMatch;
             [Key("OutlineColor")]
-            public Color OutlineColor = OutlineColorDefault;
+            public Color OutlineColor;
             [Key("AccessoryColor")]
-            public Color AccessoryColor = AccessoryColorDefault;
+            public Color AccessoryColor;
             [Key("HairLength")]
-            public float HairLength = HairLengthDefault;
-
+            public float HairLength;
         }
-        private static readonly bool ColorMatchDefault = true;
-        private static readonly bool HairGlossDefault = true;
-        private static Color OutlineColorDefault = Color.black;
-        private static Color AccessoryColorDefault = Color.red;
-        private static readonly float HairLengthDefault = 0;
         #endregion
     }
 }
