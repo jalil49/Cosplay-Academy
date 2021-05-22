@@ -85,11 +85,11 @@ namespace Cosplay_Academy
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i].Clear();
-                bool valid = ThisOutfitData.outfitpath[i].EndsWith(".png");
-                if (valid || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
+                ValidOutfits[i] = ThisOutfitData.outfitpath[i].EndsWith(".png");
+                if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
                 {
-                    GeneralizedLoad(i, valid);
-                    if (valid)
+                    GeneralizedLoad(i, ValidOutfits[i]);
+                    if (ValidOutfits[i])
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + ThisOutfitData.outfitpath[i]);
                     }
@@ -243,9 +243,6 @@ namespace Cosplay_Academy
 
                         PartsQueue.Enqueue(Underwear_PartsInfos[i]);
                         HairQueue.Enqueue(ACCdata);
-                        //}
-                        //ExpandedOutfit.Logger.LogWarning($"Queued new part: {i} ID: {Underwear_PartsInfos[i].id}");
-
                     }
                 }
 
