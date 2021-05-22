@@ -85,8 +85,23 @@ namespace Cosplay_Academy
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i].Clear();
-                GeneralizedLoad(i);
-                Settings.Logger.LogDebug($"loaded {i} " + ThisOutfitData.outfitpath[i]);
+                bool valid = ThisOutfitData.outfitpath[i].EndsWith(".png");
+                if (valid || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
+                {
+                    GeneralizedLoad(i, valid);
+                    if (valid)
+                    {
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + ThisOutfitData.outfitpath[i]);
+                    }
+                    else
+                    {
+                        Settings.Logger.LogDebug($"loaded Default with changed underwear");
+                    }
+                }
+                else
+                {
+                    Settings.Logger.LogDebug($"No valid outfits found for {(ChaFileDefine.CoordinateType)i}");
+                }
             }
 
             Original_ME_Data(); //Load existing where applicable
@@ -98,7 +113,7 @@ namespace Cosplay_Academy
             Run_Repacks(character, ThisOutfitData);
         }
 
-        private void GeneralizedLoad(int outfitnum)
+        private void GeneralizedLoad(int outfitnum, bool load)
         {
             #region Queue accessories to keep
 
@@ -121,7 +136,11 @@ namespace Cosplay_Academy
             //Load new outfit
             ChaControl.fileStatus.coordinateType = outfitnum;
             var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
-            ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
+
+            if (load)
+            {
+                ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
+            }
 
             #region MakeUp
             if (MakeUpKeep[outfitnum])
