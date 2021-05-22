@@ -14,17 +14,17 @@ namespace Cosplay_Academy
     }
     static class Constants
     {
-        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
-        //I'd imagine it's possible to scale clubs easily
         internal static void PluginCheck()
         {
             foreach (var item in PluginList)
             {
                 PluginResults[item] = Settings.TryfindPluginInstance(item);
-                Settings.Logger.LogWarning($"Found {item}: {PluginResults[item]}");
+                //Settings.Logger.LogWarning($"Found {item}: {PluginResults[item]}");
             }
         }
 
+        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
+        //I'd imagine it's possible to scale clubs easily
         public static readonly string[] InputStrings = {
             @"\School Uniform" , //0
             @"\AfterSchool", //1
@@ -96,7 +96,7 @@ namespace Cosplay_Academy
 };
         public static string[] Kill_Data = new string[] { };
         public static Dictionary<string, bool> PluginResults = new Dictionary<string, bool>();
-        private static string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
+        private static readonly string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
     }
     public enum Hexp
     {
