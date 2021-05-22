@@ -21,20 +21,27 @@ namespace Cosplay_Academy.ME
         public ME_List()
         { }
 
-        //Full Chafile List
+        //Copy
+        public ME_List(ME_List Original)
+        {
+            MaterialShader = new List<MaterialShader>(Original.MaterialShader);
+            RendererProperty = new List<RendererProperty>(Original.RendererProperty);
+            MaterialColorProperty = new List<MaterialColorProperty>(Original.MaterialColorProperty);
+            MaterialFloatProperty = new List<MaterialFloatProperty>(Original.MaterialFloatProperty);
+            MaterialTextureProperty = new List<MaterialTextureProperty>(Original.MaterialTextureProperty);
+        }
+
+        //Full Chafile Accessory Load
         public ME_List(PluginData pluginData, ChaDefault ThisOutfitData)
         {
             if (pluginData?.data != null)
             {
-                Dictionary<int, byte[]> importedTextDic = new Dictionary<int, byte[]>();
-                var ObjectTypeList = new List<ObjectType> { ObjectType.Character, ObjectType.Hair };
+                Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
+
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
-                    Dictionary<int, byte[]> Des = MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic);
-                    foreach (var x in Des)
-                    {
-                        importedTextDic.Add(x.Key, x.Value);
-                    }
+                    foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
+                        importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
                 }
 
                 if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
@@ -43,16 +50,15 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
+                        var temp = new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                            MaterialShader.Add(temp);
                         }
-                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
-                        {
-                            ThisOutfitData.Finished.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
-                        }
+                        ThisOutfitData.Finished.MaterialShader.Add(temp);
                     }
                 }
+
 
                 if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
                 {
@@ -60,32 +66,27 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
+                        var temp = new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            //ExpandedOutfit.Logger.LogWarning($"Renderer index: {loadedProperty.CoordinateIndex},\tSlot: {loadedProperty.Slot},\tName: {loadedProperty.RendererName}");
-                            RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            RendererProperty.Add(temp);
                         }
-                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
-                        {
-                            ThisOutfitData.Finished.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
+                        ThisOutfitData.Finished.RendererProperty.Add(temp);
                     }
                 }
-
                 if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
                 {
                     var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
+
+                        var temp = new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                            MaterialFloatProperty.Add(temp);
                         }
-                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
-                        {
-                            ThisOutfitData.Finished.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
+                        ThisOutfitData.Finished.MaterialFloatProperty.Add(temp);
                     }
                 }
 
@@ -95,14 +96,10 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
+                        var temp = new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
-                        {
-                            MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
-                        {
-                            ThisOutfitData.Finished.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
+                            MaterialColorProperty.Add(temp);
+                        ThisOutfitData.Finished.MaterialColorProperty.Add(temp);
                     }
                 }
 
@@ -112,32 +109,94 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
+                        int? texID = null;
+                        if (loadedProperty.TexID != null)
+                            texID = importDictionaryList[(int)loadedProperty.TexID];
+                        var temp = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            //int? texID = null;
-                            if (loadedProperty.TexID != null)
-                            {
-                                if (!ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].ContainsKey((int)loadedProperty.TexID))
-                                {
-                                    ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
-                                }
-                                //texID = ImportDictionary[(int)loadedProperty.TexID];
-                            }
-
-                            MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
+                            MaterialTextureProperty.Add(temp);
                         }
-                        else if (ObjectTypeList.Contains(loadedProperty.ObjectType))
+                        ThisOutfitData.Finished.MaterialTextureProperty.Add(temp);
+                    }
+                }
+            }
+            else
+            {
+                NoData = true;
+            }
+        }
+
+        //
+        public ME_List(PluginData pluginData, ChaDefault ThisOutfitData, List<ObjectType> objectTypes)
+        {
+            if (pluginData?.data != null)
+            {
+                Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
+
+                if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
+                {
+                    foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
+                        importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
+                }
+
+                if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypes.Contains(loadedProperty.ObjectType))
+                            MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
+                    }
+                }
+
+                if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypes.Contains(loadedProperty.ObjectType))
+                            RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypes.Contains(loadedProperty.ObjectType))
+                            MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypes.Contains(loadedProperty.ObjectType))
+                            MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                    }
+                }
+
+                if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
+                {
+                    var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
+                    for (var i = 0; i < properties.Count; i++)
+                    {
+                        var loadedProperty = properties[i];
+                        if (objectTypes.Contains(loadedProperty.ObjectType))
                         {
-                            //int? texID = null;
+                            int? texID = null;
                             if (loadedProperty.TexID != null)
-                            {
-                                if (!ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].ContainsKey((int)loadedProperty.TexID))
-                                {
-                                    ThisOutfitData.importDictionaryQueue[loadedProperty.CoordinateIndex].Add((int)loadedProperty.TexID, importedTextDic[(int)loadedProperty.TexID]);
-                                }
-                                //texID = ImportDictionary[(int)loadedProperty.TexID];
-                            }
-                            ThisOutfitData.Finished.MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.TexID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
+                                texID = importDictionaryList[(int)loadedProperty.TexID];
+
+                            MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
                         }
                     }
                 }
@@ -149,7 +208,7 @@ namespace Cosplay_Academy.ME
         }
 
         //Coordinate Load
-        public ME_List(PluginData pluginData, ChaDefault ThisOutfitData, int outfitnum = 0)
+        public ME_List(PluginData pluginData, ChaDefault ThisOutfitData, int outfitnum)
         {
             if (pluginData?.data != null)
             {
@@ -242,11 +301,10 @@ namespace Cosplay_Academy.ME
                     };
                 Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
 
-                int offset = ThisOutfitData.ME.TextureDictionary.Count;
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
                     foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                        importDictionaryList[x.Key + offset] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
+                        importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
                 }
 
                 if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
@@ -353,7 +411,7 @@ namespace Cosplay_Academy.ME
                         {
                             int? texID = null;
                             if (loadedProperty.TexID != null)
-                                texID = importDictionaryList[(int)loadedProperty.TexID + offset];
+                                texID = importDictionaryList[(int)loadedProperty.TexID];
                             if (LoadAll)
                                 for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
                                     MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
@@ -549,9 +607,10 @@ namespace Cosplay_Academy.ME
         }
 
         #region Return List of Properties
+        //specific Accessory
         public List<RendererProperty> Render_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
-            var List = RendererProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
+            var List = RendererProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot && x.CoordinateIndex == outfitnum);
             if (List.Count == 0)
             {
                 List.Add(new RendererProperty(ObjectType.Unknown, outfitnum, slot, "", RendererProperties.Enabled, "", ""));
@@ -560,7 +619,7 @@ namespace Cosplay_Academy.ME
         }
         public List<MaterialFloatProperty> Float_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
-            var List = MaterialFloatProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
+            var List = MaterialFloatProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot && x.CoordinateIndex == outfitnum);
             if (List.Count == 0)
             {
                 List.Add(new MaterialFloatProperty(ObjectType.Unknown, outfitnum, slot, "", "", "", ""));
@@ -569,7 +628,7 @@ namespace Cosplay_Academy.ME
         }
         public List<MaterialColorProperty> Color_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
-            var List = MaterialColorProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
+            var List = MaterialColorProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot && x.CoordinateIndex == outfitnum);
             if (List.Count == 0)
             {
                 Color color = new Color(0, 0, 0);
@@ -579,7 +638,7 @@ namespace Cosplay_Academy.ME
         }
         public List<MaterialTextureProperty> Texture_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
-            var List = MaterialTextureProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
+            var List = MaterialTextureProperty.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot && x.CoordinateIndex == outfitnum);
             if (List.Count == 0)
             {
                 List.Add(new MaterialTextureProperty(ObjectType.Unknown, outfitnum, slot, "", ""));
@@ -588,7 +647,7 @@ namespace Cosplay_Academy.ME
         }
         public List<MaterialShader> Shader_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
         {
-            var List = MaterialShader.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot);
+            var List = MaterialShader.FindAll(x => ObjectList.Contains(x.ObjectType) && x.Slot == slot && x.CoordinateIndex == outfitnum);
             if (List.Count == 0)
             {
                 List.Add(new MaterialShader(ObjectType.Unknown, outfitnum, slot, "", 0, 0));
@@ -598,6 +657,8 @@ namespace Cosplay_Academy.ME
         #endregion
     }
 
+
+    #region Original Stuff
     public class ME_Support
     {
         public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
@@ -616,7 +677,6 @@ namespace Cosplay_Academy.ME
         }
     }
 
-    #region Original Stuff
     public enum ObjectType
     {
         /// <summary>

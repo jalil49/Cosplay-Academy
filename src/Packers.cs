@@ -90,15 +90,20 @@ namespace Cosplay_Academy
 
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
+            var ME_Save = ThisOutfitData.Finished;
             var SaveData = new PluginData();
 
             List<int> IDsToPurge = new List<int>();
             foreach (int texID in ThisOutfitData.ME.TextureDictionary.Keys)
-                if (ThisOutfitData.Finished.MaterialTextureProperty.All(x => x.TexID != texID))
+                if (ME_Save.MaterialTextureProperty.All(x => x.TexID != texID))
                     IDsToPurge.Add(texID);
 
             for (var i = 0; i < IDsToPurge.Count; i++)
-                ThisOutfitData.ME.TextureDictionary.Remove(i);
+            {
+                int texID = IDsToPurge[i];
+                if (ThisOutfitData.ME.TextureDictionary.TryGetValue(texID, out var val)) val.Dispose();
+                ThisOutfitData.ME.TextureDictionary.Remove(texID);
+            }
 
             if (ThisOutfitData.ME.TextureDictionary.Count > 0)
                 SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(ThisOutfitData.ME.TextureDictionary.ToDictionary(pair => pair.Key, pair => pair.Value.Data)));
@@ -112,21 +117,22 @@ namespace Cosplay_Academy
 
             if (ThisOutfitData.Finished.MaterialFloatProperty.Count > 0)
                 SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialFloatProperty));
+            if (ME_Save.MaterialFloatProperty.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ME_Save.MaterialFloatProperty));
             else
                 SaveData.data.Add("MaterialFloatPropertyList", null);
 
-            if (ThisOutfitData.Finished.MaterialColorProperty.Count > 0)
                 SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialColorProperty));
             else
                 SaveData.data.Add("MaterialColorPropertyList", null);
 
-            if (ThisOutfitData.Finished.MaterialTextureProperty.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialTextureProperty));
+            if (ME_Save.MaterialTextureProperty.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(ME_Save.MaterialTextureProperty));
             else
                 SaveData.data.Add("MaterialTexturePropertyList", null);
 
-            if (ThisOutfitData.Finished.MaterialShader.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialShader));
+            if (ME_Save.MaterialShader.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(ME_Save.MaterialShader));
             else
                 SaveData.data.Add("MaterialShaderList", null);
 
@@ -188,6 +194,10 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+                    storage.Clear();
+                    foreach (var item in CurrentCharacterData)
+                    {
+                        storage[item.Key] = item.Value;
                 if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
                 {
                     if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)

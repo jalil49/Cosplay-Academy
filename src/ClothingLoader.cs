@@ -39,7 +39,7 @@ namespace Cosplay_Academy
         private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
         public bool Character_Cosplay_Ready = false;
         #endregion
-
+        private readonly bool[] ValidOutfits = new bool[Constants.Outfit_Size];
         public ClothingLoader()
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
@@ -877,13 +877,6 @@ namespace Cosplay_Academy
                 while (TextureQueue.Count != 0)
                 {
                     MaterialTextureProperty ME_Info = TextureQueue.Dequeue();
-                    if (!ThisOutfitData.ME_Work)
-                    {
-                        if (ThisOutfitData.importDictionaryQueue[ME_Info.CoordinateIndex].TryGetValue((int)ME_Info.TexID, out byte[] imgbyte))
-                        {
-                            ME_Info.TexID = ThisOutfitData.ME.SetAndGetTextureID(imgbyte);
-                        }
-                    }
                     ME_Info.Slot = ACCpostion;
                     MaterialTexture.Add(ME_Info);
                     if (TextureQueue.Count == 0 || TextureQueue.Peek().Slot != slot)
