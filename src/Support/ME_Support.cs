@@ -11,6 +11,7 @@ namespace Cosplay_Academy.ME
     public class ME_List
     {
         public bool NoData = false;
+
         public List<MaterialShader> MaterialShader = new List<MaterialShader>();
         public List<RendererProperty> RendererProperty = new List<RendererProperty>();
         public List<MaterialColorProperty> MaterialColorProperty = new List<MaterialColorProperty>();
@@ -50,12 +51,12 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
-                        var temp = new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal);
+                        //var temp = new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            MaterialShader.Add(temp);
+                            MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
                         }
-                        ThisOutfitData.Finished.MaterialShader.Add(temp);
+                        //ThisOutfitData.Finished.MaterialShader.Add(temp);
                     }
                 }
 
@@ -66,12 +67,12 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
-                        var temp = new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
+                        //var temp = new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            RendererProperty.Add(temp);
+                            RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
-                        ThisOutfitData.Finished.RendererProperty.Add(temp);
+                        //ThisOutfitData.Finished.RendererProperty.Add(temp);
                     }
                 }
                 if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
@@ -81,12 +82,12 @@ namespace Cosplay_Academy.ME
                     {
                         var loadedProperty = properties[i];
 
-                        var temp = new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
+                        //var temp = new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            MaterialFloatProperty.Add(temp);
+                            MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                         }
-                        ThisOutfitData.Finished.MaterialFloatProperty.Add(temp);
+                        //ThisOutfitData.Finished.MaterialFloatProperty.Add(temp);
                     }
                 }
 
@@ -96,10 +97,10 @@ namespace Cosplay_Academy.ME
                     for (var i = 0; i < properties.Count; i++)
                     {
                         var loadedProperty = properties[i];
-                        var temp = new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
+                        //var temp = new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
-                            MaterialColorProperty.Add(temp);
-                        ThisOutfitData.Finished.MaterialColorProperty.Add(temp);
+                            MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
+                        //ThisOutfitData.Finished.MaterialColorProperty.Add(temp);
                     }
                 }
 
@@ -112,12 +113,12 @@ namespace Cosplay_Academy.ME
                         int? texID = null;
                         if (loadedProperty.TexID != null)
                             texID = importDictionaryList[(int)loadedProperty.TexID];
-                        var temp = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
+                        //var temp = new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
                         if (loadedProperty.ObjectType == ObjectType.Accessory)
                         {
-                            MaterialTextureProperty.Add(temp);
+                            MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
                         }
-                        ThisOutfitData.Finished.MaterialTextureProperty.Add(temp);
+                        //ThisOutfitData.Finished.MaterialTextureProperty.Add(temp);
                     }
                 }
             }
