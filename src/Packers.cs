@@ -90,106 +90,45 @@ namespace Cosplay_Academy
 
         private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
-            ChaFile ChaFile = ChaControl.chaFile;
-            List<RendererProperty> RendererPropertyList = new List<RendererProperty>();
-            List<MaterialFloatProperty> MaterialFloatPropertyList = new List<MaterialFloatProperty>();
-            List<MaterialColorProperty> MaterialColorPropertyList = new List<MaterialColorProperty>();
-            List<MaterialTextureProperty> MaterialTexturePropertyList = new List<MaterialTextureProperty>();
-            List<MaterialShader> MaterialShaderList = new List<MaterialShader>();
-            Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
-
-            #region UnPackCoordinates
-            if (!ThisOutfitData.ME_Work)
-            {
-                for (int outfitnum = 0; outfitnum < ChaFile.coordinate.Length; outfitnum++)
-                {
-                    var data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.materialeditor");
-                    if (data?.data != null)
-                    {
-                        if (data.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
-                            foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                                importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
-
-                        if (data.data.TryGetValue("MaterialShaderList", out var materialShaders) && materialShaders != null)
-                        {
-                            MaterialShaderList = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])materialShaders);
-                        }
-
-                        if (data.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
-                        {
-                            RendererPropertyList = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
-                        {
-                            MaterialFloatPropertyList = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
-                        {
-                            MaterialColorPropertyList = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
-                        }
-
-                        if (data.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
-                        {
-                            var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
-                            for (var i = 0; i < properties.Count; i++)
-                            {
-                                var loadedProperty = properties[i];
-                                int? texID = null;
-                                if (loadedProperty.TexID != null)
-                                    texID = importDictionaryList[(int)loadedProperty.TexID];
-
-                                MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
-                                MaterialTexturePropertyList.Add(newTextureProperty);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                RendererPropertyList = ThisOutfitData.ReturnRenderer;
-                MaterialFloatPropertyList = ThisOutfitData.ReturnMaterialFloat;
-                MaterialColorPropertyList = ThisOutfitData.ReturnMaterialColor;
-                MaterialTexturePropertyList = ThisOutfitData.ReturnMaterialTexture;
-                MaterialShaderList = ThisOutfitData.ReturnMaterialShade;
-            }
-            #endregion
-            #region Pack
             var SaveData = new PluginData();
+
+            List<int> IDsToPurge = new List<int>();
+            foreach (int texID in ThisOutfitData.ME.TextureDictionary.Keys)
+                if (ThisOutfitData.ReturnMaterialTexture.All(x => x.TexID != texID))
+                    IDsToPurge.Add(texID);
+
+            for (var i = 0; i < IDsToPurge.Count; i++)
+                ThisOutfitData.ME.TextureDictionary.Remove(i);
 
             if (ThisOutfitData.ME.TextureDictionary.Count > 0)
                 SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(ThisOutfitData.ME.TextureDictionary.ToDictionary(pair => pair.Key, pair => pair.Value.Data)));
             else
                 SaveData.data.Add("TextureDictionary", null);
 
-            if (RendererPropertyList.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(RendererPropertyList));
+            if (ThisOutfitData.ReturnRenderer.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnRenderer));
             else
                 SaveData.data.Add("RendererPropertyList", null);
 
-            if (MaterialFloatPropertyList.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(MaterialFloatPropertyList));
+            if (ThisOutfitData.ReturnMaterialFloat.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialFloat));
             else
                 SaveData.data.Add("MaterialFloatPropertyList", null);
 
-            if (MaterialColorPropertyList.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(MaterialColorPropertyList));
+            if (ThisOutfitData.ReturnMaterialColor.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialColor));
             else
                 SaveData.data.Add("MaterialColorPropertyList", null);
 
-            if (MaterialTexturePropertyList.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(MaterialTexturePropertyList));
+            if (ThisOutfitData.ReturnMaterialTexture.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialTexture));
             else
                 SaveData.data.Add("MaterialTexturePropertyList", null);
 
-            if (MaterialShaderList.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(MaterialShaderList));
+            if (ThisOutfitData.ReturnMaterialShade.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(ThisOutfitData.ReturnMaterialShade));
             else
                 SaveData.data.Add("MaterialShaderList", null);
-
-            #endregion
 
             SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl, ThisOutfitData);
         }
