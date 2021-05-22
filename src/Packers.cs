@@ -83,7 +83,24 @@ namespace Cosplay_Academy
 
         private void HairACC_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
+            if (ValidOutfits.Any(x => !x))
+            {
+                var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+                if (ChafileData?.data != null && ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
+                {
+                    var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Cosplay_Academy.Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
+                    for (int i = 0; i < Constants.Outfit_Size; i++)
+                    {
+                        if (!ValidOutfits[i] || !original.ContainsKey(i))
+                        {
+                            continue;
+                        }
+                        HairAccessories[i] = original[i];
+                    }
+                }
+            }
             var HairPlugin = new PluginData();
+
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
             SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
         }
@@ -110,19 +127,18 @@ namespace Cosplay_Academy
             else
                 SaveData.data.Add("TextureDictionary", null);
 
-            if (ThisOutfitData.Finished.RendererProperty.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.RendererProperty));
+            if (ME_Save.RendererProperty.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(ME_Save.RendererProperty));
             else
                 SaveData.data.Add("RendererPropertyList", null);
 
-            if (ThisOutfitData.Finished.MaterialFloatProperty.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialFloatProperty));
             if (ME_Save.MaterialFloatProperty.Count > 0)
                 SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(ME_Save.MaterialFloatProperty));
             else
                 SaveData.data.Add("MaterialFloatPropertyList", null);
 
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ThisOutfitData.Finished.MaterialColorProperty));
+            if (ME_Save.MaterialColorProperty.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(ME_Save.MaterialColorProperty));
             else
                 SaveData.data.Add("MaterialColorPropertyList", null);
 
@@ -194,10 +210,16 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+
+                if (!ValidOutfits[outfitnum])
+                {
                     storage.Clear();
                     foreach (var item in CurrentCharacterData)
                     {
                         storage[item.Key] = item.Value;
+                    }
+                }
+
                 if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
                 {
                     if (ChaControl.chaFile.coordinate[outfitnum].clothes.parts[0].id != 0)
@@ -285,6 +307,11 @@ namespace Cosplay_Academy
 
         private void ClothingUnlocker_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
+            Dictionary<int, bool> FailureBools = new Dictionary<int, bool>();
+            var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.clothingunlocker");
+            if (Original != null)
+                if (Original.data.TryGetValue("ClothingUnlocked", out var loadedClothingUnlocked) && loadedClothingUnlocked != null)
+                    FailureBools = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])loadedClothingUnlocked);
             PluginData SavedData;
             Dictionary<int, bool> Final = new Dictionary<int, bool>();
             bool result;
@@ -294,7 +321,15 @@ namespace Cosplay_Academy
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
                 if (SavedData != null && SavedData.data.TryGetValue("ClothingUnlockedCoordinate", out var loadedClothingUnlocked))
                 {
-                    result = (bool)loadedClothingUnlocked;
+                    if (!ValidOutfits[i])
+                    {
+                        FailureBools.TryGetValue(i, out var Failed);
+                        result = (bool)loadedClothingUnlocked || Failed;
+                    }
+                    else
+                    {
+                        result = (bool)loadedClothingUnlocked;
+                    }
                 }
                 Final.Add(i, result);
             }
@@ -305,6 +340,25 @@ namespace Cosplay_Academy
 
         private void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
+            Dictionary<int, Pushup.ClothData> OriginalBra = new Dictionary<int, Pushup.ClothData>();
+            Dictionary<int, Pushup.ClothData> OriginalTop = new Dictionary<int, Pushup.ClothData>();
+            Pushup.BodyData Body = new Pushup.BodyData();
+            var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.pushup");
+            if (Original != null)
+            {
+                if (Original.data.TryGetValue("Pushup_BraData", out var bytes) && bytes != null)
+                {
+                    OriginalBra = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
+                }
+                if (Original.data.TryGetValue("Pushup_TopData", out bytes) && bytes != null)
+                {
+                    OriginalTop = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
+                }
+                if (Original.data.TryGetValue("Pushup_BodyData", out bytes) && bytes != null)
+                {
+                    Body = MessagePackSerializer.Deserialize<Pushup.BodyData>((byte[])bytes);
+                }
+            }
             Pushup.ClothData newBraData;
             Pushup.ClothData newTopData;
 
@@ -316,13 +370,27 @@ namespace Cosplay_Academy
                 newBraData = new Pushup.ClothData();
                 newTopData = new Pushup.ClothData();
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.pushup");
-                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
+                if (SavedData != null)
                 {
-                    newBraData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
+                    if (SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
+                    {
+                        newBraData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
+                    }
+                    if (SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
+                    {
+                        newTopData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
+                    }
                 }
-                if (SavedData != null && SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
+                if (!ValidOutfits[i])
                 {
-                    newTopData = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
+                    if (OriginalBra.ContainsKey(i))
+                    {
+                        newBraData = OriginalBra[i];
+                    }
+                    if (OriginalBra.ContainsKey(i))
+                    {
+                        newTopData = OriginalTop[i];
+                    }
                 }
                 FinalBra.Add(i, newBraData);
                 FinalTop.Add(i, newTopData);
@@ -330,7 +398,7 @@ namespace Cosplay_Academy
             var data = new PluginData();
             data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
             data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
-            //data.data.Add("Pushup_BodyData", null);
+            data.data.Add("Pushup_BodyData", MessagePackSerializer.Serialize(Body));
             SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl, ThisOutfitData);
 
             //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
@@ -422,8 +490,24 @@ namespace Cosplay_Academy
 
         private void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
-            PluginData SavedData;
             List<DynamicBoneData> Modifiers = new List<DynamicBoneData>();
+            if (ValidOutfits.Any(x => !x))
+            {
+                List<int> Invalid = new List<int>();
+                for (int i = 0; i < Constants.Outfit_Size; i++)
+                    if (!ValidOutfits[i])
+                    {
+                        Invalid.Add(i);
+                    }
+
+                var original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.dynamicboneeditor");
+                if (original?.data != null)
+                {
+                    if (original.data.TryGetValue("AccessoryDynamicBoneData", out var ByteData) && ByteData != null)
+                        Modifiers = MessagePackSerializer.Deserialize<List<DynamicBoneData>>((byte[])ByteData).FindAll(x => Invalid.Contains(x.CoordinateIndex));
+                }
+            }
+            PluginData SavedData;
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
@@ -455,9 +539,59 @@ namespace Cosplay_Academy
 
         private void AccessoryStateSync_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
+            Dictionary<int, AccStateSync.OutfitTriggerInfo> OriginalCharaTriggerInfo = new Dictionary<int, AccStateSync.OutfitTriggerInfo>();
+            Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>> OriginalCharaVirtualGroupInfo = new Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>>();
+            if (ValidOutfits.Any(x => !x))
+            {
+                var ExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "madevil.kk.ass");
+                if (ExtendedData != null && ExtendedData.data.TryGetValue("OutfitTriggerInfo", out var loadedOutfitTriggerInfo) && loadedOutfitTriggerInfo != null)
+                {
+                    if (ExtendedData.version < 2)
+                    {
+                        var OldCharaTriggerInfo = MessagePackSerializer.Deserialize<List<AccStateSync.OutfitTriggerInfoV1>>((byte[])loadedOutfitTriggerInfo);
+                        for (int i = 0; i < 7; i++)
+                        {
+                            OriginalCharaTriggerInfo[i] = AccStateSync.UpgradeOutfitTriggerInfoV1(OldCharaTriggerInfo[i]);
+                        }
+                    }
+                    else
+                        OriginalCharaTriggerInfo = MessagePackSerializer.Deserialize<Dictionary<int, AccStateSync.OutfitTriggerInfo>>((byte[])loadedOutfitTriggerInfo);
+
+                    if (ExtendedData.version < 5)
+                    {
+                        if (ExtendedData.data.TryGetValue("CharaVirtualGroupNames", out var loadedCharaVirtualGroupNames) && loadedCharaVirtualGroupNames != null)
+                        {
+                            if (ExtendedData.version < 2)
+                            {
+                                var OldCharaVirtualGroupNames = MessagePackSerializer.Deserialize<List<Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
+                                if (OldCharaVirtualGroupNames.Count() == 7)
+                                {
+                                    for (int i = 0; i < 7; i++)
+                                    {
+                                        Dictionary<string, string> VirtualGroupNames = AccStateSync.UpgradeVirtualGroupNamesV1(OldCharaVirtualGroupNames[i]);
+                                        OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(VirtualGroupNames);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Dictionary<int, Dictionary<string, string>> CharaVirtualGroupNames = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
+                                for (int i = 0; i < 7; i++)
+                                    OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(CharaVirtualGroupNames[i]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (ExtendedData.data.TryGetValue("CharaVirtualGroupInfo", out var loadedCharaVirtualGroupInfo) && loadedCharaVirtualGroupInfo != null)
+                            OriginalCharaVirtualGroupInfo = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>>>((byte[])loadedCharaVirtualGroupInfo);
+                    }
+                }
+            }
             PluginData SavedData = new PluginData() { version = 5 };
             Dictionary<int, AccStateSync.OutfitTriggerInfo> CharaTriggerInfo = new Dictionary<int, AccStateSync.OutfitTriggerInfo>();
             Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>> CharaVirtualGroupInfo = new Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>>();
+
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 CharaTriggerInfo.Add(outfitnum, new AccStateSync.OutfitTriggerInfo(outfitnum));
@@ -488,6 +622,18 @@ namespace Cosplay_Academy
                             CharaVirtualGroupInfo[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<string, AccStateSync.VirtualGroupInfo>>((byte[])loadedOutfitVirtualGroupInfo);
                     }
                 }
+                if (!ValidOutfits[outfitnum])
+                {
+                    if (OriginalCharaTriggerInfo.ContainsKey(outfitnum))
+                    {
+                        CharaTriggerInfo[outfitnum] = OriginalCharaTriggerInfo[outfitnum];
+                    }
+                    if (OriginalCharaVirtualGroupInfo.ContainsKey(outfitnum))
+                    {
+                        CharaVirtualGroupInfo[outfitnum] = OriginalCharaVirtualGroupInfo[outfitnum];
+                    }
+                }
+
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     int postion = 0;
@@ -585,11 +731,8 @@ namespace Cosplay_Academy
             List<bool>[] RelativeThemeBool = new List<bool>[Constants.Outfit_Size];
             List<Color[]>[] colors = new List<Color[]>[Constants.Outfit_Size];
             Dictionary<int, int>[] ACC_Theme_Dictionary = new Dictionary<int, int>[Constants.Outfit_Size];
-            Dictionary<int, bool>[] ColorRelativity = new Dictionary<int, bool>[Constants.Outfit_Size];
             Dictionary<int, List<int[]>>[] Relative_ACC_Dictionary = new Dictionary<int, List<int[]>>[Constants.Outfit_Size];
             bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
-            Color[] PersonalColorSkew = new Color[Constants.Outfit_Size];
-            bool[] PersonalClothingBools = new bool[9];
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
@@ -597,8 +740,34 @@ namespace Cosplay_Academy
                 RelativeThemeBool[i] = new List<bool>();
                 colors[i] = new List<Color[]>();
                 ACC_Theme_Dictionary[i] = new Dictionary<int, int>();
-                ColorRelativity[i] = new Dictionary<int, bool>();
                 Relative_ACC_Dictionary[i] = new Dictionary<int, List<int[]>>();
+            }
+            if (ValidOutfits.Any(x => !x))
+            {
+                var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Themes");
+                if (MyData != null)
+                {
+                    if (MyData.data.TryGetValue("Theme_Names", out var ByteData) && ByteData != null)
+                    {
+                        ThemeNames = MessagePackSerializer.Deserialize<List<string>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Theme_dic", out ByteData) && ByteData != null)
+                    {
+                        ACC_Theme_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Color_Theme_dic", out ByteData) && ByteData != null)
+                    {
+                        colors = MessagePackSerializer.Deserialize<List<Color[]>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Relative_Theme_Bools", out ByteData) && ByteData != null)
+                    {
+                        RelativeThemeBool = MessagePackSerializer.Deserialize<List<bool>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Relative_ACC_Dictionary", out ByteData) && ByteData != null)
+                    {
+                        Relative_ACC_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, List<int[]>>[]>((byte[])ByteData);
+                    }
+                }
             }
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
@@ -616,10 +785,6 @@ namespace Cosplay_Academy
                     if (MyData.data.TryGetValue("Color_Theme_dic", out var S_ColorThemeDic) && S_ColorThemeDic != null)
                     {
                         colors[outfitnum] = MessagePackSerializer.Deserialize<List<Color[]>>((byte[])S_ColorThemeDic);
-                    }
-                    if (MyData.data.TryGetValue("Color_Relativity", out var S_Relativity) && S_Relativity != null)
-                    {
-                        ColorRelativity[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])S_Relativity);
                     }
                     if (MyData.data.TryGetValue("Relative_Theme_Bools", out var S_Theme_Bools) && S_Theme_Bools != null)
                     {
@@ -642,47 +807,31 @@ namespace Cosplay_Academy
             SavedData.data.Add("Theme_Names", MessagePackSerializer.Serialize(ThemeNames));
             SavedData.data.Add("Theme_dic", MessagePackSerializer.Serialize(ACC_Theme_Dictionary));
             SavedData.data.Add("Color_Theme_dic", MessagePackSerializer.Serialize(colors));
-            SavedData.data.Add("Color_Relativity", MessagePackSerializer.Serialize(ColorRelativity));
             SavedData.data.Add("Relative_Theme_Bools", MessagePackSerializer.Serialize(RelativeThemeBool));
             SavedData.data.Add("Relative_ACC_Dictionary", MessagePackSerializer.Serialize(Relative_ACC_Dictionary));
-            var personaldata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Themes");
-            if (personaldata != null)
-            {
-                if (personaldata.data.TryGetValue("Personal_Clothing_Save", out var S_Clothing_Save) && S_Clothing_Save != null)
-                {
-                    PersonalClothingBools = MessagePackSerializer.Deserialize<bool[]>((byte[])S_Clothing_Save);
-                }
-                if (personaldata.data.TryGetValue("Color_Skews", out var S_PersonalColorSkew) && S_PersonalColorSkew != null)
-                {
-                    PersonalColorSkew = MessagePackSerializer.Deserialize<Color[]>((byte[])S_PersonalColorSkew);
-                }
-            }
-            SavedData.data.Add("Personal_Clothing_Save", MessagePackSerializer.Serialize(PersonalClothingBools));
-            SavedData.data.Add("Color_Skews", MessagePackSerializer.Serialize(PersonalColorSkew));
 
             SetExtendedData("Accessory_Themes", SavedData, ChaControl, ThisOutfitData);
         }
 
         private void Additional_Card_Info_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
-            int CoordinateLength = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;
-            List<int>[] AccKeep = new List<int>[CoordinateLength];
-            List<int>[] HairAcc = new List<int>[CoordinateLength];
-            bool[][] CoordinateSaveBools = new bool[CoordinateLength][];
-            Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[CoordinateLength];
-            Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[CoordinateLength];
-            int[] HstateType_Restriction = new int[CoordinateLength];
-            int[] ClubType_Restriction = new int[CoordinateLength];
-            bool[][] Height_Restriction = new bool[CoordinateLength][];
-            bool[][] Breastsize_Restriction = new bool[CoordinateLength][];
-            int[] CoordinateType = new int[CoordinateLength];
-            int[] CoordinateSubType = new int[CoordinateLength];
-            string[] CreatorNames = new string[CoordinateLength];
-            string[] SetNames = new string[CoordinateLength];
-            string[] SubSetNames = new string[CoordinateLength];
-            int[] GenderType = new int[CoordinateLength];
+            List<int>[] AccKeep = new List<int>[Constants.Outfit_Size];
+            List<int>[] HairAcc = new List<int>[Constants.Outfit_Size];
+            bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
+            Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
+            Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
+            int[] HstateType_Restriction = new int[Constants.Outfit_Size];
+            int[] ClubType_Restriction = new int[Constants.Outfit_Size];
+            bool[][] Height_Restriction = new bool[Constants.Outfit_Size][];
+            bool[][] Breastsize_Restriction = new bool[Constants.Outfit_Size][];
+            int[] CoordinateType = new int[Constants.Outfit_Size];
+            int[] CoordinateSubType = new int[Constants.Outfit_Size];
+            string[] CreatorNames = new string[Constants.Outfit_Size];
+            string[] SetNames = new string[Constants.Outfit_Size];
+            string[] SubSetNames = new string[Constants.Outfit_Size];
+            int[] GenderType = new int[Constants.Outfit_Size];
 
-            for (int outfitnum = 0; outfitnum < CoordinateLength; outfitnum++)
+            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 AccKeep[outfitnum] = new List<int>();
                 HairAcc[outfitnum] = new List<int>();
@@ -699,6 +848,27 @@ namespace Cosplay_Academy
                 SetNames[outfitnum] = "";
                 SubSetNames[outfitnum] = "";
                 GenderType[outfitnum] = 0;
+            }
+
+            if (ValidOutfits.Any(x => !x))
+            {
+                var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
+                if (MyData != null)
+                {
+                    if (MyData.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                    {
+                        HairAcc = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                    {
+                        AccKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
+                    }
+                }
+            }
+
+            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            {
+
                 var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
                 if (MyData != null)
                 {
@@ -793,31 +963,51 @@ namespace Cosplay_Academy
 
         private void Accessory_Parents_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
         {
-            int CoordinateLength = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;
+            Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[Constants.Outfit_Size];
+            Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[Constants.Outfit_Size];
+            Dictionary<int, Vector3[,]>[] Relative_Data = new Dictionary<int, Vector3[,]>[Constants.Outfit_Size];
 
-            Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[CoordinateLength];
-            Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[CoordinateLength];
-            Dictionary<int, Vector3[,]>[] Relative_Data = new Dictionary<int, Vector3[,]>[CoordinateLength];
-
-            for (int outfitnum = 0; outfitnum < CoordinateLength; outfitnum++)
+            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 Bindings[outfitnum] = new Dictionary<int, List<int>>();
                 Custom_Names[outfitnum] = new Dictionary<string, int>();
                 Relative_Data[outfitnum] = new Dictionary<int, Vector3[,]>();
-                var Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
+            }
+            if (ValidOutfits.Any(x => !x))
+            {
+                var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Parents");
+                if (MyData != null)
+                {
+                    if (MyData.data.TryGetValue("Parenting_Data", out var ByteData) && ByteData != null)
+                    {
+                        Bindings = MessagePackSerializer.Deserialize<Dictionary<int, List<int>>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Parenting_Names", out ByteData) && ByteData != null)
+                    {
+                        Custom_Names = MessagePackSerializer.Deserialize<Dictionary<string, int>[]>((byte[])ByteData);
+                    }
+                    if (MyData.data.TryGetValue("Relative_Data", out ByteData) && ByteData != null)
+                    {
+                        Relative_Data = MessagePackSerializer.Deserialize<Dictionary<int, Vector3[,]>[]>((byte[])ByteData);
+                    }
+                }
+            }
+            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            {
+                var Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_Parents");
                 if (Data != null)
                 {
                     if (Data.data.TryGetValue("Parenting_Data", out var ByteData) && ByteData != null)
                     {
-                        Bindings = MessagePackSerializer.Deserialize<Dictionary<int, List<int>>[]>((byte[])ByteData);
+                        Bindings[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, List<int>>>((byte[])ByteData);
                     }
                     if (Data.data.TryGetValue("Parenting_Names", out ByteData) && ByteData != null)
                     {
-                        Custom_Names = MessagePackSerializer.Deserialize<Dictionary<string, int>[]>((byte[])ByteData);
+                        Custom_Names[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<string, int>>((byte[])ByteData);
                     }
                     if (Data.data.TryGetValue("Relative_Data", out ByteData) && ByteData != null)
                     {
-                        Relative_Data = MessagePackSerializer.Deserialize<Dictionary<int, Vector3[,]>[]>((byte[])ByteData);
+                        Relative_Data[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, Vector3[,]>>((byte[])ByteData);
                     }
                 }
             }
@@ -843,7 +1033,32 @@ namespace Cosplay_Academy
                 ACC_State_array[outfitnum] = new Dictionary<int, int[]>();
                 ACC_Name_Dictionary[outfitnum] = new Dictionary<int, string>();
                 ACC_Parented_Dictionary[outfitnum] = new Dictionary<int, bool>();
-
+            }
+            if (ValidOutfits.Any(x => !x))
+            {
+                var Extended_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_States");
+                if (Extended_Data != null)
+                {
+                    if (Extended_Data.data.TryGetValue("ACC_Binding_Dictionary", out var ByteData) && ByteData != null)
+                    {
+                        ACC_Binding_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
+                    }
+                    if (Extended_Data.data.TryGetValue("ACC_State_array", out ByteData) && ByteData != null)
+                    {
+                        ACC_State_array = MessagePackSerializer.Deserialize<Dictionary<int, int[]>[]>((byte[])ByteData);
+                    }
+                    if (Extended_Data.data.TryGetValue("ACC_Name_Dictionary", out ByteData) && ByteData != null)
+                    {
+                        ACC_Name_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, string>[]>((byte[])ByteData);
+                    }
+                    if (Extended_Data.data.TryGetValue("ACC_Parented_Dictionary", out ByteData) && ByteData != null)
+                    {
+                        ACC_Parented_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, bool>[]>((byte[])ByteData);
+                    }
+                }
+            }
+            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            {
                 var State_data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
                 if (State_data != null)
                 {
