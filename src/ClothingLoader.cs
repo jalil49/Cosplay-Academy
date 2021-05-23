@@ -72,9 +72,10 @@ namespace Cosplay_Academy
             ChaFile = file;
 
             Extract_Personal_Data();
-
+            ThisOutfitData.Finished.Clear();
             bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_inH").GetValue();
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(false);
+
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
             Underwear.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
@@ -418,7 +419,10 @@ namespace Cosplay_Academy
                     }
                 }
             }
-
+            else
+            {
+                ACCpostion = 20 + NewRAW.Count;
+            }
             //original accessories
             bool print = true;
             while (PartsQueue.Count != 0)
@@ -506,13 +510,8 @@ namespace Cosplay_Academy
             Queue<ChaFileAccessory.PartsInfo> PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
             Queue<HairSupport.HairAccessoryInfo> HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
 
-            Queue<bool> ACCKeepQueue = new Queue<bool>();
-            Queue<bool> HairKeepQueue = new Queue<bool>();
-            if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
-            {
-                HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
-                ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
-            }
+            Queue<bool> ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+            Queue<bool> HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
             List<int> HairKeepResult = new List<int>();
             List<int> ACCKeepResult = new List<int>();
 
@@ -720,7 +719,7 @@ namespace Cosplay_Academy
 
             ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
 
-            if (Constants.PluginResults["Additional_Card_Info"] && InsideMaker)
+            if (InsideMaker && Constants.PluginResults["Additional_Card_Info"])
             {
                 SaveData = new PluginData();
                 Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
