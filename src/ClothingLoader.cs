@@ -23,7 +23,20 @@ namespace Cosplay_Academy
 
         private static bool InsideMaker = false;
 
+        #region MoreAccessories
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+        private MoreAccessories.CharAdditionalData More_Char_Data
+        {
+            get
+            {
+                if (_accessoriesByChar.TryGetValue(ChaFile, out MoreAccessories.CharAdditionalData data) == false)
+                {
+                    data = new MoreAccessories.CharAdditionalData();
+                }
+                return data;
+            }
+        }
+        #endregion
 
         #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
@@ -182,13 +195,8 @@ namespace Cosplay_Academy
                 }
             }
 
-            if (_accessoriesByChar.TryGetValue(ChaFile, out MoreAccessories.CharAdditionalData data) == false)
-            {
-                data = new MoreAccessories.CharAdditionalData();
-                _accessoriesByChar.Add(ChaFile, data);
-            }
-
-            if (data.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
+            var Local_More_Char = More_Char_Data;
+            if (Local_More_Char.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
@@ -464,16 +472,16 @@ namespace Cosplay_Academy
             }
 
             HairAccessories.Add(outfitnum, HairAccInfo);
-            while (data.infoAccessory.Count < data.nowAccessories.Count)
-                data.infoAccessory.Add(null);
-            while (data.objAccessory.Count < data.nowAccessories.Count)
-                data.objAccessory.Add(null);
-            while (data.objAcsMove.Count < data.nowAccessories.Count)
-                data.objAcsMove.Add(new GameObject[2]);
-            while (data.cusAcsCmp.Count < data.nowAccessories.Count)
-                data.cusAcsCmp.Add(null);
-            while (data.showAccessories.Count < data.nowAccessories.Count)
-                data.showAccessories.Add(true);
+            while (Local_More_Char.infoAccessory.Count < Local_More_Char.nowAccessories.Count)
+                Local_More_Char.infoAccessory.Add(null);
+            while (Local_More_Char.objAccessory.Count < Local_More_Char.nowAccessories.Count)
+                Local_More_Char.objAccessory.Add(null);
+            while (Local_More_Char.objAcsMove.Count < Local_More_Char.nowAccessories.Count)
+                Local_More_Char.objAcsMove.Add(new GameObject[2]);
+            while (Local_More_Char.cusAcsCmp.Count < Local_More_Char.nowAccessories.Count)
+                Local_More_Char.cusAcsCmp.Add(null);
+            while (Local_More_Char.showAccessories.Count < Local_More_Char.nowAccessories.Count)
+                Local_More_Char.showAccessories.Add(true);
 
             ThisOutfitData.Finished.MaterialColorProperty.AddRange(Import_ME_Data.MaterialColorProperty);
 
@@ -523,13 +531,8 @@ namespace Cosplay_Academy
             #endregion
 
             //Apply pre-existing Accessories in any open slot or final slots.
-            WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-            if (_accessoriesByChar.TryGetValue(ChaFile, out MoreAccessories.CharAdditionalData data) == false)
-            {
-                data = new MoreAccessories.CharAdditionalData();
-                _accessoriesByChar.Add(ChaFile, data);
-            }
-            List<ChaFileAccessory.PartsInfo> MoreACCData = data.nowAccessories;
+            var Local_More = More_Char_Data;
+            List<ChaFileAccessory.PartsInfo> MoreACCData = Local_More.nowAccessories;
             ChaFileAccessory.PartsInfo[] OriginalData = ChaControl.nowCoordinate.accessory.parts;
 
             #region Reassign Existing Accessories
@@ -670,16 +673,16 @@ namespace Cosplay_Academy
                 ACCpostion++;
             }
 
-            while (data.infoAccessory.Count < data.nowAccessories.Count)
-                data.infoAccessory.Add(null);
-            while (data.objAccessory.Count < data.nowAccessories.Count)
-                data.objAccessory.Add(null);
-            while (data.objAcsMove.Count < data.nowAccessories.Count)
-                data.objAcsMove.Add(new GameObject[2]);
-            while (data.cusAcsCmp.Count < data.nowAccessories.Count)
-                data.cusAcsCmp.Add(null);
-            while (data.showAccessories.Count < data.nowAccessories.Count)
-                data.showAccessories.Add(true);
+            while (Local_More.infoAccessory.Count < Local_More.nowAccessories.Count)
+                Local_More.infoAccessory.Add(null);
+            while (Local_More.objAccessory.Count < Local_More.nowAccessories.Count)
+                Local_More.objAccessory.Add(null);
+            while (Local_More.objAcsMove.Count < Local_More.nowAccessories.Count)
+                Local_More.objAcsMove.Add(new GameObject[2]);
+            while (Local_More.cusAcsCmp.Count < Local_More.nowAccessories.Count)
+                Local_More.cusAcsCmp.Add(null);
+            while (Local_More.showAccessories.Count < Local_More.nowAccessories.Count)
+                Local_More.showAccessories.Add(true);
             #endregion
 
             #region Pack
