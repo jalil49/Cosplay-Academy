@@ -17,35 +17,35 @@ namespace Cosplay_Academy
 {
     public partial class ClothingLoader
     {
-        public void Run_Repacks(ChaControl character, ChaDefault ThisOutfitData)
+        public void Run_Repacks(ChaControl character)
         {
-            ME_RePack(character, ThisOutfitData);
-            KCOX_RePack(character, ThisOutfitData);
-            KKABM_Repack(character, ThisOutfitData);
-            DynamicBone_Repack(character, ThisOutfitData);
-            PushUp_RePack(character, ThisOutfitData);
-            ClothingUnlocker_RePack(character, ThisOutfitData);
-            HairACC_Repack(character, ThisOutfitData);
+            ME_RePack(character);
+            KCOX_RePack(character);
+            KKABM_Repack(character);
+            DynamicBone_Repack(character);
+            PushUp_RePack(character);
+            ClothingUnlocker_RePack(character);
+            HairACC_Repack(character);
 
             if (Constants.PluginResults["Additional_Card_Info"])
             {
-                Additional_Card_Info_Repack(character, ThisOutfitData);
+                Additional_Card_Info_Repack(character);
             }
             if (Constants.PluginResults["Accessory_States"])
             {
-                Accessory_States_Repack(character, ThisOutfitData);
+                Accessory_States_Repack(character);
             }
             if (Constants.PluginResults["madevil.kk.ass"])
             {
-                AccessoryStateSync_Repack(character, ThisOutfitData);
+                AccessoryStateSync_Repack(character);
             }
             if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
             {
-                Accessory_Parents_Repack(character, ThisOutfitData);
+                Accessory_Parents_Repack(character);
             }
             if (Constants.PluginResults["Accessory_Themes"] && InsideMaker)
             {
-                Accessory_Themes_Repack(character, ThisOutfitData);
+                Accessory_Themes_Repack(character);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Cosplay_Academy
                 ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
         }
 
-        private void HairACC_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void HairACC_Repack(ChaControl ChaControl)
         {
             if (ValidOutfits.Any(x => !x))
             {
@@ -102,10 +102,10 @@ namespace Cosplay_Academy
             var HairPlugin = new PluginData();
 
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
-            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl, ThisOutfitData);
+            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl);
         }
 
-        private void ME_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void ME_RePack(ChaControl ChaControl)
         {
             var ME_Save = ThisOutfitData.Finished;
             var SaveData = new PluginData();
@@ -151,10 +151,10 @@ namespace Cosplay_Academy
             else
                 SaveData.data.Add("MaterialShaderList", null);
 
-            SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl, ThisOutfitData);
+            SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl);
         }
 
-        private void KCOX_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void KCOX_RePack(ChaControl ChaControl)
         {
             PluginData SavedData;
             var data = new PluginData { version = 1 };
@@ -301,10 +301,10 @@ namespace Cosplay_Academy
             }
 
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
+            SetExtendedData("KCOX", data, ChaControl);
         }
 
-        private void ClothingUnlocker_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void ClothingUnlocker_RePack(ChaControl ChaControl)
         {
             Dictionary<int, bool> FailureBools = new Dictionary<int, bool>();
             var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.clothingunlocker");
@@ -334,10 +334,10 @@ namespace Cosplay_Academy
             }
             var data = new PluginData();
             data.data.Add("ClothingUnlocked", MessagePackSerializer.Serialize(Final));
-            SetExtendedData("com.deathweasel.bepinex.clothingunlocker", data, ChaControl, ThisOutfitData);
+            SetExtendedData("com.deathweasel.bepinex.clothingunlocker", data, ChaControl);
         }
 
-        private void PushUp_RePack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void PushUp_RePack(ChaControl ChaControl)
         {
             Dictionary<int, Pushup.ClothData> OriginalBra = new Dictionary<int, Pushup.ClothData>();
             Dictionary<int, Pushup.ClothData> OriginalTop = new Dictionary<int, Pushup.ClothData>();
@@ -398,10 +398,10 @@ namespace Cosplay_Academy
             data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
             data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
             data.data.Add("Pushup_BodyData", MessagePackSerializer.Serialize(Body));
-            SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl, ThisOutfitData);
+            SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl);
 
             //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            //SetExtendedData("KCOX", data, ChaControl, ThisOutfitData);
+            //SetExtendedData("KCOX", data, ChaControl);
             //var KoiOverlay = typeof(KoiClothesOverlayController);
             //if (KoiOverlay != null)
             //{
@@ -412,7 +412,7 @@ namespace Cosplay_Academy
             //}
         }
 
-        private void KKABM_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void KKABM_Repack(ChaControl ChaControl)
         {
             PluginData SavedData;
             List<BoneModifier> Modifiers = new List<BoneModifier>();
@@ -478,16 +478,16 @@ namespace Cosplay_Academy
             }
             if (Modifiers.Count == 0)
             {
-                SetExtendedData("KKABMPlugin.ABMData", null, ChaControl, ThisOutfitData);
+                SetExtendedData("KKABMPlugin.ABMData", null, ChaControl);
                 return;
             }
 
             var data = new PluginData { version = 2 };
             data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
-            SetExtendedData("KKABMPlugin.ABMData", data, ChaControl, ThisOutfitData);
+            SetExtendedData("KKABMPlugin.ABMData", data, ChaControl);
         }
 
-        private void DynamicBone_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void DynamicBone_Repack(ChaControl ChaControl)
         {
             List<DynamicBoneData> Modifiers = new List<DynamicBoneData>();
             if (ValidOutfits.Any(x => !x))
@@ -527,16 +527,16 @@ namespace Cosplay_Academy
             }
             if (Modifiers.Count == 0)
             {
-                SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", null, ChaControl, ThisOutfitData);
+                SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", null, ChaControl);
                 return;
             }
 
             var data = new PluginData();
             data.data.Add("AccessoryDynamicBoneData", MessagePackSerializer.Serialize(Modifiers));
-            SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", data, ChaControl, ThisOutfitData);
+            SetExtendedData("com.deathweasel.bepinex.dynamicboneeditor", data, ChaControl);
         }
 
-        private void AccessoryStateSync_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void AccessoryStateSync_Repack(ChaControl ChaControl)
         {
             Dictionary<int, AccStateSync.OutfitTriggerInfo> OriginalCharaTriggerInfo = new Dictionary<int, AccStateSync.OutfitTriggerInfo>();
             Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>> OriginalCharaVirtualGroupInfo = new Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>>();
@@ -719,10 +719,10 @@ namespace Cosplay_Academy
             SavedData.data.Add("CharaTriggerInfo", MessagePackSerializer.Serialize(CharaTriggerInfo));
             SavedData.data.Add("CharaVirtualGroupInfo", MessagePackSerializer.Serialize(CharaVirtualGroupInfo));
 
-            SetExtendedData("madevil.kk.ass", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("madevil.kk.ass", SavedData, ChaControl);
         }
 
-        private void Accessory_Themes_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void Accessory_Themes_Repack(ChaControl ChaControl)
         {
             PluginData SavedData = new PluginData();
 
@@ -809,10 +809,10 @@ namespace Cosplay_Academy
             SavedData.data.Add("Relative_Theme_Bools", MessagePackSerializer.Serialize(RelativeThemeBool));
             SavedData.data.Add("Relative_ACC_Dictionary", MessagePackSerializer.Serialize(Relative_ACC_Dictionary));
 
-            SetExtendedData("Accessory_Themes", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("Accessory_Themes", SavedData, ChaControl);
         }
 
-        private void Additional_Card_Info_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void Additional_Card_Info_Repack(ChaControl ChaControl)
         {
             List<int>[] AccKeep = new List<int>[Constants.Outfit_Size];
             List<int>[] HairAcc = new List<int>[Constants.Outfit_Size];
@@ -957,10 +957,10 @@ namespace Cosplay_Academy
             SavedData.data.Add("Cosplay_Academy_Ready", MessagePackSerializer.Serialize(Character_Cosplay_Ready));
             SavedData.data.Add("GenderType", MessagePackSerializer.Serialize(GenderType));
 
-            SetExtendedData("Additional_Card_Info", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("Additional_Card_Info", SavedData, ChaControl);
         }
 
-        private void Accessory_Parents_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void Accessory_Parents_Repack(ChaControl ChaControl)
         {
             Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[Constants.Outfit_Size];
             Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[Constants.Outfit_Size];
@@ -1015,10 +1015,10 @@ namespace Cosplay_Academy
             SavedData.data.Add("Parenting_Names", MessagePackSerializer.Serialize(Custom_Names));
             SavedData.data.Add("Relative_Data", MessagePackSerializer.Serialize(Relative_Data));
 
-            SetExtendedData("Accessory_Parents", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("Accessory_Parents", SavedData, ChaControl);
         }
 
-        private void Accessory_States_Repack(ChaControl ChaControl, ChaDefault ThisOutfitData)
+        private void Accessory_States_Repack(ChaControl ChaControl)
         {
             PluginData SavedData = new PluginData();
             Dictionary<int, int>[] ACC_Binding_Dictionary = new Dictionary<int, int>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
@@ -1224,7 +1224,7 @@ namespace Cosplay_Academy
             SavedData.data.Add("ACC_Name_Dictionary", MessagePackSerializer.Serialize(ACC_Name_Dictionary));
             SavedData.data.Add("ACC_Parented_Dictionary", MessagePackSerializer.Serialize(ACC_Parented_Dictionary));
 
-            SetExtendedData("Accessory_States", SavedData, ChaControl, ThisOutfitData);
+            SetExtendedData("Accessory_States", SavedData, ChaControl);
         }
 
         private void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
@@ -1244,6 +1244,17 @@ namespace Cosplay_Academy
                 var temp = ChaControl.GetComponent(Controller);
                 object[] Input_Parameter = new object[2] { coordinate, false };
                 Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
+            }
+        }
+
+        public void SetExtendedData(string IDtoSET, PluginData data, ChaControl ChaControl)
+        {
+            ExtendedSave.SetExtendedDataById(ChaControl.chaFile, IDtoSET, data);
+            ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
+
+            if (ThisOutfitData.heroine != null)
+            {
+                ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
             }
         }
     }

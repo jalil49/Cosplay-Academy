@@ -233,7 +233,7 @@ namespace Cosplay_Academy
 
         internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.Outfit_Size];
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
-        internal ClothingLoader ClothingLoader = new ClothingLoader();
+        internal ClothingLoader ClothingLoader;
         internal List<bool>[] HairKeepQueue = new List<bool>[Constants.Outfit_Size];
         internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.Outfit_Size];
 
@@ -254,6 +254,8 @@ namespace Cosplay_Academy
 
         public ChaDefault()
         {
+            ClothingLoader = new ClothingLoader(this);
+
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();

@@ -67,7 +67,7 @@ namespace Cosplay_Academy
             else if (ThisOutfitData.processed && GameAPI.InsideHScene)
             {
                 ThisOutfitData.Chafile = ChaFileControl;
-                ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl, ThisOutfitData);
+                ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
             }
             if (IsMaker && Firstpass)
@@ -252,7 +252,7 @@ namespace Cosplay_Academy
                     }
                 }
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
-                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData, ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
+                ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
@@ -265,7 +265,7 @@ namespace Cosplay_Academy
             {
                 return;
             }//if disabled don't run
-            ThisOutfitData.ClothingLoader.CoordinateLoad(ThisOutfitData, coordinate, ChaControl);
+            ThisOutfitData.ClothingLoader.CoordinateLoad(coordinate, ChaControl);
         }
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)

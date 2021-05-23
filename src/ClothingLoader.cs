@@ -39,22 +39,24 @@ namespace Cosplay_Academy
         private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
         public bool Character_Cosplay_Ready = false;
         #endregion
+
         private readonly bool[] ValidOutfits = new bool[Constants.Outfit_Size];
-        public ClothingLoader()
+
+        public ClothingLoader(ChaDefault ThisOutfitData)
         {
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i] = new List<int>();
                 CharacterClothingKeep_Coordinate[i] = new bool[9];
             }
+            this.ThisOutfitData = ThisOutfitData;
         }
 
-        public void FullLoad(ChaDefault InputOutfitData, ChaControl character, ChaFile file)
+        public void FullLoad(ChaControl character, ChaFile file)
         {
             InsideMaker = MakerAPI.InsideMaker;
             ChaControl = character;
             ChaFile = file;
-            ThisOutfitData = InputOutfitData;
 
             Extract_Personal_Data();
 
@@ -105,7 +107,7 @@ namespace Cosplay_Academy
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
 
-            Run_Repacks(character, ThisOutfitData);
+            Run_Repacks(character);
         }
 
         private void GeneralizedLoad(int outfitnum, bool load)
@@ -485,10 +487,10 @@ namespace Cosplay_Academy
             #endregion
         }
 
-        public void CoordinateLoad(ChaDefault ThisOutfitData, ChaFileCoordinate coordinate, ChaControl ChaControl)
+        public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl ChaControl)
         {
+            this.ChaControl = ChaControl;
             InsideMaker = MakerAPI.InsideMaker;
-            ChaFile ChaFile = ChaControl.chaFile;
             #region Queue accessories to keep
 
             int outfitnum = ChaControl.fileStatus.coordinateType;
@@ -943,19 +945,6 @@ namespace Cosplay_Academy
             }
         }
         #endregion
-
-        public static void SetExtendedData(string IDtoSET, PluginData data, ChaControl ChaControl, ChaDefault ThisOutfitData)
-        {
-            ChaFile ChaFile = ChaControl.chaFile;
-            ExtendedSave.SetExtendedDataById(ChaFile, IDtoSET, data);
-            ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
-
-            if (ThisOutfitData.heroine != null && ChaControl.sex == 1)
-            {
-                ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
-                //ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.chaCtrl.chaFile, IDtoSET, data);
-            }
-        }
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_List ME_Data)
         {
