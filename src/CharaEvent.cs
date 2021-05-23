@@ -7,13 +7,14 @@ using KKAPI.Chara;
 using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI.Sidebar;
-using Manager;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System.Collections.Generic;
+#if DEBUG
+using System.Diagnostics;
+#if DEBUG
 using System.Linq;
 using ToolBox;
-using UnityEngine;
 
 namespace Cosplay_Academy
 {
@@ -21,6 +22,10 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool Firstpass = true;
+#if DEBUG
+        private static Stopwatch Time = new Stopwatch();
+        private static List<long> Average = new List<long>();
+#endif
         public bool Harem = false;
         public static void MakerAPI_MakerExiting()
         {
@@ -58,6 +63,13 @@ namespace Cosplay_Academy
             {
                 return;
             }
+#if DEBUG
+            var Start = Time.ElapsedMilliseconds;
+            if (ThisOutfitData == null || !ThisOutfitData.processed)
+            {
+                Time.Start();
+            }
+#endif
             if (currentGameMode == GameMode.Studio)
             {
                 return;
@@ -81,6 +93,15 @@ namespace Cosplay_Academy
                 ChaControl.ChangeCoordinateTypeAndReload();
                 Firstpass = false;
             }
+#if DEBUG
+            if (Time.IsRunning)
+            {
+                Time.Stop();
+                var temp = Time.ElapsedMilliseconds - Start;
+                Average.Add(temp);
+                Settings.Logger.LogWarning($"Total elaspsed time {Time.ElapsedMilliseconds}ms\nRun {Average.Count}: {temp}ms\nAverage: {Average.Average()}ms");
+            }
+#endif
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
