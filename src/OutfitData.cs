@@ -3,12 +3,12 @@ using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cosplay_Academy
 {
     public class OutfitData
     {
-
         private readonly bool[] Part_of_Set = new bool[Enum.GetValues(typeof(HStates)).Length];
         public readonly string[][] Outfits_Per_State = new string[Enum.GetValues(typeof(HStates)).Length][];
         private readonly string[] Match_Outfit_Paths = new string[Enum.GetValues(typeof(HStates)).Length];
@@ -69,7 +69,11 @@ namespace Cosplay_Academy
                 do
                 {
                     Result = Outfits_Per_State[level][UnityEngine.Random.Range(0, Outfits_Per_State[level].Length)];
-                    if (Tries++ == 3 || Match)
+                    if (Settings.EnableDefaults.Value && !Result.EndsWith(".png") || Result.EndsWith(".png"))
+                    {
+                        break;
+                    }
+                    if (Tries++ >= 3)
                     {
                         EXP--;
                         Tries = 0;
@@ -78,7 +82,7 @@ namespace Cosplay_Academy
                             EXP--;
                         }
                     }
-                } while (!Settings.EnableDefaults.Value && EXP > -1 && !Result.EndsWith(".png"));
+                } while (EXP > -1);
                 return Result;
             }
             return Outfits_Per_State[0][UnityEngine.Random.Range(0, Outfits_Per_State[0].Length)];
@@ -131,7 +135,11 @@ namespace Cosplay_Academy
                             }
                             else
                                 Result = Match_Outfit_Paths[EXP];
-                            if (Tries++ == 3 || Match)
+                            if (Settings.EnableDefaults.Value && !Result.EndsWith(".png") || Result.EndsWith(".png"))
+                            {
+                                break;
+                            }
+                            if ((Tries++ >= 3 || Match))
                             {
                                 EXP--;
                                 Tries = 0;
@@ -140,7 +148,7 @@ namespace Cosplay_Academy
                                     EXP--;
                                 }
                             }
-                        } while (!Settings.EnableDefaults.Value && EXP > -1 && !Result.EndsWith(".png"));
+                        } while (EXP > -1);
                         return Result;
                     }
                     RandResult -= Settings.HStateWeights[i].Value;
@@ -156,8 +164,16 @@ namespace Cosplay_Academy
                 else
                     temp.Add(Match_Outfit_Paths[i]);
             }
-
-            return temp[UnityEngine.Random.Range(0, temp.Count)];
+            var LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
+            for (int i = 0; i < level; i++)
+            {
+                if (Outfits_Per_State[i].ToList().Contains(LastResult))
+                {
+                    Settings.Logger.LogWarning(LastResult);
+                    return LastResult;
+                }
+            }
+            return Outfits_Per_State[0][UnityEngine.Random.Range(0, Outfits_Per_State[0].Length)];
         }
 
         public string[] Exportarray(int level)
