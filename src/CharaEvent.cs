@@ -89,25 +89,19 @@ namespace Cosplay_Academy
         public void Process(GameMode currentGameMode)
         {
             #region ThisOutfitData Assignment
-
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
                 //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chano {ChaControl.fileParam.strBirthDay} name {ChaControl.fileParam.personality}");
-                ThisOutfitData = new ChaDefault();
-                Constants.ChaDefaults.Add(ThisOutfitData);
-                ThisOutfitData.FullName = ChaControl.fileParam.fullname;
-                ThisOutfitData.BirthDay = ChaControl.fileParam.strBirthDay;
-                ThisOutfitData.Personality = ChaControl.fileParam.personality;
-                Game _gamemgr = Game.Instance;
-                foreach (SaveData.Heroine Heroine in _gamemgr.HeroineList)
+                ThisOutfitData = new ChaDefault
                 {
-                    if (Heroine.parameter.personality == ChaControl.fileParam.personality && Heroine.parameter.fullname == ChaControl.fileParam.fullname && Heroine.parameter.strBirthDay == ChaControl.fileParam.strBirthDay)
-                    {
-                        ThisOutfitData.heroine = Heroine;
-                        break;
-                    }
-                }
+                    FullName = ChaControl.fileParam.fullname,
+                    BirthDay = ChaControl.fileParam.strBirthDay,
+                    Personality = ChaControl.fileParam.personality,
+                    heroine = ChaControl.GetHeroine()
+                };
+                Constants.ChaDefaults.Add(ThisOutfitData);
+
             }
             if (ChaControl.sex != 0 && ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {

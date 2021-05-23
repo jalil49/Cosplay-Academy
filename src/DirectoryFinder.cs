@@ -94,7 +94,6 @@ namespace Cosplay_Academy
                 }
                 string[] files = System.IO.Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
-
             }
             if (Choosen.Count == 0)
             {

@@ -144,5 +144,4 @@ namespace Cosplay_Academy.Support
             return OutfitVirtualGroupInfo;
         }
     }
-
 }

@@ -156,7 +156,6 @@ namespace Cosplay_Academy
             //Additional Outfits
             AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");
             SundayDate = Config.Bind("Additional Outfit", "Sunday Date Special", true, "Date will wear something different on Sunday");
-            Settings.Logger.LogWarning("2");
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable maker view", false, "View in creator mode\ndoesn't load School Uniform upon entering maker from Main Menu swap uniform type to view");
