@@ -46,6 +46,7 @@ namespace Cosplay_Academy
             SaveData.Heroine person = ThisOutfitData.heroine;
             if (!IsInitialized)
             {
+                OutfitData.Anger = false;
                 Get_Outfits();
                 IsInitialized = true;
                 foreach (var data in outfitData)
@@ -165,7 +166,7 @@ namespace Cosplay_Academy
                     {
                         string choosen = Grabber(Input1, result);
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2, Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
-                        if (Settings.EnableDefaults.Value)
+                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
                         {
                             temp2.Add("Defaults");
                         }
@@ -181,6 +182,10 @@ namespace Cosplay_Academy
                             Setsfunction(array);
                         }
                         temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
+                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
+                        {
+                            temp2.Add("Defaults");
+                        }
                         outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
                     }
                 }
@@ -215,7 +220,6 @@ namespace Cosplay_Academy
                         {
                             break;
                         }
-                        //outfitData[j].Path_set(exp, result[i]);
                         List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, false);
                         outfitData[j].Insert(exp, temp.ToArray(), true);
                         break;
