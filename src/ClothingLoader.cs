@@ -124,10 +124,14 @@ namespace Cosplay_Academy
             Run_Repacks(character);
         }
 
-        private void GeneralizedLoad(int outfitnum, bool load)
+        public void GeneralizedLoad(int outfitnum, bool load)
         {
+            ValidOutfits[outfitnum] = load;
+            ThisOutfitData.Finished.ClearCoord(outfitnum);
             UnderwearAccessoriesLocations[outfitnum].Clear();
             HairAccessories.Remove(outfitnum);
+            ThisOutfitData.HairKeepReturn[outfitnum].Clear();
+            ThisOutfitData.ACCKeepReturn[outfitnum].Clear();
 
             #region Queue accessories to keep
 

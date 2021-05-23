@@ -49,9 +49,24 @@ namespace Cosplay_Academy
             }
         }
 
-        public void Reload_RePacks(ChaControl ChaControl)
+        public void Reload_RePacks(ChaControl ChaControl, bool ForceALL)
         {
             ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
+
+            if (Constants.PluginResults["Accessory_States"])
+                ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
+
+            if (Constants.PluginResults["Additional_Card_Info"])
+                ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
+
+            if (InsideMaker && Constants.PluginResults["Accessory_Themes"])
+                ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
+
+            if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
+                ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
+
+            if (!ForceALL)
+                return;
 
             ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
 
@@ -67,18 +82,6 @@ namespace Cosplay_Academy
 
             if (Constants.PluginResults["madevil.kk.ass"])
                 ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
-
-            if (Constants.PluginResults["Accessory_States"])
-                ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
-
-            if (Constants.PluginResults["Additional_Card_Info"])
-                ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
-
-            if (Constants.PluginResults["Accessory_Themes"] && InsideMaker)
-                ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
-
-            if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
-                ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
         }
 
         private void HairACC_Repack(ChaControl ChaControl)

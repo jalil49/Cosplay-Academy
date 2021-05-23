@@ -107,9 +107,10 @@ namespace Cosplay_Academy
                 if (ThisOutfitData.ChangeKoiToClub)
                 {
                     ThisOutfitData.outfitpath[4] = ThisOutfitData.ClubOutfitPath;
-                    ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
                     ThisOutfitData.ChangeKoiToClub = false;
-                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
                     Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 }
             }
@@ -123,9 +124,10 @@ namespace Cosplay_Academy
                     num = 0;
                 }
                 ThisOutfitData.heroine.coordinates[num] = 4;
-                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
+                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
                 ThisOutfitData.ChangeClubToKoi = false;
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
                 Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 //Chara.chaCtrl.SetAccessoryStateAll(true);
             }
@@ -141,8 +143,9 @@ namespace Cosplay_Academy
                         num = 0;
                     }
                     ThisOutfitData.heroine.coordinates[num] = 4;
-                    ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
-                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
+                    ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
                     ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
                 }
@@ -252,10 +255,10 @@ namespace Cosplay_Academy
             {
                 ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpath[4];
                 ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
-                ThisOutfitData.ClothingLoader.FullLoad(ThisOutfitData.ChaControl, ThisOutfitData.Chafile);
+                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
                 ThisOutfitData.heroine.coordinates[0] = 4;
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
-                ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
                 __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                 //__instance.chaCtrl.SetAccessoryStateAll(true);
                 //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);

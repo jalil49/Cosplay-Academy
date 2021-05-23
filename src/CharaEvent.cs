@@ -21,7 +21,7 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool Firstpass = true;
-
+        public bool Harem = false;
         public static void MakerAPI_MakerExiting()
         {
             Firstpass = true;
@@ -54,6 +54,10 @@ namespace Cosplay_Academy
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
         {
+            if (ChaControl.sex == 0)
+            {
+                return;
+            }
             if (currentGameMode == GameMode.Studio)
             {
                 return;
@@ -62,23 +66,21 @@ namespace Cosplay_Academy
             if (IsMaker || ThisOutfitData == null || !ThisOutfitData.processed)
             {
                 Process(currentGameMode);
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
+
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, Harem);
             }
             else if (ThisOutfitData.processed && GameAPI.InsideHScene)
             {
                 ThisOutfitData.Chafile = ChaFileControl;
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl);
+
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, Harem);
             }
             if (IsMaker && Firstpass)
             {
                 ChaControl.ChangeCoordinateTypeAndReload();
                 Firstpass = false;
             }
-
-            //Time.Stop();
-
-            //ExpandedOutfit.Logger.LogWarning($"Time is {Time.ElapsedMilliseconds}");
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
