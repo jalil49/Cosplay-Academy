@@ -108,6 +108,27 @@ namespace Cosplay_Academy
         private void ME_RePack(ChaControl ChaControl)
         {
             var ME_Save = ThisOutfitData.Finished;
+            var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
+            List<ObjectType> objectTypes = new List<ObjectType>() { ObjectType.Accessory, ObjectType.Character, ObjectType.Clothing, ObjectType.Hair };
+            var ME_Chafile = new ME_List(ChafileData, ThisOutfitData, objectTypes);
+            if (!ME_Chafile.NoData)
+            {
+                var FailedOutfits = new List<int>();
+                for (int i = 0; i < Constants.Outfit_Size; i++)
+                {
+                    if (!ValidOutfits[i])
+                    {
+                        FailedOutfits.Add(i);
+                    }
+                }
+                List<ObjectType> FailedTypes = new List<ObjectType>() { ObjectType.Accessory, ObjectType.Clothing };
+                List<ObjectType> Always = new List<ObjectType>() { ObjectType.Hair, ObjectType.Character };
+                ME_Save.MaterialShader.AddRange(ME_Chafile.MaterialShader.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+                ME_Save.RendererProperty.AddRange(ME_Chafile.RendererProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialColorProperty.AddRange(ME_Chafile.MaterialColorProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialFloatProperty.AddRange(ME_Chafile.MaterialFloatProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialTextureProperty.AddRange(ME_Chafile.MaterialTextureProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+            }
             var SaveData = new PluginData();
 
             List<int> IDsToPurge = new List<int>();
