@@ -607,6 +607,15 @@ namespace Cosplay_Academy.ME
             MaterialTextureProperty.Clear();
         }
 
+        public void ClearCoord(int outfitnum)
+        {
+            MaterialShader.RemoveAll(x => x.CoordinateIndex == outfitnum);
+            RendererProperty.RemoveAll(x => x.CoordinateIndex == outfitnum);
+            MaterialColorProperty.RemoveAll(x => x.CoordinateIndex == outfitnum);
+            MaterialFloatProperty.RemoveAll(x => x.CoordinateIndex == outfitnum);
+            MaterialTextureProperty.RemoveAll(x => x.CoordinateIndex == outfitnum);
+        }
+
         #region Return List of Properties
         //specific Accessory
         public List<RendererProperty> Render_FindAll(List<ObjectType> ObjectList, int slot, int outfitnum)
@@ -701,6 +710,7 @@ namespace Cosplay_Academy.ME
         /// </summary>
         Character
     };
+
 
     public sealed class TextureContainer
     {
