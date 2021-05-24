@@ -152,14 +152,14 @@ namespace Cosplay_Academy
                     {
                         continue;
                     }
-                    temp2 = DirectoryFinder.Grab_All_Files(coordinatepath + "coordinate" + Input1 + Input2);
+                    temp2 = DirectoryFinder.Grab_All_Directories(coordinatepath + "coordinate" + Input1 + Input2);
                     if (Input1 == @"\AfterSchool" && Settings.GrabUniform.Value)
                     {
-                        temp2.AddRange(DirectoryFinder.Grab_All_Files(coordinatepath + @"coordinate\School Uniform" + Input2));
+                        temp2.AddRange(DirectoryFinder.Grab_All_Directories(coordinatepath + @"coordinate\School Uniform" + Input2));
                     }
                     else if (Input1 == @"\Club\Swim" && Settings.GrabSwimsuits.Value)
                     {
-                        temp2.AddRange(DirectoryFinder.Grab_All_Files(coordinatepath + @"coordinate\Swimsuit" + Input2));
+                        temp2.AddRange(DirectoryFinder.Grab_All_Directories(coordinatepath + @"coordinate\Swimsuit" + Input2));
                     }
                     string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
                     if (!Settings.EnableSets.Value || !result.Contains(@"\Sets\"))

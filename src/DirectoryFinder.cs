@@ -102,7 +102,7 @@ namespace Cosplay_Academy
             }
         }
 
-        public static List<string> Grab_All_Files(string input)
+        public static List<string> Grab_All_Directories(string input)
         {
             FoldersPath.Clear();
             FoldersPath.Add(input);
