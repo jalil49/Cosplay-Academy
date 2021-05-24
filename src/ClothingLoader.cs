@@ -18,8 +18,8 @@ namespace Cosplay_Academy
 {
     public partial class ClothingLoader
     {
-        private Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
-        private ChaDefault ThisOutfitData;
+        private readonly Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> HairAccessories = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
+        private readonly ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
 
@@ -396,7 +396,7 @@ namespace Cosplay_Academy
 
                         ME_Color_Loop(ColorQueue, ACCpostion, Import_ME_Data.MaterialColorProperty);
 
-                        ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                        ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty);
 
                         ME_Float_Loop(FloatQueue, ACCpostion, Import_ME_Data.MaterialFloatProperty);
 
@@ -445,7 +445,7 @@ namespace Cosplay_Academy
 
                         ME_Color_Loop(ColorQueue, ACCpostion, Import_ME_Data.MaterialColorProperty);
 
-                        ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                        ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty);
 
                         ME_Float_Loop(FloatQueue, ACCpostion, Import_ME_Data.MaterialFloatProperty);
 
@@ -505,7 +505,7 @@ namespace Cosplay_Academy
 
                 ME_Color_Loop(ColorQueue, ACCpostion, Import_ME_Data.MaterialColorProperty);
 
-                ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                ME_Texture_Loop(TextureQueue, ACCpostion, Import_ME_Data.MaterialTextureProperty);
 
                 ME_Float_Loop(FloatQueue, ACCpostion, Import_ME_Data.MaterialFloatProperty);
 
@@ -603,7 +603,7 @@ namespace Cosplay_Academy
 
                     ME_Color_Loop(ColorQueue, ACCpostion, Coordinate_ME_Data.MaterialColorProperty);
 
-                    ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                    ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty);
 
                     ME_Float_Loop(FloatQueue, ACCpostion, Coordinate_ME_Data.MaterialFloatProperty);
 
@@ -642,7 +642,7 @@ namespace Cosplay_Academy
 
                     ME_Color_Loop(ColorQueue, ACCpostion, Coordinate_ME_Data.MaterialColorProperty);
 
-                    ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                    ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty);
 
                     ME_Float_Loop(FloatQueue, ACCpostion, Coordinate_ME_Data.MaterialFloatProperty);
 
@@ -691,7 +691,7 @@ namespace Cosplay_Academy
 
                 ME_Color_Loop(ColorQueue, ACCpostion, Coordinate_ME_Data.MaterialColorProperty);
 
-                ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty, ThisOutfitData);
+                ME_Texture_Loop(TextureQueue, ACCpostion, Coordinate_ME_Data.MaterialTextureProperty);
 
                 ME_Float_Loop(FloatQueue, ACCpostion, Coordinate_ME_Data.MaterialFloatProperty);
 
@@ -905,7 +905,7 @@ namespace Cosplay_Academy
             }
         }
 
-        private static void ME_Texture_Loop(Queue<MaterialTextureProperty> TextureQueue, int ACCpostion, List<MaterialTextureProperty> MaterialTexture, ChaDefault ThisOutfitData)
+        private static void ME_Texture_Loop(Queue<MaterialTextureProperty> TextureQueue, int ACCpostion, List<MaterialTextureProperty> MaterialTexture)
         {
             if (TextureQueue.Count == 0)
             {
