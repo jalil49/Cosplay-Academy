@@ -69,7 +69,7 @@ namespace Cosplay_Academy
                 do
                 {
                     Result = Outfits_Per_State[level][UnityEngine.Random.Range(0, Outfits_Per_State[level].Length)];
-                    if (Settings.EnableDefaults.Value && !Result.EndsWith(".png") || Result.EndsWith(".png"))
+                    if (Settings.EnableDefaults.Value || Result.EndsWith(".png"))
                     {
                         break;
                     }
@@ -135,7 +135,7 @@ namespace Cosplay_Academy
                             }
                             else
                                 Result = Match_Outfit_Paths[EXP];
-                            if (Settings.EnableDefaults.Value && !Result.EndsWith(".png") || Result.EndsWith(".png"))
+                            if (Settings.EnableDefaults.Value || Result.EndsWith(".png"))
                             {
                                 break;
                             }
@@ -164,16 +164,13 @@ namespace Cosplay_Academy
                 else
                     temp.Add(Match_Outfit_Paths[i]);
             }
-            var LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
-            for (int i = 0; i < level; i++)
+            string LastResult;
+            int tries = 0;
+            do
             {
-                if (Outfits_Per_State[i].ToList().Contains(LastResult))
-                {
-                    Settings.Logger.LogWarning(LastResult);
-                    return LastResult;
-                }
-            }
-            return Outfits_Per_State[0][UnityEngine.Random.Range(0, Outfits_Per_State[0].Length)];
+                LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
+            } while (++tries < 3 && !LastResult.EndsWith(".png") && !Settings.EnableDefaults.Value);
+            return LastResult;
         }
 
         public string[] Exportarray(int level)
