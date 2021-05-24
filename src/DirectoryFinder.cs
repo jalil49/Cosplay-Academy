@@ -8,14 +8,6 @@ namespace Cosplay_Academy
 {
     static class DirectoryFinder
     {
-        static readonly List<string> Choosen;
-        static readonly List<string> FoldersPath;
-        static DirectoryFinder()
-        {
-            Choosen = new List<string>();
-            FoldersPath = new List<string>();
-        }
-
         public static void CheckMissingFiles()
         {
             string[] InputStrings3 = { @"\Sets", "" };
@@ -44,68 +36,75 @@ namespace Cosplay_Academy
         public static void Organize()
         {
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + "coordinate";
-            string[] files = System.IO.Directory.GetFiles(coordinatepath + @"\Unorganized", "*.png");
-            foreach (var Coordinate in files)
+            var folders = Grab_All_Directories(coordinatepath);
+            foreach (var item in folders)
             {
-                ChaFileCoordinate Organizer = new ChaFileCoordinate();
-                Organizer.LoadFile(Coordinate);
-                var ACI_Data = ExtendedSave.GetExtendedDataById(Organizer, "Additional_Card_Info");
+                var files = Get_Outfits_From_Path(item, false);
 
-                if (ACI_Data?.data != null)
+                foreach (var Coordinate in files)
                 {
+                    ChaFileCoordinate Organizer = new ChaFileCoordinate();
+                    Organizer.LoadFile(Coordinate);
+                    var ACI_Data = ExtendedSave.GetExtendedDataById(Organizer, "Additional_Card_Info");
 
-                    var CoordinateSubType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateSubType"]);
-                    if (CoordinateSubType != 0 && CoordinateSubType != 10)
+                    if (ACI_Data?.data != null)
                     {
-                        continue;
-                    }
-                    int CoordinateType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateType"]);
-                    string SubSetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["SubSetNames"]);
-                    string SetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["Set_Name"]);
-                    int HstateType_Restriction = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["HstateType_Restriction"]);
-                    string Result;
-                    string SubPath = @"\";
-                    if (SetNames.Length > 0)
-                    {
-                        SubPath += @"Sets\" + SetNames;
-                    }
-                    if (SubSetNames.Length > 0)
-                    {
-                        if (!SubPath.EndsWith(@"\"))
+
+                        var CoordinateSubType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateSubType"]);
+                        if (CoordinateSubType != 0 && CoordinateSubType != 10)
                         {
-                            SubPath += @"\";
+                            continue;
                         }
-                        SubPath += SubSetNames;
-                    }
-                    var FileName = @"\" + Coordinate.Split('\\').Last();
-                    if (CoordinateSubType == 10)
-                    {
-                        Result = coordinatepath + Constants.InputStrings[12] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                        int CoordinateType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateType"]);
+                        string SubSetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["SubSetNames"]);
+                        string SetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["Set_Name"]);
+                        int HstateType_Restriction = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["HstateType_Restriction"]);
+                        string Result;
+                        string SubPath = @"\";
+                        if (SetNames.Length > 0)
+                        {
+                            SubPath += @"Sets\" + SetNames;
+                        }
+                        if (SubSetNames.Length > 0)
+                        {
+                            if (!SubPath.EndsWith(@"\"))
+                            {
+                                SubPath += @"\";
+                            }
+                            SubPath += SubSetNames;
+                        }
+                        var FileName = @"\" + Coordinate.Split('\\').Last();
+                        if (CoordinateSubType == 10)
+                        {
+                            Result = coordinatepath + Constants.InputStrings[12] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                            if (!Directory.Exists(Result))
+                                Directory.CreateDirectory(Result);
+                            Result += FileName;
+                            File.Copy(Coordinate, Result, true);
+                            File.Delete(Coordinate);
+                            continue;
+                        }
+                        if (CoordinateType > 0)
+                        {
+                            CoordinateType++;
+                        }
+                        Result = coordinatepath + Constants.InputStrings[CoordinateType] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
                         if (!Directory.Exists(Result))
                             Directory.CreateDirectory(Result);
                         Result += FileName;
                         File.Copy(Coordinate, Result, true);
                         File.Delete(Coordinate);
-                        continue;
                     }
-                    if (CoordinateType > 0)
-                    {
-                        CoordinateType++;
-                    }
-                    Result = coordinatepath + Constants.InputStrings[CoordinateType] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
-                    if (!Directory.Exists(Result))
-                        Directory.CreateDirectory(Result);
-                    Result += FileName;
-                    File.Copy(Coordinate, Result, true);
-                    File.Delete(Coordinate);
                 }
             }
         }
 
         public static List<string> Grab_All_Directories(string input)
         {
-            FoldersPath.Clear();
-            FoldersPath.Add(input);
+            List<string> FoldersPath = new List<string>
+            {
+                input
+            };
             string[] folders = System.IO.Directory.GetDirectories(input, "*", System.IO.SearchOption.AllDirectories); //grab child folders
             List<string> FolderLists = folders.ToList();
             int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
@@ -114,9 +113,10 @@ namespace Cosplay_Academy
 
             return FoldersPath;
         }
+
         public static List<string> Get_Set_Paths(string Narrow)
         {
-            Choosen.Clear();
+            List<string> Choosen = new List<string>();
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
             string[] folders = System.IO.Directory.GetDirectories(coordinatepath + "coordinate", "*", System.IO.SearchOption.AllDirectories); //grab child folders
             foreach (string folder in folders)
@@ -126,10 +126,10 @@ namespace Cosplay_Academy
             }
             return Choosen;
         }
+
         public static List<string> Get_Outfits_From_Path(string FilePath, bool RemoveSets = true)
         {
-            //ExpandedOutfit.Logger.LogDebug("Searching " + FilePath);
-            Choosen.Clear();
+            List<string> Choosen = new List<string>();
             List<string> Paths = new List<string>
             {
                 FilePath //add parent folder to list
