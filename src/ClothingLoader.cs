@@ -55,6 +55,8 @@ namespace Cosplay_Academy
         public bool Character_Cosplay_Ready = false;
         #endregion
 
+        private List<int>[] ME_Dont_Touch = new List<int>[Constants.Outfit_Size];
+
 #if TRACE
         #region StopWatches
         private static bool TimeProcess = true;
@@ -83,6 +85,7 @@ namespace Cosplay_Academy
             {
                 UnderwearAccessoriesLocations[i] = new List<int>();
                 CharacterClothingKeep_Coordinate[i] = new bool[9];
+                ME_Dont_Touch[i] = new List<int>();
             }
             this.ThisOutfitData = ThisOutfitData;
         }
@@ -161,6 +164,7 @@ namespace Cosplay_Academy
             var Start = TimeWatch[1].ElapsedMilliseconds;
             TimeWatch[1].Start();
 #endif
+            ME_Dont_Touch[outfitnum].Clear();
             ValidOutfits[outfitnum] = load;
             ThisOutfitData.Finished.ClearCoord(outfitnum);
             UnderwearAccessoriesLocations[outfitnum].Clear();
@@ -358,6 +362,7 @@ namespace Cosplay_Academy
             int insert = 0;
             int ACCpostion = 0;
             bool Empty;
+            bool print = true;
 
             //Skip if inside Maker
             if (MakerAPI.InsideMaker)
@@ -461,9 +466,10 @@ namespace Cosplay_Academy
             else
             {
                 ACCpostion = 20 + NewRAW.Count;
+                print = false;
             }
+
             //original accessories
-            bool print = true;
             while (PartsQueue.Count != 0)
             {
                 if (print)
@@ -995,6 +1001,7 @@ namespace Cosplay_Academy
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_List ME_Data)
         {
+            ME_Dont_Touch[outfitnum].Add(index);
             #region Remove Existing Data
             ThisOutfitData.Finished.MaterialColorProperty.RemoveAll(x => x.ObjectType == ObjectType.Clothing && x.Slot == index && outfitnum == x.CoordinateIndex);
             ThisOutfitData.Finished.MaterialShader.RemoveAll(x => x.ObjectType == ObjectType.Clothing && x.Slot == index && outfitnum == x.CoordinateIndex);
@@ -1004,11 +1011,11 @@ namespace Cosplay_Academy
             #endregion
 
             #region AddData
-            ThisOutfitData.Finished.MaterialColorProperty.AddRange(ME_Data.MaterialColorProperty.Where(x => x.Slot == index).ToList());
-            ThisOutfitData.Finished.MaterialShader.AddRange(ME_Data.MaterialShader.Where(x => x.Slot == index).ToList());
-            ThisOutfitData.Finished.RendererProperty.AddRange(ME_Data.RendererProperty.Where(x => x.Slot == index).ToList());
-            ThisOutfitData.Finished.MaterialFloatProperty.AddRange(ME_Data.MaterialFloatProperty.Where(x => x.Slot == index).ToList());
-            ThisOutfitData.Finished.MaterialTextureProperty.AddRange(ME_Data.MaterialTextureProperty.Where(x => x.Slot == index).ToList());
+            ThisOutfitData.Finished.MaterialColorProperty.AddRange(ME_Data.MaterialColorProperty.Where(x => x.Slot == index));
+            ThisOutfitData.Finished.MaterialShader.AddRange(ME_Data.MaterialShader.Where(x => x.Slot == index));
+            ThisOutfitData.Finished.RendererProperty.AddRange(ME_Data.RendererProperty.Where(x => x.Slot == index));
+            ThisOutfitData.Finished.MaterialFloatProperty.AddRange(ME_Data.MaterialFloatProperty.Where(x => x.Slot == index));
+            ThisOutfitData.Finished.MaterialTextureProperty.AddRange(ME_Data.MaterialTextureProperty.Where(x => x.Slot == index));
             #endregion
         }
 

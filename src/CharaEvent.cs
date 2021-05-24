@@ -132,18 +132,21 @@ namespace Cosplay_Academy
         {
             ThisOutfitDataProcess();
 
-            if (ChaControl.sex != 0 && ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
+            if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
+
             if (GameMode.Maker == currentGameMode)
             {
+                ThisOutfitData.firstpass = true;
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
                 if (Settings.ResetMaker.Value)
                 {
                     OutfitDecider.ResetDecider();
                 }
             }
+
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
                 ThisOutfitData.Clear_Firstpass();
@@ -252,11 +255,7 @@ namespace Cosplay_Academy
                 }
 
                 #endregion
-                if (currentGameMode != GameMode.Maker)
-                {
-                    ThisOutfitData.firstpass = false;
-                }
-
+                ThisOutfitData.firstpass = false;
             }
 
             if (!Settings.EnableSetting.Value && GameMode.MainGame == currentGameMode || !Settings.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode)
