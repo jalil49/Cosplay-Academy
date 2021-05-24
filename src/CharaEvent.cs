@@ -49,7 +49,7 @@ namespace Cosplay_Academy
             e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).BindToFunctionController<CharaEvent, bool>(
                 (controller) => Settings.RandomizeUnderwear.Value,
                 (controller, value) => Settings.RandomizeUnderwear.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Reset Process", Settings.ResetMaker.Value, owner)).BindToFunctionController<CharaEvent, bool>(
+            e.AddSidebarControl(new SidebarToggle("CA: Reset Sets", Settings.ResetMaker.Value, owner)).BindToFunctionController<CharaEvent, bool>(
                 (controller) => Settings.ResetMaker.Value,
                 (controller, value) => Settings.ResetMaker.Value = value);
             e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).BindToFunctionController<CharaEvent, bool>(
