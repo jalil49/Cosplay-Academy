@@ -89,6 +89,7 @@ namespace Cosplay_Academy
             Logger = base.Logger;
             Hooks.Init();
             StartCoroutine(Wait());
+            DirectoryFinder.CheckMissingFiles();
             IEnumerator Wait()
             {
                 yield return null;
