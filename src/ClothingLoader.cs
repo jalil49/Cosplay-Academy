@@ -536,6 +536,12 @@ namespace Cosplay_Academy
 
             ThisOutfitData.Finished.RendererProperty.AddRange(Import_ME_Data.RendererProperty);
             #endregion
+#if TRACE
+            TimeWatch[1].Stop();
+            var temp = TimeWatch[1].ElapsedMilliseconds - Start;
+            Average[1].Add(temp);
+            Settings.Logger.LogWarning($"\tGeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
+#endif
         }
 
         public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl ChaControl)
