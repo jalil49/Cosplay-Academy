@@ -476,18 +476,17 @@ namespace Cosplay_Academy
             SavedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KKABMPlugin.ABMData");
             if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes != null)
             {
-                List<BoneModifier> newModifiers = new List<BoneModifier>();
                 try
                 {
                     switch (SavedData.version)
                     {
                         case 2:
-                            newModifiers = LZ4MessagePackSerializer.Deserialize<List<BoneModifier>>((byte[])bytes);
+                            Modifiers = LZ4MessagePackSerializer.Deserialize<List<BoneModifier>>((byte[])bytes);
                             break;
 
                         case 1:
                             Settings.Logger.LogDebug($"[Cosplay Academy][KKABMX] Loading legacy embedded ABM data from card: {ChaFile.parameter?.fullname}");
-                            newModifiers = KKAMBX_Migrate.MigrateOldExtData(SavedData);
+                            Modifiers = KKAMBX_Migrate.MigrateOldExtData(SavedData);
                             break;
 
                         default:
@@ -498,11 +497,17 @@ namespace Cosplay_Academy
                 {
                     Settings.Logger.LogError("[Cosplay Academy][KKABMX] Failed to load extended data - " + ex);
                 }
-                if (newModifiers == null)
+                if (Modifiers == null)
                 {
-                    newModifiers = new List<BoneModifier>();
+                    Modifiers = new List<BoneModifier>();
                 }
-                Modifiers = newModifiers.Where(x => !x.IsCoordinateSpecific()).ToList();
+                //unknown
+                //for (int i = 0; i < Constants.Outfit_Size; i++)
+                //{
+                //    if (ValidOutfits[i])                    
+                //        continue;
+                //}
+                //Modifiers.AddRange(Modifiers.Where(x => !x.IsCoordinateSpecific()));
             }
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
