@@ -26,7 +26,7 @@ namespace Cosplay_Academy
         private static Stopwatch Time = new Stopwatch();
         private static List<long> Average = new List<long>();
 #endif
-        public bool Harem = false;
+        public static bool inH = false; //hopefully code that will work if additional heroines are loaded in H actively. such as in Kplug, Not tested.
         public static void MakerAPI_MakerExiting()
         {
             Firstpass = true;
@@ -79,16 +79,16 @@ namespace Cosplay_Academy
             {
                 Process(currentGameMode);
 
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, Harem);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
             else if (ThisOutfitData.processed && GameAPI.InsideHScene)
             {
                 ThisOutfitData.Chafile = ChaFileControl;
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
 
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, Harem);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
-            if (IsMaker && Firstpass)
+            if (IsMaker && Firstpass || inH)
             {
                 ChaControl.ChangeCoordinateTypeAndReload();
                 Firstpass = false;

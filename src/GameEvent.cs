@@ -48,6 +48,7 @@ namespace Cosplay_Academy
                     Heroine.chaCtrl.ChangeCoordinateTypeAndReload();
                 }
             }
+            CharaEvent.inH = true;
         }
 
         protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
@@ -57,6 +58,7 @@ namespace Cosplay_Academy
                 Constants.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
+            CharaEvent.inH = false;
         }
     }
 }
