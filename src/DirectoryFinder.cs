@@ -36,7 +36,7 @@ namespace Cosplay_Academy
         public static void Organize()
         {
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + "coordinate";
-            var folders = Grab_All_Directories(coordinatepath);
+            var folders = Grab_All_Directories(coordinatepath + @"\Unorganized");
             foreach (var item in folders)
             {
                 var files = Get_Outfits_From_Path(item, false);
@@ -108,7 +108,10 @@ namespace Cosplay_Academy
             string[] folders = System.IO.Directory.GetDirectories(input, "*", System.IO.SearchOption.AllDirectories); //grab child folders
             List<string> FolderLists = folders.ToList();
             int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
-            FolderLists.RemoveAt(index);
+            if (index != -1)
+            {
+                FolderLists.RemoveAt(index);
+            }
             FoldersPath.AddRange(FolderLists);
 
             return FoldersPath;
