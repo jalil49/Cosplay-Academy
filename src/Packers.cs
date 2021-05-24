@@ -155,13 +155,15 @@ namespace Cosplay_Academy
                         FailedOutfits.Add(i);
                     }
                 }
+
                 List<ObjectType> FailedTypes = new List<ObjectType>() { ObjectType.Accessory, ObjectType.Clothing };
                 List<ObjectType> Always = new List<ObjectType>() { ObjectType.Hair, ObjectType.Character };
-                ME_Save.MaterialShader.AddRange(ME_Chafile.MaterialShader.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
-                ME_Save.RendererProperty.AddRange(ME_Chafile.RendererProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
-                ME_Save.MaterialColorProperty.AddRange(ME_Chafile.MaterialColorProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
-                ME_Save.MaterialFloatProperty.AddRange(ME_Chafile.MaterialFloatProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
-                ME_Save.MaterialTextureProperty.AddRange(ME_Chafile.MaterialTextureProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) || Always.Contains(x.ObjectType)));
+
+                ME_Save.MaterialShader.AddRange(ME_Chafile.MaterialShader.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) && !(x.ObjectType == ObjectType.Clothing && ME_Dont_Touch[x.CoordinateIndex].Contains(x.Slot)) || Always.Contains(x.ObjectType)));
+                ME_Save.RendererProperty.AddRange(ME_Chafile.RendererProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) && !(x.ObjectType == ObjectType.Clothing && ME_Dont_Touch[x.CoordinateIndex].Contains(x.Slot)) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialColorProperty.AddRange(ME_Chafile.MaterialColorProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) && !(x.ObjectType == ObjectType.Clothing && ME_Dont_Touch[x.CoordinateIndex].Contains(x.Slot)) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialFloatProperty.AddRange(ME_Chafile.MaterialFloatProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) && !(x.ObjectType == ObjectType.Clothing && ME_Dont_Touch[x.CoordinateIndex].Contains(x.Slot)) || Always.Contains(x.ObjectType)));
+                ME_Save.MaterialTextureProperty.AddRange(ME_Chafile.MaterialTextureProperty.FindAll(x => objectTypes.Contains(x.ObjectType) && FailedOutfits.Contains(x.CoordinateIndex) && !(x.ObjectType == ObjectType.Clothing && ME_Dont_Touch[x.CoordinateIndex].Contains(x.Slot)) || Always.Contains(x.ObjectType)));
             }
             var SaveData = new PluginData();
 
