@@ -8,9 +8,9 @@ namespace Cosplay_Academy
         [Description("Update outfits everyday")]
         Daily,
         [Description("Update outfits on Mondays")]
-        Weekly/*,*/
-        //[Description("Update everytime character reloads")]
-        //EveryReload
+        Weekly,
+        [Description("Update every period")]
+        EveryPeriod
     }
     static class Constants
     {

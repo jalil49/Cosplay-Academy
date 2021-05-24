@@ -225,7 +225,7 @@ namespace Cosplay_Academy
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (Settings.ExtremeAccKeeper.Value || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
+                        if (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
                         {
                             if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
                             {

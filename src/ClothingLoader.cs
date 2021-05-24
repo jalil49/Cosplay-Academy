@@ -363,7 +363,6 @@ namespace Cosplay_Academy
             int ACCpostion = 0;
             bool Empty;
             bool print = true;
-
             //Skip if inside Maker
             if (MakerAPI.InsideMaker)
             {
@@ -387,7 +386,6 @@ namespace Cosplay_Academy
                             HairAccInfo.Remove(ACCpostion);
                             HairQueue.Dequeue();
                         }
-
                         if (HairKeepQueue.Dequeue())
                         {
                             ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);

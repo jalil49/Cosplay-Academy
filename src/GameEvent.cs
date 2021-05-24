@@ -6,7 +6,7 @@ namespace Cosplay_Academy
     {
         protected override void OnPeriodChange(Cycle.Type period)
         {
-            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily)
+            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily || Settings.UpdateFrequency.Value == OutfitUpdate.EveryPeriod && (period == Cycle.Type.StaffTime || period == Cycle.Type.AfterSchool || Cycle.Type.MyHouse == period))
             {
                 OutfitDecider.ResetDecider();
             }
@@ -20,7 +20,6 @@ namespace Cosplay_Academy
         {
             if ((Cycle.Week.Monday == day && Settings.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && Settings.SundayDate.Value)
             {
-                //Constants.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
         }
