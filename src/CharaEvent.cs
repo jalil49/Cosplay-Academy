@@ -109,9 +109,8 @@ namespace Cosplay_Academy
             //unused mandatory function 
         }
 
-        public void Process(GameMode currentGameMode)
+        private void ThisOutfitDataProcess()
         {
-            #region ThisOutfitData Assignment
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
@@ -124,16 +123,19 @@ namespace Cosplay_Academy
                     heroine = ChaControl.GetHeroine()
                 };
                 Constants.ChaDefaults.Add(ThisOutfitData);
-
             }
+            ThisOutfitData.ChaControl = ChaControl;
+            ThisOutfitData.Chafile = ChaFileControl;
+        }
+
+        public void Process(GameMode currentGameMode)
+        {
+            ThisOutfitDataProcess();
+
             if (ChaControl.sex != 0 && ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
-            ThisOutfitData.ChaControl = ChaControl;
-            ThisOutfitData.Chafile = ChaFileControl;
-            #endregion
-
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
@@ -197,8 +199,6 @@ namespace Cosplay_Academy
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
 
-                    List<ChaFileAccessory.PartsInfo> AccImport = new List<ChaFileAccessory.PartsInfo>();
-                    List<HairSupport.HairAccessoryInfo> HairImport = new List<HairSupport.HairAccessoryInfo>();
                     if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
