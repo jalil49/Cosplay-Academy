@@ -98,6 +98,8 @@ namespace Cosplay_Academy
                 {
                     CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
                 }
+                yield return null;
+                DirectoryFinder.Organize();
             }
             GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID);
