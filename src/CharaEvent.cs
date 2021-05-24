@@ -265,13 +265,10 @@ namespace Cosplay_Academy
 
             if (ChaControl.sex == 1)//run the following if female
             {
-                if (currentGameMode == GameMode.MainGame || Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
+                if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed || Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
                 {
-                    if (!ThisOutfitData.processed)//run if unprocessed
-                    {
-                        OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                        ThisOutfitData.processed = true;
-                    }
+                    OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
+                    ThisOutfitData.processed = true;
                 }
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
