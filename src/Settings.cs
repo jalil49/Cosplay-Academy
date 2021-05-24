@@ -109,21 +109,20 @@ namespace Cosplay_Academy
             HairMatch = Config.Bind("Accessories", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
 
             //Main Game
-            EnableDefaults = Config.Bind("Main Game", "Enable Default in rolls", true, "Adds default outfit to roll tables");
             AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, "Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Academy Ready character marked by Additional Card Info");
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
-            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Don't load new outfits");
-            UnderwearStates = Config.Bind("Main Game", "Randomize Underwear: ACC_States", false, "");
+            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
 
             //NonMatchWeight = Config.Bind("Main Game", "Non-Set weight Adjustment", true, "When outfit is not part of a set, give equal weight to a full set.\nIf this is disabled and you have one set folder the chance would be 50% of not being a set item if there are 9 items not in the set the set will have a 10% chance");
 
             //StoryMode
-            StoryModeChange = Config.Bind("Story Mode", "KoiKatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
-            KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behaviour", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
+            StoryModeChange = Config.Bind("Story Mode", "Koikatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
+            KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behavior", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
             ChangeToClubatKoi = Config.Bind("Story Mode", "Change at Koikatsu Start", false, "Change Heroine to club outfit when they start in Koikatsu room");
             TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, "Teachers probably would like to dress up if everyone does it.");
             UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
+            SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday");
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
@@ -133,7 +132,6 @@ namespace Cosplay_Academy
             //match uniforms
             MatchUniform = Config.Bind("Match Outfit", "Coordinated Uniforms", true, "Everyone wears same uniform");
             AfterUniform = Config.Bind("Match Outfit", "Different Uniform for afterschool", false, "Everyone wears different uniform afterschool");
-            GrabUniform = Config.Bind("Additional Outfit", "Grab Normal uniforms for afterschool", true, "50% chance of being overwritten by AfterSchool Casual");
             MatchGym = Config.Bind("Match Outfit", "Coordinated Gym Uniforms", true, "Everyone wears same uniform during Gym");
             MatchSwim = Config.Bind("Match Outfit", "Coordinated Swim class outfits", false, "Everyone wears same uniform during Swim Class");
             MatchSwimClub = Config.Bind("Match Outfit", "Coordinated Swim Club outfits", true, "Everyone wears same uniform during Swim Club");
@@ -145,7 +143,12 @@ namespace Cosplay_Academy
             MatchCasual = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, "It's an option");
             MatchNightwear = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
             MatchUnderwear = Config.Bind("Match Outfit", "Coordinated Underwear", false, "It's an option");
-            GrabSwimsuits = Config.Bind("Additional Outfit", "Grab Swimsuits for Swimclub", true);
+
+            //Additional Outfit
+            GrabSwimsuits = Config.Bind("Additional Outfits", "Grab Swimsuits for Swim club", true);
+            GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true, "Uses Casual getup afterschool");
+            EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, "Adds default outfit to roll tables");
+            AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, "Everyone can be in casual wear after school");
 
             //Probability
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
@@ -153,21 +156,21 @@ namespace Cosplay_Academy
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
             for (int i = 0; i < HStateWeights.Length; i++)
             {
-                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 1, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100)));
+                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100)));
             }
 
-            //Additional Outfits
-            AfterSchoolCasual = Config.Bind("Additional Outfit", "After School Casual", true, "Everyone can be in casual wear after school");
-            SundayDate = Config.Bind("Additional Outfit", "Sunday Date Special", true, "Date will wear something different on Sunday");
-
             //Maker
-            Makerview = Config.Bind("Maker", "Enable maker view", false, "View in creator mode\ndoesn't load School Uniform upon entering maker from Main Menu swap uniform type to view");
+            Makerview = Config.Bind("Maker", "Enable Maker Mode", false);
             KoiClub = Config.Bind("Maker", "Is member of Koikatsu club", false, "Adds possibilty of choosing Koi outfit");
             MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
             ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub, "Affects club outfit in FreeH and cutscene non-heroine NPCs in story mode");
-            ResetMaker = Config.Bind("Maker", "Randomize Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
+            ResetMaker = Config.Bind("Maker", "Reset Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false);
 
+            //Other Mods
+            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", false, "");
+
+            //Overrides
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
             for (int i = 0; i < ListOverride.Length; i++)
             {
