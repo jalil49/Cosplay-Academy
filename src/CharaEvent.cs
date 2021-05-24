@@ -10,7 +10,7 @@ using KKAPI.Maker.UI.Sidebar;
 using MessagePack;
 using MoreAccessoriesKOI;
 using System.Collections.Generic;
-#if DEBUG
+#if TRACE
 using System.Diagnostics;
 #endif
 using System.Linq;
@@ -22,9 +22,9 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool Firstpass = true;
-#if DEBUG
-        private static Stopwatch Time = new Stopwatch();
-        private static List<long> Average = new List<long>();
+#if TRACE
+        private static readonly Stopwatch Time = new Stopwatch();
+        private static readonly List<long> Average = new List<long>();
 #endif
         public static bool inH = false; //hopefully code that will work if additional heroines are loaded in H actively. such as in Kplug, Not tested.
         public static void MakerAPI_MakerExiting()
@@ -63,9 +63,9 @@ namespace Cosplay_Academy
             {
                 return;
             }
-#if DEBUG
+#if TRACE
             var Start = Time.ElapsedMilliseconds;
-            if (ThisOutfitData == null || !ThisOutfitData.processed)
+            if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
             {
                 Time.Start();
             }
@@ -93,13 +93,13 @@ namespace Cosplay_Academy
                 ChaControl.ChangeCoordinateTypeAndReload();
                 Firstpass = false;
             }
-#if DEBUG
+#if TRACE
             if (Time.IsRunning)
             {
                 Time.Stop();
                 var temp = Time.ElapsedMilliseconds - Start;
                 Average.Add(temp);
-                Settings.Logger.LogWarning($"Total elaspsed time {Time.ElapsedMilliseconds}ms\nRun {Average.Count}: {temp}ms\nAverage: {Average.Average()}ms");
+                Settings.Logger.LogWarning($"Total elapsed time {Time.ElapsedMilliseconds}ms\nRun {Average.Count}: {temp}ms\nAverage: {Average.Average()}ms");
             }
 #endif
         }

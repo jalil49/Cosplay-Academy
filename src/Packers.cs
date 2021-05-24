@@ -9,6 +9,9 @@ using KKAPI;
 using MessagePack;
 using System;
 using System.Collections.Generic;
+#if TRACE
+using System.Diagnostics;
+#endif
 using System.Linq;
 using UnityEngine;
 using CoordinateType = ChaFileDefine.CoordinateType;
@@ -19,6 +22,10 @@ namespace Cosplay_Academy
     {
         public void Run_Repacks(ChaControl character)
         {
+#if TRACE
+            var Start = TimeWatch[2].ElapsedMilliseconds;
+            TimeWatch[2].Start();
+#endif
             ME_RePack(character);
             KCOX_RePack(character);
             KKABM_Repack(character);
@@ -47,10 +54,20 @@ namespace Cosplay_Academy
             {
                 Accessory_Themes_Repack(character);
             }
+#if TRACE
+            TimeWatch[2].Stop();
+            var temp = TimeWatch[2].ElapsedMilliseconds - Start;
+            Average[2].Add(temp);
+            Settings.Logger.LogWarning($"\t\tRun_Repacks: Total elapsed time {TimeWatch[2].ElapsedMilliseconds}ms\n\t\tRun {Average[2].Count}: {temp}ms\n\t\tAverage: {Average[2].Average()}ms");
+#endif
         }
 
         public void Reload_RePacks(ChaControl ChaControl, bool ForceALL)
         {
+#if TRACE
+            var Start = TimeWatch[3].ElapsedMilliseconds;
+            TimeWatch[3].Start();
+#endif
             ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
 
             if (Constants.PluginResults["Accessory_States"])
@@ -66,7 +83,15 @@ namespace Cosplay_Academy
                 ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
 
             if (!ForceALL)
+            {
+#if TRACE
+                TimeWatch[3].Stop();
+                var temp = TimeWatch[3].ElapsedMilliseconds - Start;
+                Average[3].Add(temp);
+                Settings.Logger.LogWarning($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp}ms\n\t\tAverage: {Average[3].Average()}ms");
+#endif
                 return;
+            }
 
             ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
 
@@ -82,6 +107,12 @@ namespace Cosplay_Academy
 
             if (Constants.PluginResults["madevil.kk.ass"])
                 ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
+#if TRACE
+            TimeWatch[3].Stop();
+            var temp2 = TimeWatch[3].ElapsedMilliseconds - Start;
+            Average[3].Add(temp2);
+            Settings.Logger.LogWarning($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp2}ms\n\t\tAverage: {Average[3].Average()}ms");
+#endif
         }
 
         private void HairACC_Repack(ChaControl ChaControl)

@@ -7,7 +7,9 @@ using MessagePack;
 using MoreAccessoriesKOI;
 using System;
 using System.Collections.Generic;
-//using System.Diagnostics;
+#if TRACE
+using System.Diagnostics;
+#endif
 using System.Linq;
 using ToolBox;
 using UnityEngine;
@@ -53,10 +55,30 @@ namespace Cosplay_Academy
         public bool Character_Cosplay_Ready = false;
         #endregion
 
+#if TRACE
+        #region StopWatches
+        private static bool TimeProcess = true;
+        private static readonly Stopwatch[] TimeWatch = new Stopwatch[4];
+        private static List<long>[] Average;
+        #endregion
+#endif
         private readonly bool[] ValidOutfits = new bool[Constants.Outfit_Size];
 
         public ClothingLoader(ChaDefault ThisOutfitData)
         {
+#if TRACE
+            if (TimeProcess)// do once
+            {
+                TimeProcess = false;
+                Average = new List<long>[TimeWatch.Length];
+                for (int i = 0; i < TimeWatch.Length; i++)
+                {
+                    TimeWatch[i] = new Stopwatch();
+                    Average[i] = new List<long>();
+                }
+            }
+#endif
+
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i] = new List<int>();
@@ -67,6 +89,10 @@ namespace Cosplay_Academy
 
         public void FullLoad(ChaControl character, ChaFile file)
         {
+#if TRACE
+            var Start = TimeWatch[0].ElapsedMilliseconds;
+            TimeWatch[0].Start();
+#endif
             InsideMaker = MakerAPI.InsideMaker;
             ChaControl = character;
             ChaFile = file;
@@ -94,7 +120,7 @@ namespace Cosplay_Academy
             ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.Underwear);
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[Original_Coord].accessory.parts);
             Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
-            //FullTime.Start();
+
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
                 ValidOutfits[i] = ThisOutfitData.outfitpath[i].EndsWith(".png");
@@ -120,12 +146,21 @@ namespace Cosplay_Academy
 
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
             Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
-
+#if TRACE
+            TimeWatch[0].Stop();
+            var temp = TimeWatch[0].ElapsedMilliseconds - Start;
+            Average[0].Add(temp);
+            Settings.Logger.LogWarning($"\tFullLoad: Total elapsed time {TimeWatch[0].ElapsedMilliseconds}ms\n\tRun {Average[0].Count}: {temp}ms\n\tAverage: {Average[0].Average()}ms");
+#endif
             Run_Repacks(character);
         }
 
         public void GeneralizedLoad(int outfitnum, bool load)
         {
+#if TRACE
+            var Start = TimeWatch[1].ElapsedMilliseconds;
+            TimeWatch[1].Start();
+#endif
             ValidOutfits[outfitnum] = load;
             ThisOutfitData.Finished.ClearCoord(outfitnum);
             UnderwearAccessoriesLocations[outfitnum].Clear();
