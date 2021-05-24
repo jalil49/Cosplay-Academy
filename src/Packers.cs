@@ -797,9 +797,9 @@ namespace Cosplay_Academy
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                ThemeNames[i] = new List<string>();
-                RelativeThemeBool[i] = new List<bool>();
-                colors[i] = new List<Color[]>();
+                ThemeNames[i] = new List<string>() { "None" };
+                RelativeThemeBool[i] = new List<bool>() { false };
+                colors[i] = new List<Color[]> { new Color[] { new Color(), new Color(), new Color(), new Color() } };
                 ACC_Theme_Dictionary[i] = new Dictionary<int, int>();
                 Relative_ACC_Dictionary[i] = new Dictionary<int, List<int[]>>();
             }
@@ -859,10 +859,6 @@ namespace Cosplay_Academy
                     {
                         Relative_ACC_Dictionary[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, List<int[]>>>((byte[])S_Relative_ACC_Dictionary);
                     }
-                }
-                if (ThemeNames[outfitnum].Count == 0)
-                {
-                    ThemeNames[outfitnum].Add("None");
                 }
             }
             SavedData.data.Add("Theme_Names", MessagePackSerializer.Serialize(ThemeNames));
