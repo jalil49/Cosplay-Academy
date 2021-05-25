@@ -153,7 +153,7 @@ namespace Cosplay_Academy
                 string[] files = System.IO.Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }
-            if (Choosen.Count == 0)
+            if (Choosen.Count == 0 && !FilePath.Contains(@"\Unorganized"))
             {
                 Choosen.Add("Default");
                 Settings.Logger.LogWarning("No files found in :" + FilePath);
