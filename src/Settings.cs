@@ -165,10 +165,10 @@ namespace Cosplay_Academy
             MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
             ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub, "Affects club outfit in FreeH and cutscene non-heroine NPCs in story mode");
             ResetMaker = Config.Bind("Maker", "Reset Sets", false, "Will overwrite current day outfit in storymode if you wanted to view that version.");
-            ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false);
+            ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, "Pick new coordinates in maker");
 
             //Other Mods
-            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", false, "");
+            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
             //Overrides
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
