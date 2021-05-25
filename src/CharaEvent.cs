@@ -22,6 +22,8 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool Firstpass = true;
+        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
+
 #if TRACE
         private static readonly Stopwatch Time = new Stopwatch();
         private static readonly List<long> Average = new List<long>();
@@ -111,6 +113,10 @@ namespace Cosplay_Academy
 
         private void ThisOutfitDataProcess()
         {
+            if (ThisOutfitData != null && MakerAPI.InsideMaker)
+            {
+                return;
+            }
             ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
             if (ThisOutfitData == null)
             {
@@ -150,8 +156,6 @@ namespace Cosplay_Academy
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
                 ThisOutfitData.Clear_Firstpass();
-
-                WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 
                 Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 

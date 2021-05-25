@@ -42,7 +42,7 @@ namespace Cosplay_Academy
 
         #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
-        private readonly bool[][] Underwearbools = new bool[Constants.Outfit_Size][];
+        private readonly bool[][] Underwearbools = new bool[Constants.Outfit_Size][]; //0: not bot; 1: notbra; 2: notshorts
         private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private ME_List Underwear_ME_Data;
@@ -55,7 +55,7 @@ namespace Cosplay_Academy
         public bool Character_Cosplay_Ready = false;
         #endregion
 
-        private List<int>[] ME_Dont_Touch = new List<int>[Constants.Outfit_Size];
+        private readonly List<int>[] ME_Dont_Touch = new List<int>[Constants.Outfit_Size];
 
 #if TRACE
         #region StopWatches
@@ -363,13 +363,14 @@ namespace Cosplay_Academy
             int ACCpostion = 0;
             bool Empty;
             bool print = true;
-            //Skip if inside Maker
+
+            //Don't Skip if inside Maker
             if (MakerAPI.InsideMaker)
             {
                 //Normal
                 for (int n = ThisCoordinate.accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
                 {
-                    Empty = ThisCoordinate.accessory.parts[ACCpostion].type == 120;
+                    Empty = ThisCoordinate.accessory.parts[ACCpostion].type < 121;
                     if (Empty) //120 is empty/default
                     {
                         if (insert++ >= UnderwearAccessoryStart)
@@ -415,7 +416,7 @@ namespace Cosplay_Academy
                 //MoreAccessories
                 for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
                 {
-                    Empty = NewRAW[ACCpostion - 20].type == 120;
+                    Empty = NewRAW[ACCpostion - 20].type < 121;
                     if (Empty) //120 is empty/default
                     {
                         if (insert++ >= UnderwearAccessoryStart)
