@@ -42,10 +42,6 @@ namespace Cosplay_Academy
             {
                 Accessory_States_Repack(character);
             }
-            if (Constants.PluginResults["madevil.kk.ass"])
-            {
-                AccessoryStateSync_Repack(character);
-            }
             if (Constants.PluginResults["Accessory_Parents"] && InsideMaker)
             {
                 Accessory_Parents_Repack(character);
@@ -54,6 +50,11 @@ namespace Cosplay_Academy
             {
                 Accessory_Themes_Repack(character);
             }
+            if (Constants.PluginResults["madevil.kk.ass"])
+            {
+                AccessoryStateSync_Repack(character);
+            }
+
 #if TRACE
             TimeWatch[2].Stop();
             var temp = TimeWatch[2].ElapsedMilliseconds - Start;
@@ -653,35 +654,25 @@ namespace Cosplay_Academy
             Dictionary<int, AccStateSync.OutfitTriggerInfo> CharaTriggerInfo = new Dictionary<int, AccStateSync.OutfitTriggerInfo>();
             Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>> CharaVirtualGroupInfo = new Dictionary<int, Dictionary<string, AccStateSync.VirtualGroupInfo>>();
 
+            AccStateSync.OutfitTriggerInfo UnderwearTrigger = null;
+            Dictionary<string, AccStateSync.VirtualGroupInfo> UnderwearGroups = new Dictionary<string, AccStateSync.VirtualGroupInfo>();
+            var UnderwearExtended = ExtendedSave.GetExtendedDataById(Underwear, "madevil.kk.ass");
+            if (UnderwearExtended != null && UnderwearExtended.data.TryGetValue("OutfitTriggerInfo", out var ByteData) && ByteData != null)
+            {
+                AccStateSync.CoordinateProcess(UnderwearExtended, (byte[])ByteData, out UnderwearTrigger, out UnderwearGroups);
+            }
+
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 CharaTriggerInfo.Add(outfitnum, new AccStateSync.OutfitTriggerInfo(outfitnum));
                 CharaVirtualGroupInfo.Add(outfitnum, new Dictionary<string, AccStateSync.VirtualGroupInfo>());
 
                 PluginData ExtendedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "madevil.kk.ass");
-                if (ExtendedData != null && ExtendedData.data.TryGetValue("OutfitTriggerInfo", out var loadedOutfitTriggerInfo) && loadedOutfitTriggerInfo != null)
+                if (ExtendedData != null && ExtendedData.data.TryGetValue("OutfitTriggerInfo", out ByteData) && ByteData != null)
                 {
-                    if (ExtendedData.version < 2)
-                    {
-                        AccStateSync.OutfitTriggerInfoV1 OldCharaTriggerInfo = MessagePackSerializer.Deserialize<AccStateSync.OutfitTriggerInfoV1>((byte[])loadedOutfitTriggerInfo);
-                        CharaTriggerInfo[outfitnum] = AccStateSync.UpgradeOutfitTriggerInfoV1(OldCharaTriggerInfo);
-                    }
-                    else
-                        CharaTriggerInfo[outfitnum] = MessagePackSerializer.Deserialize<AccStateSync.OutfitTriggerInfo>((byte[])loadedOutfitTriggerInfo);
-
-                    if (ExtendedData.version < 5)
-                    {
-                        if (ExtendedData.data.TryGetValue("OutfitVirtualGroupNames", out var loadedOutfitVirtualGroupNames) && loadedOutfitVirtualGroupNames != null)
-                        {
-                            Dictionary<string, string> OutfitVirtualGroupNames = MessagePackSerializer.Deserialize<Dictionary<string, string>>((byte[])loadedOutfitVirtualGroupNames);
-                            CharaVirtualGroupInfo[outfitnum] = AccStateSync.UpgradeVirtualGroupNamesV2(OutfitVirtualGroupNames);
-                        }
-                    }
-                    else
-                    {
-                        if (ExtendedData.data.TryGetValue("OutfitVirtualGroupInfo", out var loadedOutfitVirtualGroupInfo) && loadedOutfitVirtualGroupInfo != null)
-                            CharaVirtualGroupInfo[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<string, AccStateSync.VirtualGroupInfo>>((byte[])loadedOutfitVirtualGroupInfo);
-                    }
+                    AccStateSync.CoordinateProcess(ExtendedData, (byte[])ByteData, out var Trigger, out var Groups);
+                    CharaTriggerInfo[outfitnum] = Trigger;
+                    CharaVirtualGroupInfo[outfitnum] = Groups;
                 }
                 if (!ValidOutfits[outfitnum])
                 {
@@ -698,10 +689,49 @@ namespace Cosplay_Academy
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     int postion = 0;
+                    int partnum = -1;
+                    int Max = 10;
+                    int Custom_offset = 0;
+                    int inc_offset = -1;
                     ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
+                    Dictionary<string, AccStateSync.VirtualGroupInfo> SubUnderwearGroups = new Dictionary<string, AccStateSync.VirtualGroupInfo>(UnderwearGroups);
+                    var KindStringDict = new Dictionary<string, int>();
+                    if (UnderwearTrigger != null)
+                    {
+                        foreach (var item in CharaVirtualGroupInfo[outfitnum])
+                        {
+                            KindStringDict[item.Key] = item.Value.Kind;
+                            Max = Math.Max(Max, item.Value.Kind);
+                        }
+                        Custom_offset = (Max > 9) ? Max - 9 : 0;
+                        var parts = UnderwearTrigger.Parts;
+                        for (int i = 0, n = SubUnderwearGroups.Count; i < n; i++)
+                        {
+                            if (!KindStringDict.ContainsKey(SubUnderwearGroups.ElementAt(i).Key))
+                            {
+                                inc_offset++;
+                                KindStringDict[SubUnderwearGroups.ElementAt(i).Key] = SubUnderwearGroups.ElementAt(i).Value.Kind + Custom_offset + inc_offset;
+                            }
+                        }
+                        for (int i = 0, n = parts.Count(); i < n; i++)
+                        {
+                            int kind = parts.ElementAt(i).Value.Kind;
+                            var group = parts.ElementAt(i).Value.Group;
+                            if (KindStringDict.ContainsKey(group))
+                            {
+                                kind = KindStringDict[group];
+                            }
+                            else if (kind > 9)
+                            {
+                                kind += Custom_offset;
+                            }
+                            CharaVirtualGroupInfo[outfitnum][group].Kind = kind;
+                        }
+                    }
                     foreach (var accessory in Underwear_PartsInfos)
                     {
-                        if (accessory.id == 120 || accessory.id == 0)
+                        partnum++;
+                        if (accessory.type < 121)
                         {
                             continue;
                         }
@@ -714,11 +744,53 @@ namespace Cosplay_Academy
                         //6 pantyhose
                         //7 socks
                         //8 shoes
+
+
                         var states = new List<bool> { true, false, false, false };
                         var location = UnderwearAccessoriesLocations[outfitnum][postion++];
                         var inclusionarray = new bool[Constants.Inclusion.Length];
                         int binder = -1;
                         bool found = false;
+
+                        if (UnderwearTrigger != null)
+                        {
+                            if (UnderwearTrigger.Parts.TryGetValue(partnum, out var originaltrigger))
+                            {
+                                var kind = originaltrigger.Kind;
+                                if (kind < 9)
+                                {
+                                    if (kind == 2 && clothes[1].id != 0 || kind == 2 && clothes[0].id != 0 && Underwearbools[outfitnum][0] ||
+                                        kind == 3 && clothes[2].id != 0 || kind == 3 && clothes[0].id != 0 && Underwearbools[outfitnum][1] ||
+                                        kind == 4 && clothes[3].id != 0 || kind == 4 && clothes[1].id != 0 && Underwearbools[outfitnum][2])
+                                    {
+                                        originaltrigger.Slot = location;
+                                        CharaTriggerInfo[outfitnum].Parts[location] = originaltrigger;
+                                        continue;
+                                    }
+                                    else if (kind != 2 && kind != 3 && kind != 4 && kind < 8)
+                                    {
+                                        originaltrigger.Slot = location;
+                                        CharaTriggerInfo[outfitnum].Parts[location] = originaltrigger;
+                                        continue;
+                                    }
+                                    else if (kind == 8)
+                                    {
+                                        originaltrigger.Slot = location;
+                                        CharaTriggerInfo[outfitnum].Parts[location] = originaltrigger;
+                                        continue;
+                                    }
+                                }
+                                else if (kind != 9)
+                                {
+                                    if (KindStringDict.ContainsKey(originaltrigger.Group))
+                                    {
+                                        kind = KindStringDict[originaltrigger.Group];
+                                    }
+
+                                }
+                            }
+                        }
+
                         for (int i = 0; i < inclusionarray.Length; i++)
                         {
                             if (!found)
@@ -741,7 +813,7 @@ namespace Cosplay_Academy
                             binder = 6;
                         }
                         //panties
-                        else if (clothes[3].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        else if ((clothes[3].id != 0 || clothes[2].id != 0 && Underwearbools[outfitnum][2]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
                         {
                             binder = 3;
                             states = new List<bool> { false, true, true, true };
@@ -752,7 +824,7 @@ namespace Cosplay_Academy
                             binder = 5;
                         }
                         //Bra
-                        else if (clothes[2].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
+                        else if ((clothes[2].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][1]) && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
                         {
                             binder = 2;
                             states = new List<bool> { false, true, true, true };
@@ -764,7 +836,7 @@ namespace Cosplay_Academy
                             states = new List<bool> { false, true, true, true };
                         }
                         //bottom
-                        else if (clothes[1].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        else if ((clothes[1].id != 0 || clothes[2].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
                         {
                             binder = 1;
                             states = new List<bool> { false, true, true, true };
@@ -1079,6 +1151,7 @@ namespace Cosplay_Academy
         private void Accessory_States_Repack(ChaControl ChaControl)
         {
             PluginData SavedData = new PluginData();
+
             Dictionary<int, int>[] ACC_Binding_Dictionary = new Dictionary<int, int>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
             Dictionary<int, int[]>[] ACC_State_array = new Dictionary<int, int[]>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
             Dictionary<int, string>[] ACC_Name_Dictionary = new Dictionary<int, string>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
@@ -1114,9 +1187,34 @@ namespace Cosplay_Academy
                     }
                 }
             }
+
+            Dictionary<int, int> Under_Binding_Dictionary = new Dictionary<int, int>();
+            Dictionary<int, int[]> Under_State_array = new Dictionary<int, int[]>();
+            Dictionary<int, string> Under_Name_Dictionary = new Dictionary<int, string>();
+            Dictionary<int, bool> Under_Parented_Dictionary = new Dictionary<int, bool>();
+            var State_data = ExtendedSave.GetExtendedDataById(Underwear, "Accessory_States");
+            if (State_data != null)
+            {
+                if (State_data.data.TryGetValue("ACC_Binding_Dictionary", out var ByteData) && ByteData != null)
+                {
+                    Under_Binding_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
+                }
+                if (State_data.data.TryGetValue("ACC_State_array", out ByteData) && ByteData != null)
+                {
+                    Under_State_array = MessagePackSerializer.Deserialize<Dictionary<int, int[]>>((byte[])ByteData);
+                }
+                if (State_data.data.TryGetValue("ACC_Name_Dictionary", out ByteData) && ByteData != null)
+                {
+                    Under_Name_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, string>>((byte[])ByteData);
+                }
+                if (State_data.data.TryGetValue("ACC_Parented_Dictionary", out ByteData) && ByteData != null)
+                {
+                    Under_Parented_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])ByteData);
+                }
+            }
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
-                var State_data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
+                State_data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
                 if (State_data != null)
                 {
                     if (State_data.data.TryGetValue("ACC_Binding_Dictionary", out var ByteData) && ByteData != null)
@@ -1138,141 +1236,140 @@ namespace Cosplay_Academy
                 }
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
-                    //ExpandedOutfit.Logger.LogWarning("Creating underwear data");
-                    ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
-                    Dictionary<int, int> Underwear_Binding_Dictionary = new Dictionary<int, int>();
-                    Dictionary<int, int[]> Underwear_State_array = new Dictionary<int, int[]>();
-                    Dictionary<int, string> Underwear_Name_Dictionary = new Dictionary<int, string>();
-                    Dictionary<int, bool> Underwear_Parented_Dictionary = new Dictionary<int, bool>();
-                    int offset = ACC_Name_Dictionary[outfitnum].Count;
-                    var Underwear_state_data = ExtendedSave.GetExtendedDataById(Underwear, "Accessory_States");
-                    if (Underwear_state_data != null)
+                    var clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
+                    int postion = 0;
+                    int local = -1;
+                    int Custom_offset = (ACC_Name_Dictionary[outfitnum].Count > 0) ? Math.Max(ACC_Name_Dictionary[outfitnum].Keys.Max() - 14, 0) : 0;
+                    foreach (var item in Under_Name_Dictionary)
                     {
-                        if (Underwear_state_data.data.TryGetValue("ACC_Binding_Dictionary", out var ByteData) && ByteData != null)
-                        {
-                            Underwear_Binding_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
-                        }
-                        if (Underwear_state_data.data.TryGetValue("ACC_State_array", out ByteData) && ByteData != null)
-                        {
-                            Underwear_State_array = MessagePackSerializer.Deserialize<Dictionary<int, int[]>>((byte[])ByteData);
-                        }
-                        if (Underwear_state_data.data.TryGetValue("ACC_Name_Dictionary", out ByteData) && ByteData != null)
-                        {
-                            Underwear_Name_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, string>>((byte[])ByteData);
-                        }
-                        if (Underwear_state_data.data.TryGetValue("ACC_Parented_Dictionary", out ByteData) && ByteData != null)
-                        {
-                            Underwear_Parented_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])ByteData);
-                        }
+                        ACC_Name_Dictionary[outfitnum][item.Key + Custom_offset] = item.Value;
                     }
-                    else
+                    foreach (var accessory in Underwear_PartsInfos)
                     {
-                        //foreach (var item in UnderwearAccessoriesLocations[outfitnum])
-                        //{
-                        //    ExpandedOutfit.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)outfitnum} Location: {item}");
-                        //}
-                        int postion = 0;
-                        foreach (var accessory in Underwear_PartsInfos)
+                        local++;
+                        if (accessory.type < 121)
                         {
-                            if (accessory.id == 120 || accessory.id == 0)
+                            continue;
+                        }
+                        //0 None
+                        //1 top
+                        //2 bot
+                        //3 bra
+                        //4 panties
+                        //5 glove
+                        //6 pantyhose
+                        //7 socks
+                        //8 shoes
+                        int binder = 0;
+                        int[] states = new int[] { 0, 3 };
+                        bool ClothFound = false;
+                        var location = UnderwearAccessoriesLocations[outfitnum][postion++];
+                        var inclusionarray = new bool[Constants.Inclusion.Length];
+                        bool found = false;
+
+                        if (Under_Parented_Dictionary.TryGetValue(local, out var parented))
+                        {
+                            ACC_Parented_Dictionary[outfitnum][location] = parented;
+                        }
+
+                        if (Under_Binding_Dictionary.TryGetValue(local, out var kind))
+                        {
+                            if (kind < 9)
                             {
-                                continue;
-                            }
-                            //0 None
-                            //1 top
-                            //2 bot
-                            //3 bra
-                            //4 panties
-                            //5 glove
-                            //6 pantyhose
-                            //7 socks
-                            //8 shoes
-                            int binder = 0;
-                            int[] states = new int[] { 0, 3 };
-                            var location = UnderwearAccessoriesLocations[outfitnum][postion++];
-                            var inclusionarray = new bool[Constants.Inclusion.Length];
-                            bool found = false;
-                            for (int i = 0; i < inclusionarray.Length; i++)
-                            {
-                                if (!found)
+                                if (
+                                    kind == 2 && clothes[1].id != 0 || kind == 2 && clothes[0].id != 0 && Underwearbools[outfitnum][0] ||
+                                    kind == 3 && clothes[2].id != 0 || kind == 3 && clothes[0].id != 0 && Underwearbools[outfitnum][1] ||
+                                    kind == 4 && clothes[3].id != 0 || kind == 4 && clothes[1].id != 0 && Underwearbools[outfitnum][2]
+                                   )
                                 {
-                                    found = inclusionarray[i] = Constants.Inclusion[i].Contains(accessory.parentKey);
+                                    ClothFound = true;
                                 }
-                                else
+                                else if (kind != 2 && kind != 3 && kind != 4 && kind < 8)
                                 {
-                                    inclusionarray[i] = false;
+                                    ClothFound = true;
                                 }
-                            }
-                            //gloves
-                            if (clothes[4].id != 0 && (inclusionarray[9] || inclusionarray[8]))
-                            {
-                                binder = 5;
-                            }
-                            //socks
-                            else if (clothes[6].id != 0 && inclusionarray[7])
-                            {
-                                binder = 7;
-                            }
-                            //panties
-                            else if ((clothes[3].id != 0 || (clothes[2].id != 0 && Underwearbools[outfitnum][1])) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                            {
-                                binder = 4;
-                                states = new int[] { 1, 3 };
-                            }
-                            //Pantyhose
-                            else if (clothes[5].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                            {
-                                binder = 6;
-                            }
-                            //Bra
-                            else if (clothes[2].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
-                            {
-                                binder = 3;
-                                states = new int[] { 1, 3 };
-                            }
-                            //top
-                            else if (clothes[0].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
-                            {
-                                binder = 1;
-                                states = new int[] { 1, 3 };
-                            }
-                            //bottom
-                            else if ((clothes[1].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][2]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                            {
-                                binder = 2;
-                                states = new int[] { 1, 3 };
+                                else if (kind == 8)
+                                {
+                                    ACC_Binding_Dictionary[outfitnum][location] = 8;
+                                    ACC_State_array[outfitnum][location] = new int[] { 0, 1 };
+                                    continue;
+                                }
                             }
                             else
                             {
-                                //ExpandedOutfit.Logger.LogWarning("always show");
-                                binder = 0;
+                                ACC_Binding_Dictionary[outfitnum][location] = kind + Custom_offset;
+                                ClothFound = true;
                             }
-                            Underwear_Binding_Dictionary[location] = binder;
-                            Underwear_State_array[location] = states;
                         }
-                    }
-                    foreach (var item in Underwear_Binding_Dictionary)
-                    {
-                        if (item.Key < 9)
+
+                        if (Under_State_array.TryGetValue(local, out var understate))
                         {
-                            ACC_Binding_Dictionary[outfitnum][item.Key] = item.Value;
+                            ACC_State_array[outfitnum][location] = understate;
+                            if (ClothFound)
+                            {
+                                continue;
+                            }
+                        }
+
+                        for (int i = 0; i < inclusionarray.Length; i++)
+                        {
+                            if (!found)
+                            {
+                                found = inclusionarray[i] = Constants.Inclusion[i].Contains(accessory.parentKey);
+                            }
+                            else
+                            {
+                                inclusionarray[i] = false;
+                            }
+                        }
+                        //gloves
+                        if (clothes[4].id != 0 && (inclusionarray[9] || inclusionarray[8]))
+                        {
+                            binder = 5;
+                        }
+                        //socks
+                        else if (clothes[6].id != 0 && inclusionarray[7])
+                        {
+                            binder = 7;
+                        }
+                        //panties
+                        else if ((clothes[3].id != 0 || (clothes[2].id != 0 && Underwearbools[outfitnum][2])) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        {
+                            binder = 4;
+                            states = new int[] { 1, 3 };
+                        }
+                        //Pantyhose
+                        else if (clothes[5].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        {
+                            binder = 6;
+                        }
+                        //Bra
+                        else if ((clothes[2].id != 0 || clothes[2].id != 0 && Underwearbools[outfitnum][1]) && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
+                        {
+                            binder = 3;
+                            states = new int[] { 1, 3 };
+                        }
+                        //top
+                        else if (clothes[0].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
+                        {
+                            binder = 1;
+                            states = new int[] { 1, 3 };
+                        }
+                        //bottom
+                        else if ((clothes[1].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        {
+                            binder = 2;
+                            states = new int[] { 1, 3 };
                         }
                         else
                         {
-                            ACC_Binding_Dictionary[outfitnum][item.Key + offset] = item.Value;
+                            binder = 0;
                         }
-                    }
-                    foreach (var item in Underwear_State_array)
-                    {
-                        ACC_State_array[outfitnum][item.Key] = item.Value;
-                    }
-                    foreach (var item in Underwear_Name_Dictionary)
-                    {
-                        ACC_Name_Dictionary[outfitnum][item.Key + offset] = item.Value;
-                    }
-                    foreach (var item in Underwear_Parented_Dictionary)
-                    {
-                        ACC_Parented_Dictionary[outfitnum][item.Key] = item.Value;
+                        ACC_Binding_Dictionary[outfitnum][location] = binder;
+                        if (!ClothFound)
+                        {
+                            ACC_State_array[outfitnum][location] = states;
+                        }
                     }
                 }
             }

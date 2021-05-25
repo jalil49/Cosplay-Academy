@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using ExtensibleSaveFormat;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,6 +143,28 @@ namespace Cosplay_Academy.Support
                 }
             }
             return OutfitVirtualGroupInfo;
+        }
+
+        public static void CoordinateProcess(PluginData ExtendedData, byte[] ByteData, out OutfitTriggerInfo CharaTriggerInfo, out Dictionary<string, VirtualGroupInfo> CharaVirtualGroupInfo)
+        {
+            if (ExtendedData.version < 2)
+            {
+                OutfitTriggerInfoV1 OldCharaTriggerInfo = MessagePackSerializer.Deserialize<OutfitTriggerInfoV1>(ByteData);
+                CharaTriggerInfo = UpgradeOutfitTriggerInfoV1(OldCharaTriggerInfo);
+            }
+            else
+                CharaTriggerInfo = MessagePackSerializer.Deserialize<OutfitTriggerInfo>(ByteData);
+
+            if (ExtendedData.version < 5)
+            {
+                Dictionary<string, string> OutfitVirtualGroupNames = MessagePackSerializer.Deserialize<Dictionary<string, string>>((byte[])ExtendedData.data["OutfitVirtualGroupNames"]);
+                CharaVirtualGroupInfo = UpgradeVirtualGroupNamesV2(OutfitVirtualGroupNames);
+
+            }
+            else
+            {
+                CharaVirtualGroupInfo = MessagePackSerializer.Deserialize<Dictionary<string, VirtualGroupInfo>>((byte[])ExtendedData.data["OutfitVirtualGroupInfo"]);
+            }
         }
     }
 }
