@@ -61,6 +61,7 @@ namespace Cosplay_Academy
             }
             else
             {
+                OutfitData.Anger = false;
                 HExperience = (int)Settings.MakerHstate.Value;
             }
             RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);

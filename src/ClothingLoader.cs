@@ -111,7 +111,6 @@ namespace Cosplay_Academy
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
 
             Underwear_ME_Data = new ME_List(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, true);
-            //ExpandedOutfit.Logger.LogWarning($"underwear is {ThisOutfitData.Underwear}");
             int Original_Coord = ChaControl.fileStatus.coordinateType;
 
             if (_accessoriesByChar.TryGetValue(ChaFile, out var SaveAccessory) == false)
@@ -120,7 +119,7 @@ namespace Cosplay_Academy
                 _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
             }
 
-            ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.Underwear);
+            ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[Original_Coord].accessory.parts);
             Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
 
@@ -259,10 +258,11 @@ namespace Cosplay_Academy
 
             if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
             {
+                var Local_Underwear_ACC_Info = new List<ChaFileAccessory.PartsInfo>(Underwear_PartsInfos);
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
-                for (int i = 0; i < Underwear_PartsInfos.Count; i++)
+                for (int i = 0; i < Local_Underwear_ACC_Info.Count; i++)
                 {
-                    if (Underwear_PartsInfos[i].id != 120 && Underwear_PartsInfos[i].id != 0)
+                    if (Local_Underwear_ACC_Info[i].type > 120)
                     {
                         var ACCdata = new HairSupport.HairAccessoryInfo
                         {
@@ -296,7 +296,7 @@ namespace Cosplay_Academy
                             RenderQueue.Enqueue(item);
                         }
 
-                        PartsQueue.Enqueue(Underwear_PartsInfos[i]);
+                        PartsQueue.Enqueue(Local_Underwear_ACC_Info[i]);
                         HairQueue.Enqueue(ACCdata);
                     }
                 }

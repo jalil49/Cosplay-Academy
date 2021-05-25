@@ -231,7 +231,6 @@ namespace Cosplay_Academy
 
         internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.Outfit_Size];
         internal string[] outfitpath = new string[Constants.Outfit_Size + Number_Of_Extra_Outfits];
-        internal string Underwear = "";
         internal int Personality;
         internal string BirthDay;
         internal string FullName;
