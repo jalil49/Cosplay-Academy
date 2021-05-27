@@ -399,7 +399,7 @@ namespace Cosplay_Academy
         {
             Dictionary<int, Pushup.ClothData> OriginalBra = new Dictionary<int, Pushup.ClothData>();
             Dictionary<int, Pushup.ClothData> OriginalTop = new Dictionary<int, Pushup.ClothData>();
-            Pushup.BodyData Body = new Pushup.BodyData();
+            Pushup.BodyData Body;
             var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.pushup");
             if (Original != null)
             {
@@ -415,6 +415,14 @@ namespace Cosplay_Academy
                 {
                     Body = MessagePackSerializer.Deserialize<Pushup.BodyData>((byte[])bytes);
                 }
+                else
+                {
+                    Body = null;
+                }
+            }
+            else
+            {
+                Body = null;
             }
             Pushup.ClothData newBraData;
             Pushup.ClothData newTopData;
@@ -444,7 +452,7 @@ namespace Cosplay_Academy
                     {
                         newBraData = OriginalBra[i];
                     }
-                    if (OriginalBra.ContainsKey(i))
+                    if (OriginalTop.ContainsKey(i))
                     {
                         newTopData = OriginalTop[i];
                     }
@@ -455,7 +463,10 @@ namespace Cosplay_Academy
             var data = new PluginData();
             data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(FinalBra));
             data.data.Add("Pushup_TopData", MessagePackSerializer.Serialize(FinalTop));
-            data.data.Add("Pushup_BodyData", MessagePackSerializer.Serialize(Body));
+            if (Body != null)
+            {
+                data.data.Add("Pushup_BodyData", MessagePackSerializer.Serialize(Body));
+            }
             SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl);
 
             //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
