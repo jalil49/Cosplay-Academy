@@ -111,7 +111,8 @@ namespace Cosplay_Academy
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
 
             Underwear_ME_Data = new ME_List(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, true);
-            int Original_Coord = ChaControl.fileStatus.coordinateType;
+
+            ChaControl.nowCoordinate.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
 
             if (_accessoriesByChar.TryGetValue(ChaFile, out var SaveAccessory) == false)
             {
@@ -119,8 +120,7 @@ namespace Cosplay_Academy
                 _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
             }
 
-            ChaControl.chaFile.coordinate[Original_Coord].LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
-            Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.chaFile.coordinate[Original_Coord].accessory.parts);
+            Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.nowCoordinate.accessory.parts);
             Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
