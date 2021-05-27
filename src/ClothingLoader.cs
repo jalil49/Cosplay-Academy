@@ -1073,17 +1073,19 @@ namespace Cosplay_Academy
         private void Original_ME_Data()
         {
             var KeepCloth = new List<int>[Constants.Outfit_Size];
+
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
                 KeepCloth[outfitnum] = new List<int>();
                 for (int i = 0; i < 9; i++)
                 {
-                    if (CharacterClothingKeep_Coordinate[outfitnum][i])
+                    if (CharacterClothingKeep_Coordinate[outfitnum][i] || CharacterClothingKeep[i])
                     {
                         KeepCloth[outfitnum].Add(i);
                     }
                 }
             }
+
             var Original_ME_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
             var ME_Data = new ME_List(Original_ME_Data, ThisOutfitData, KeepCloth);
