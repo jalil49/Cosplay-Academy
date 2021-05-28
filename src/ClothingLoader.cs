@@ -38,6 +38,7 @@ namespace Cosplay_Academy
                 return data;
             }
         }
+        private static Traverse InH_Field = Traverse.Create(MoreAccessories._self).Field("_inH");
         #endregion
 
         #region Underwear stuff
@@ -102,26 +103,20 @@ namespace Cosplay_Academy
 
             Extract_Personal_Data();
             ThisOutfitData.Finished.Clear();
-            bool retain = (bool)Traverse.Create(MoreAccessories._self).Field("_inH").GetValue();
-            Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(false);
 
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
+            bool retain = (bool)InH_Field.GetValue();
 
             Underwear.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
 
             Underwear_ME_Data = new ME_List(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, true);
 
-            ChaControl.nowCoordinate.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
+            Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
+            Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
 
-            if (_accessoriesByChar.TryGetValue(ChaFile, out var SaveAccessory) == false)
-            {
-                SaveAccessory = new MoreAccessories.CharAdditionalData();
-                _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
-            }
+            InH_Field.SetValue(false);
 
-            Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(ChaControl.nowCoordinate.accessory.parts);
-            Underwear_PartsInfos.AddRange(new List<ChaFileAccessory.PartsInfo>(SaveAccessory.nowAccessories));
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
@@ -135,7 +130,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
-                        Settings.Logger.LogDebug($"loaded Default with changed underwear");
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} Default with changed underwear");
                     }
                 }
                 else
@@ -147,7 +142,7 @@ namespace Cosplay_Academy
             Original_ME_Data(); //Load existing where applicable
 
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
-            Traverse.Create(MoreAccessories._self).Field("_inH").SetValue(retain);
+            InH_Field.SetValue(retain);
 #if TRACE
             TimeWatch[0].Stop();
             var temp = TimeWatch[0].ElapsedMilliseconds - Start;
@@ -171,21 +166,23 @@ namespace Cosplay_Academy
             ThisOutfitData.HairKeepReturn[outfitnum].Clear();
             ThisOutfitData.ACCKeepReturn[outfitnum].Clear();
 
+            ChaControl.fileStatus.coordinateType = outfitnum;
+            var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
+
+
             #region Queue accessories to keep
 
-            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
-            var HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+            Queue<ChaFileAccessory.PartsInfo> PartsQueue = new Queue<ChaFileAccessory.PartsInfo>();
+            Queue<HairSupport.HairAccessoryInfo> HairQueue = new Queue<HairSupport.HairAccessoryInfo>();
 
-            var UnderwearAccessoryStart = PartsQueue.Count();
+            Queue<bool> HairKeepQueue = new Queue<bool>();
+            Queue<bool> ACCKeepqueue = new Queue<bool>();
 
-            var HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
-            var ACCKeepqueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
-
-            var RenderQueue = new Queue<RendererProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].RendererProperty);
-            var FloatQueue = new Queue<MaterialFloatProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialFloatProperty);
-            var ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialColorProperty);
-            var TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialTextureProperty);
-            var ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialShader);
+            Queue<RendererProperty> RenderQueue = new Queue<RendererProperty>();
+            Queue<MaterialFloatProperty> FloatQueue = new Queue<MaterialFloatProperty>();
+            Queue<MaterialColorProperty> ColorQueue = new Queue<MaterialColorProperty>();
+            Queue<MaterialTextureProperty> TextureQueue = new Queue<MaterialTextureProperty>();
+            Queue<MaterialShader> ShaderQueue = new Queue<MaterialShader>();
 
             bool[] UnderClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
             Underwearbools[outfitnum] = new bool[] { false, false, false };
@@ -193,13 +190,26 @@ namespace Cosplay_Academy
             #endregion
 
             //Load new outfit
-            ChaControl.fileStatus.coordinateType = outfitnum;
-            var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
 
             if (load)
             {
+                //only requeue items if a new file is loaded as they are unloaded.
+                PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
+                HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+
+                HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
+                ACCKeepqueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+
+                RenderQueue = new Queue<RendererProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].RendererProperty);
+                FloatQueue = new Queue<MaterialFloatProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialFloatProperty);
+                ColorQueue = new Queue<MaterialColorProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialColorProperty);
+                TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialTextureProperty);
+                ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialShader);
+
                 ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
             }
+
+            int UnderwearAccessoryStart = PartsQueue.Count();
 
             #region MakeUp
             if (MakeUpKeep[outfitnum])
@@ -243,6 +253,7 @@ namespace Cosplay_Academy
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
+
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
