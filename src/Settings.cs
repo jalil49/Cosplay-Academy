@@ -17,7 +17,7 @@ namespace Cosplay_Academy
     public class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.8.0";
+        public const string Version = "0.8.1";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
