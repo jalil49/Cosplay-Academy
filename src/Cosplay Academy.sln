@@ -5,12 +5,20 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosplay Academy", "Cosplay Academy.csproj", "{1C928150-B47E-4B1B-9D18-15E4997AF124}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A65FB8E-42BB-4B1A-A188-A2D60A9EB4E6}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KK_KKP", "KK_KKP", "{9E5CC147-5D24-4D8B-9E9F-18A3214C67A0}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CosplayAcademy.Core", "..\CosplayAcademy.Core\CosplayAcademy.Core.shproj", "{D16032F2-42BE-414E-A4CC-AF5F170EF1D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KKS", "KKS", "{10A1A7EE-C5B6-4466-BAEA-C8290FC77E22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosplay Academy Sun", "..\Cosplay Academy Sun\Cosplay Academy Sun.csproj", "{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\CosplayAcademy.Core\CosplayAcademy.Core.projitems*{1c928150-b47e-4b1b-9d18-15e4997af124}*SharedItemsImports = 4
+		..\CosplayAcademy.Core\CosplayAcademy.Core.projitems*{8ad23bdb-f0c8-4e10-99f3-4d90f68170e9}*SharedItemsImports = 4
+		..\CosplayAcademy.Core\CosplayAcademy.Core.projitems*{d16032f2-42be-414e-a4cc-af5f170ef1d9}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -20,9 +28,17 @@ Global
 		{1C928150-B47E-4B1B-9D18-15E4997AF124}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C928150-B47E-4B1B-9D18-15E4997AF124}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C928150-B47E-4B1B-9D18-15E4997AF124}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C928150-B47E-4B1B-9D18-15E4997AF124} = {9E5CC147-5D24-4D8B-9E9F-18A3214C67A0}
+		{8AD23BDB-F0C8-4E10-99F3-4D90F68170E9} = {10A1A7EE-C5B6-4466-BAEA-C8290FC77E22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {961648CD-5B91-499F-8C38-BF3ACF0B34B1}

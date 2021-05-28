@@ -126,7 +126,9 @@ namespace Cosplay_Academy
                     FullName = ChaControl.fileParam.fullname,
                     BirthDay = ChaControl.fileParam.strBirthDay,
                     Personality = ChaControl.fileParam.personality,
+#if !KKS
                     heroine = ChaControl.GetHeroine()
+#endif
                 };
                 Constants.ChaDefaults.Add(ThisOutfitData);
             }
@@ -137,12 +139,12 @@ namespace Cosplay_Academy
         public void Process(GameMode currentGameMode)
         {
             ThisOutfitDataProcess();
-
+#if !KKS
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
-
+#endif
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.firstpass = true;

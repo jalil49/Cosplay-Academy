@@ -1,24 +1,28 @@
-﻿using System;
+﻿using BepInEx;
+using System;
 using System.Collections.Generic;
+#if !KKS
 using System.ComponentModel;
+#endif
 namespace Cosplay_Academy
 {
-    public enum OutfitUpdate
-    {
-        [Description("Update outfits everyday")]
-        Daily,
-        [Description("Update outfits on Mondays")]
-        Weekly,
-        [Description("Update every period")]
-        EveryPeriod
-    }
     static class Constants
     {
-        static Constants()
+        internal static void PluginCheck()
         {
-            if (Outfit_Size < 5)
+            foreach (var item in PluginList)
             {
-                InputStrings = new string[] {
+                PluginResults[item] = TryfindPluginInstance(item);
+                //Settings.Logger.LogWarning($"Found {item}: {PluginResults[item]}");
+            }
+        }
+
+        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
+        //I'd imagine it's possible to scale clubs easily
+        public static readonly string[] InputStrings =
+            {
+#if !KKS
+            
                     @"\School Uniform", //0
                     @"\AfterSchool", //1
                     @"\Gym" ,//2
@@ -32,33 +36,15 @@ namespace Cosplay_Academy
                     @"\Nightwear", //10
                     @"\Club\Koi", //11
                     @"\Underwear"//12
-                 };
-            }
-            else
-            {
-                InputStrings = new string[] {
+                 
+#elif Sun
                     @"\Casual", //0
                     @"\Swimsuit", //1
                     @"\Nightwear", //2
                     @"\Bathroom", //3
                     @"\Underwear"//4
-                };
-            }
-        }
-
-        internal static void PluginCheck()
-        {
-            foreach (var item in PluginList)
-            {
-                PluginResults[item] = Settings.TryfindPluginInstance(item);
-                //Settings.Logger.LogWarning($"Found {item}: {PluginResults[item]}");
-            }
-        }
-
-        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
-        //I'd imagine it's possible to scale clubs easily
-        public static readonly string[] InputStrings;//Folders
-
+#endif
+};
         public static readonly string[] InputStrings2 = {
             @"\FirstTime", //0
             @"\Amateur", //1
@@ -116,13 +102,29 @@ namespace Cosplay_Academy
         public static string[] Kill_Data = new string[] { };
         public static Dictionary<string, bool> PluginResults = new Dictionary<string, bool>();
         private static readonly string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
+
+        internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
+        {
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
+            if (null != target)
+            {
+                if (target.Metadata.Version >= minimumVersion)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
+
     public enum Hexp
     {
         Randomize,
         RandConstant,
         Maximize,
     }
+
     public enum HStates
     {
         FirstTime, //0
@@ -130,6 +132,18 @@ namespace Cosplay_Academy
         Pro, //2
         Lewd //3
     }
+
+#if !KKS
+    public enum OutfitUpdate
+    {
+        [Description("Update outfits everyday")]
+        Daily,
+        [Description("Update outfits on Mondays")]
+        Weekly,
+        [Description("Update every period")]
+        EveryPeriod
+    }
+
     public enum Club
     {
         HomeClub, //0
@@ -139,67 +153,5 @@ namespace Cosplay_Academy
         TeaClub, //4
         TrackClub //5
     }
-    //public enum Personailty //Will probably be a main folder that just gets appended onto available options if this ever becomes a feature rather than going into folder hell mode
-    //{
-    //    Airhead,
-    //    Angel,
-    //    Athlete,
-    //    BigSister,
-    //    Bookworm,
-    //    Classicheroine,
-    //    DarkLord,
-    //    Emotionless,
-    //    Enigma,
-    //    Extrovert,
-    //    Fangirl,
-    //    Flirt,
-    //    Geek,
-    //    GirlNextdoor,
-    //    Heiress,
-    //    HonorStudent,
-    //    Introvert,
-    //    JapaneseIdeal,
-    //    Loner,
-    //    MisfortuneMagnet,
-    //    Motherfigure,
-    //    OldSchool,
-    //    Perfectionist,
-    //    PsychoStalker,
-    //    PureHeart,
-    //    Rebel,
-    //    Returnee,
-    //    ScaredyCat,
-    //    Seductress,
-    //    Ski,
-    //    Slacker,
-    //    Slangy,
-    //    Snob,
-    //    Sourpuss,
-    //    SpaceCase,
-    //    Tomboy,
-    //    ToughGirl,
-    //    Underclassman,
-    //    WildChild,
-    //}
-    //public enum Traits
-    //{
-    //    PeesOften,
-    //    Hungry,
-    //    Insensitive,
-    //    Simple,
-    //    Slutty,
-    //    Gloomy,
-    //    LikesReading,
-    //    LikesMusic,
-    //    Lively,
-    //    Passive,
-    //    Friendly,
-    //    LikesCleanliness,
-    //    Lazy,
-    //    SuddenlyAppears,
-    //    LikesBeingAone,
-    //    LikesExcercising,
-    //    Diligent,
-    //    LikesGirls
-    //}
+#endif
 }

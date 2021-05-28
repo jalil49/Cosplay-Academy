@@ -18,14 +18,14 @@ namespace Cosplay_Academy
             //ShowTypeInfo(typeof(HairAccessoryCustomizer.HairAccessoryController));
         }
 
-        private static void ShowTypeInfo(Type t)
-        {
-            Settings.Logger.LogWarning($"Name: {t.Name}");
-            Settings.Logger.LogWarning($"Full Name: {t.FullName}");
-            Settings.Logger.LogWarning($"ToString:  {t}");
-            Settings.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
-            Settings.Logger.LogWarning("");
-        }
+        //private static void ShowTypeInfo(Type t)
+        //{
+        //    Settings.Logger.LogWarning($"Name: {t.Name}");
+        //    Settings.Logger.LogWarning($"Full Name: {t.FullName}");
+        //    Settings.Logger.LogWarning($"ToString:  {t}");
+        //    Settings.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
+        //    Settings.Logger.LogWarning("");
+        //}
 
         //private static bool CheckEndFinally(CodeInstruction instruction) => instruction.opcode == OpCodes.Endfinally;
         //[HarmonyPatch]

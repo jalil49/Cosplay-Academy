@@ -38,7 +38,7 @@ namespace Cosplay_Academy
                 return data;
             }
         }
-        private static Traverse InH_Field = Traverse.Create(MoreAccessories._self).Field("_inH");
+        private static readonly Traverse InH_Field = Traverse.Create(MoreAccessories._self).Field("_inH");
         #endregion
 
         #region Underwear stuff

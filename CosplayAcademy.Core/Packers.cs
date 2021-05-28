@@ -622,7 +622,7 @@ namespace Cosplay_Academy
                     if (ExtendedData.version < 2)
                     {
                         var OldCharaTriggerInfo = MessagePackSerializer.Deserialize<List<AccStateSync.OutfitTriggerInfoV1>>((byte[])loadedOutfitTriggerInfo);
-                        for (int i = 0; i < 7; i++)
+                        for (int i = 0; i < Constants.Outfit_Size; i++)
                         {
                             OriginalCharaTriggerInfo[i] = AccStateSync.UpgradeOutfitTriggerInfoV1(OldCharaTriggerInfo[i]);
                         }
@@ -637,9 +637,9 @@ namespace Cosplay_Academy
                             if (ExtendedData.version < 2)
                             {
                                 var OldCharaVirtualGroupNames = MessagePackSerializer.Deserialize<List<Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
-                                if (OldCharaVirtualGroupNames.Count() == 7)
+                                if (OldCharaVirtualGroupNames.Count() == Constants.Outfit_Size)
                                 {
-                                    for (int i = 0; i < 7; i++)
+                                    for (int i = 0; i < Constants.Outfit_Size; i++)
                                     {
                                         Dictionary<string, string> VirtualGroupNames = AccStateSync.UpgradeVirtualGroupNamesV1(OldCharaVirtualGroupNames[i]);
                                         OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(VirtualGroupNames);
@@ -649,7 +649,7 @@ namespace Cosplay_Academy
                             else
                             {
                                 Dictionary<int, Dictionary<string, string>> CharaVirtualGroupNames = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
-                                for (int i = 0; i < 7; i++)
+                                for (int i = 0; i < Constants.Outfit_Size; i++)
                                     OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(CharaVirtualGroupNames[i]);
                             }
                         }
@@ -1417,11 +1417,12 @@ namespace Cosplay_Academy
         {
             ExtendedSave.SetExtendedDataById(ChaControl.chaFile, IDtoSET, data);
             ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
-
+#if !KKS
             if (ThisOutfitData.heroine != null)
             {
                 ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
             }
+#endif
         }
     }
 }

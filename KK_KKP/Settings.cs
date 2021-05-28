@@ -12,10 +12,6 @@ using System.IO;
 namespace Cosplay_Academy
 {
     [BepInPlugin(GUID, "Cosplay Academy", Version)]
-    [BepInProcess("Koikatu")]
-    [BepInProcess("Koikatsu Party")]
-    [BepInProcess("KoikatuVR")]
-    [BepInProcess("Koikatsu Party VR")]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency("com.joan6694.illusionplugins.moreaccessories", BepInDependency.DependencyFlags.HardDependency)]
     public class Settings : BaseUnityPlugin
@@ -183,6 +179,19 @@ namespace Cosplay_Academy
             }
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
+        }
+
+        internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
+        {
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
+            if (null != target)
+            {
+                if (target.Metadata.Version >= minimumVersion)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
