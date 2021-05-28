@@ -14,6 +14,38 @@ namespace Cosplay_Academy
     }
     static class Constants
     {
+        static Constants()
+        {
+            if (Outfit_Size < 5)
+            {
+                InputStrings = new string[] {
+                    @"\School Uniform", //0
+                    @"\AfterSchool", //1
+                    @"\Gym" ,//2
+                    @"\Swimsuit" , //3
+                    @"\Club\Swim" , //4
+                    @"\Club\Manga", //5
+                    @"\Club\Cheer", //6
+                    @"\Club\Tea", //7
+                    @"\Club\Track", //8
+                    @"\Casual" , //9
+                    @"\Nightwear", //10
+                    @"\Club\Koi", //11
+                    @"\Underwear"//12
+                 };
+            }
+            else
+            {
+                InputStrings = new string[] {
+                    @"\Casual", //0
+                    @"\Swimsuit", //1
+                    @"\Nightwear", //2
+                    @"\Bathroom", //3
+                    @"\Underwear"//4
+                };
+            }
+        }
+
         internal static void PluginCheck()
         {
             foreach (var item in PluginList)
@@ -25,21 +57,8 @@ namespace Cosplay_Academy
 
         //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
         //I'd imagine it's possible to scale clubs easily
-        public static readonly string[] InputStrings = {
-            @"\School Uniform" , //0
-            @"\AfterSchool", //1
-            @"\Gym" ,//2
-            @"\Swimsuit" , //3
-            @"\Club\Swim" , //4
-            @"\Club\Manga", //5
-            @"\Club\Cheer", //6
-            @"\Club\Tea", //7
-            @"\Club\Track", //8
-            @"\Casual" , //9
-            @"\Nightwear", //10
-            @"\Club\Koi", //11
-            @"\Underwear"//12
-        };//Folders
+        public static readonly string[] InputStrings;//Folders
+
         public static readonly string[] InputStrings2 = {
             @"\FirstTime", //0
             @"\Amateur", //1
