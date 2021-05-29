@@ -855,7 +855,7 @@ namespace Cosplay_Academy
                 SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
 
                 ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
-                ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
+                ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.Core.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
             }
 
             #endregion

@@ -69,19 +69,19 @@ namespace Cosplay_Academy
             var Start = TimeWatch[3].ElapsedMilliseconds;
             TimeWatch[3].Start();
 #endif
-            ControllerReload_Loop(Type.GetType("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", false), ChaControl);
+            ControllerReload_Loop("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", ChaControl);
 
             if (Constants.PluginResults["Accessory_States"])
-                ControllerReload_Loop(Type.GetType("Accessory_States.CharaEvent, Accessory_States", false), ChaControl);
+                ControllerReload_Loop("Accessory_States.Core.CharaEvent, Accessory_States", ChaControl);
 
             if (Constants.PluginResults["Additional_Card_Info"])
-                ControllerReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl);
+                ControllerReload_Loop("Additional_Card_Info.Core.CharaEvent, Additional_Card_Info", ChaControl);
 
             if (InsideMaker && Constants.PluginResults["Accessory_Themes"])
-                ControllerReload_Loop(Type.GetType("Accessory_Themes.CharaEvent, Accessory_Themes", false), ChaControl);
+                ControllerReload_Loop("Accessory_Themes.Core.CharaEvent, Accessory_Themes", ChaControl);
 
             if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
-                ControllerReload_Loop(Type.GetType("Accessory_Parents.CharaEvent, Accessory_Parents", false), ChaControl);
+                ControllerReload_Loop("Accessory_Parents.Core.CharaEvent, Accessory_Parents", ChaControl);
 
             if (!ForceALL)
             {
@@ -94,20 +94,20 @@ namespace Cosplay_Academy
                 return;
             }
 
-            ControllerReload_Loop(Type.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", false), ChaControl);
+            ControllerReload_Loop("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", ChaControl);
 
-            ControllerReload_Loop(Type.GetType("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", false), ChaControl);
+            ControllerReload_Loop("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", ChaControl);
 
-            ControllerReload_Loop(Type.GetType("KK_Plugins.Pushup+PushupController, KK_Pushup", false), ChaControl);
+            ControllerReload_Loop("KK_Plugins.Pushup+PushupController, KK_Pushup", ChaControl);
 
-            ControllerReload_Loop(Type.GetType("KKABMX.Core.BoneController, KKABMX", false), ChaControl);
+            ControllerReload_Loop("KKABMX.Core.BoneController, KKABMX", ChaControl);
 
-            ControllerReload_Loop(Type.GetType("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", false), ChaControl);
+            ControllerReload_Loop("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", ChaControl);
 
-            ControllerReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl);
+            ControllerReload_Loop("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", ChaControl);
 
             if (Constants.PluginResults["madevil.kk.ass"])
-                ControllerReload_Loop(Type.GetType("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", false), ChaControl);
+                ControllerReload_Loop("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", ChaControl);
 #if TRACE
             TimeWatch[3].Stop();
             var temp2 = TimeWatch[3].ElapsedMilliseconds - Start;
@@ -847,7 +847,7 @@ namespace Cosplay_Academy
                             states = new List<bool> { false, true, true, true };
                         }
                         //bottom
-                        else if ((clothes[1].id != 0 || clothes[2].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                        else if ((clothes[1].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
                         {
                             binder = 1;
                             states = new List<bool> { false, true, true, true };
@@ -960,6 +960,7 @@ namespace Cosplay_Academy
             bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
             Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
             Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
+            Dictionary<int, int>[] Interest_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
             int[] HstateType_Restriction = new int[Constants.Outfit_Size];
             int[] ClubType_Restriction = new int[Constants.Outfit_Size];
             bool[][] Height_Restriction = new bool[Constants.Outfit_Size][];
@@ -978,6 +979,7 @@ namespace Cosplay_Academy
                 CoordinateSaveBools[outfitnum] = new bool[Enum.GetNames(typeof(ChaFileDefine.ClothesKind)).Length];
                 PersonalityType_Restriction[outfitnum] = new Dictionary<int, int>();
                 TraitType_Restriction[outfitnum] = new Dictionary<int, int>();
+                Interest_Restriction[outfitnum] = new Dictionary<int, int>();
                 HstateType_Restriction[outfitnum] = 0;
                 ClubType_Restriction[outfitnum] = 0;
                 Height_Restriction[outfitnum] = new bool[3];
@@ -992,14 +994,15 @@ namespace Cosplay_Academy
 
             if (ValidOutfits.Any(x => !x))
             {
-                var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
-                if (MyData != null)
+                var ACI_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
+                if (ACI_Data != null)
                 {
-                    if (MyData.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
                     {
-                        HairAcc = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
+                        var temp = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
+
                     }
-                    if (MyData.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
                     {
                         AccKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
                     }
@@ -1008,67 +1011,70 @@ namespace Cosplay_Academy
 
             for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
             {
-
-                var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
-                if (MyData != null)
+                var ACI_Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
+                if (ACI_Data != null)
                 {
-                    if (MyData.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
                     {
                         HairAcc[outfitnum] = MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("CoordinateSaveBools", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("CoordinateSaveBools", out ByteData) && ByteData != null)
                     {
                         CoordinateSaveBools[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
                     {
                         AccKeep[outfitnum] = MessagePackSerializer.Deserialize<List<int>>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
                     {
                         PersonalityType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("Interest_Restriction", out ByteData) && ByteData != null)
+                    {
+                        Interest_Restriction[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
+                    }
+                    if (ACI_Data.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
                     {
                         TraitType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, int>>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
                     {
                         HstateType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
                     {
                         ClubType_Restriction[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
                     {
                         Height_Restriction[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
                     {
                         Breastsize_Restriction[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
                     {
                         CoordinateType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
                     {
                         CoordinateSubType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("Creator", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("Creator", out ByteData) && ByteData != null)
                     {
                         CreatorNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
                     {
                         SetNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
                     {
                         SubSetNames[outfitnum] = MessagePackSerializer.Deserialize<string>((byte[])ByteData);
                     }
-                    if (MyData.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
+                    if (ACI_Data.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
                     {
                         GenderType[outfitnum] = MessagePackSerializer.Deserialize<int>((byte[])ByteData);
                     }
@@ -1245,7 +1251,7 @@ namespace Cosplay_Academy
                         ACC_Parented_Dictionary[outfitnum] = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])ByteData);
                     }
                 }
-                if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
+                if (outfitnum != 3 && Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     var clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
                     int postion = 0;
@@ -1333,48 +1339,48 @@ namespace Cosplay_Academy
                                 inclusionarray[i] = false;
                             }
                         }
+
                         //gloves
-                        if (clothes[4].id != 0 && (inclusionarray[9] || inclusionarray[8]))
+                        if (found)
                         {
-                            binder = 5;
-                        }
-                        //socks
-                        else if (clothes[6].id != 0 && inclusionarray[7])
-                        {
-                            binder = 7;
-                        }
-                        //panties
-                        else if ((clothes[3].id != 0 || (clothes[2].id != 0 && Underwearbools[outfitnum][2])) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                        {
-                            binder = 4;
-                            states = new int[] { 1, 3 };
-                        }
-                        //Pantyhose
-                        else if (clothes[5].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                        {
-                            binder = 6;
-                        }
-                        //Bra
-                        else if ((clothes[2].id != 0 || clothes[2].id != 0 && Underwearbools[outfitnum][1]) && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
-                        {
-                            binder = 3;
-                            states = new int[] { 1, 3 };
-                        }
-                        //top
-                        else if (clothes[0].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
-                        {
-                            binder = 1;
-                            states = new int[] { 1, 3 };
-                        }
-                        //bottom
-                        else if ((clothes[1].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
-                        {
-                            binder = 2;
-                            states = new int[] { 1, 3 };
-                        }
-                        else
-                        {
-                            binder = 0;
+                            if (clothes[4].id != 0 && (inclusionarray[9] || inclusionarray[8]))
+                            {
+                                binder = 5;
+                            }
+                            //socks
+                            else if (clothes[6].id != 0 && inclusionarray[7])
+                            {
+                                binder = 7;
+                            }
+                            //panties
+                            else if ((clothes[3].id != 0 || (clothes[2].id != 0 && Underwearbools[outfitnum][2])) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                            {
+                                binder = 4;
+                                states = new int[] { 1, 3 };
+                            }
+                            //Pantyhose
+                            else if (clothes[5].id != 0 && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                            {
+                                binder = 6;
+                            }
+                            //Bra
+                            else if ((clothes[2].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][1]) && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
+                            {
+                                binder = 3;
+                                states = new int[] { 1, 3 };
+                            }
+                            //top
+                            else if (clothes[0].id != 0 && (inclusionarray[4] || inclusionarray[5] || inclusionarray[8]))
+                            {
+                                binder = 1;
+                                states = new int[] { 1, 3 };
+                            }
+                            //bottom
+                            else if ((clothes[1].id != 0 || clothes[0].id != 0 && Underwearbools[outfitnum][0]) && (inclusionarray[6] || inclusionarray[7] || inclusionarray[10]))
+                            {
+                                binder = 2;
+                                states = new int[] { 1, 3 };
+                            }
                         }
                         ACC_Binding_Dictionary[outfitnum][location] = binder;
                         if (!ClothFound)
@@ -1393,13 +1399,18 @@ namespace Cosplay_Academy
             SetExtendedData("Accessory_States", SavedData, ChaControl);
         }
 
-        private void ControllerReload_Loop(Type Controller, ChaControl ChaControl)
+        private void ControllerReload_Loop(string Controller_Name, ChaControl ChaControl)
         {
+            Type Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
             {
                 var temp = ChaControl.GetComponent(Controller);
                 object[] Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
                 Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
+            }
+            else
+            {
+                Settings.Logger.LogError($"Controller {Controller_Name} not found");
             }
         }
 
