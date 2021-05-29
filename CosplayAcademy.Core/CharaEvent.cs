@@ -277,7 +277,7 @@ namespace Cosplay_Academy
                     ThisOutfitData.processed = true;
                 }
                 int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
-                ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);//Load outfits; has to run again for story mode les scene at least
+                ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
                 ChaInfo temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits

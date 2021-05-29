@@ -92,7 +92,7 @@ namespace Cosplay_Academy
                     exp++;
                     if (Settings.ListOverrideBool[set].Value)
                     {
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(Settings.ListOverride[set].Value, false); //when sets are enabled don't include them in rolls, but do if disabled
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(Settings.ListOverride[set].Value, null, false); //when sets are enabled don't include them in rolls, but do if disabled
                         outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
                         continue;
                     }
@@ -105,7 +105,7 @@ namespace Cosplay_Academy
                     if (!Settings.EnableSets.Value || !result.Contains(@"\Sets\"))
                     {
                         string choosen = result;
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2, Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2, result.Replace(coordinatepath, Settings.AlternativePath.Value), Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
                         if (Settings.EnableDefaults.Value && temp2.Count != 1)
                         {
                             temp2.Add("Defaults");
@@ -121,7 +121,7 @@ namespace Cosplay_Academy
                         {
                             Setsfunction(array);
                         }
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, result.Replace(coordinatepath, Settings.AlternativePath.Value), false);
                         if (Settings.EnableDefaults.Value && temp2.Count != 1)
                         {
                             temp2.Add("Defaults");
@@ -160,7 +160,7 @@ namespace Cosplay_Academy
                         {
                             break;
                         }
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, false);
+                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, item.Replace(new DirectoryInfo(UserData.Path).FullName, Settings.AlternativePath.Value), false);
                         outfitData[j].Insert(exp, temp.ToArray(), true);
                         break;
                     }

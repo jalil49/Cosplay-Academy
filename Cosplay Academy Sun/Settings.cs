@@ -21,6 +21,8 @@ namespace Cosplay_Academy
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
+        public static ConfigEntry<bool> UseAlternativePath { get; private set; }
+        public static ConfigEntry<string> AlternativePath { get; private set; }
         public static ConfigEntry<bool> EnableSetting { get; private set; }
         public static ConfigEntry<bool> EnableSets { get; private set; }
         public static ConfigEntry<bool> IndividualSets { get; private set; }
@@ -138,21 +140,12 @@ namespace Cosplay_Academy
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
 
+            //Alternative path for other games
+            AlternativePath = Config.Bind("Other Games", "KK or KKP UserData", new DirectoryInfo(UserData.Path).FullName.ToString(), "UserData Path of KK or KKP");
+            UseAlternativePath = Config.Bind("Other Games", "Pull outfits from KK or KKP", false, "Use applicable outfits from Sunshine");
+
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
-        }
-
-        internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
-        {
-            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
-            if (null != target)
-            {
-                if (target.Metadata.Version >= minimumVersion)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

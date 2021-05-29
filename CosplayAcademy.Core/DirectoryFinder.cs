@@ -39,7 +39,7 @@ namespace Cosplay_Academy
             var folders = Grab_All_Directories(coordinatepath + @"\Unorganized");
             foreach (var item in folders)
             {
-                var files = Get_Outfits_From_Path(item, false);
+                var files = Get_Outfits_From_Path(item, null, false);
 
                 foreach (var Coordinate in files)
                 {
@@ -99,21 +99,34 @@ namespace Cosplay_Academy
             }
         }
 
-        public static List<string> Grab_All_Directories(string input)
+        public static List<string> Grab_All_Directories(string OriginalPath, string AlternativePath = null)
         {
             List<string> FoldersPath = new List<string>
             {
-                input
+                OriginalPath
             };
-            string[] folders = System.IO.Directory.GetDirectories(input, "*", System.IO.SearchOption.AllDirectories); //grab child folders
-            List<string> FolderLists = folders.ToList();
-            int index = FolderLists.FindIndex(a => a.EndsWith(@"\Sets"));
-            if (index != -1)
+            FoldersPath.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
+            if (AlternativePath != null && Settings.UseAlternativePath.Value && Directory.Exists(AlternativePath))
             {
-                FolderLists.RemoveAt(index);
+                FoldersPath.Add(AlternativePath);
+                FoldersPath.AddRange(Directory.GetDirectories(AlternativePath, "*", SearchOption.AllDirectories));
             }
-            FoldersPath.AddRange(FolderLists);
-
+            for (int i = 0; i < FoldersPath.Count; i++)
+            {
+                if (FoldersPath[i].EndsWith(@"\Sets"))
+                {
+                    FoldersPath.RemoveAt(i--);
+                    continue;
+                }
+                if (Directory.GetFiles(FoldersPath[i], "*.png").Length == 0)
+                {
+                    FoldersPath.RemoveAt(i--);
+                }
+            }
+            if (FoldersPath.Count == 0)
+            {
+                FoldersPath.Add(OriginalPath);
+            }
             return FoldersPath;
         }
 
@@ -121,7 +134,12 @@ namespace Cosplay_Academy
         {
             List<string> Choosen = new List<string>();
             string coordinatepath = new DirectoryInfo(UserData.Path).FullName;
-            string[] folders = System.IO.Directory.GetDirectories(coordinatepath + "coordinate", "*", System.IO.SearchOption.AllDirectories); //grab child folders
+            string AlternativePath = Settings.AlternativePath.Value + "coordinate";
+            var folders = Directory.GetDirectories(coordinatepath + "coordinate", "*", SearchOption.AllDirectories).ToList(); //grab child folders
+            if (Settings.UseAlternativePath.Value && Directory.Exists(AlternativePath))
+            {
+                folders.AddRange(Directory.GetDirectories(AlternativePath, "*", SearchOption.AllDirectories));
+            }
             foreach (string folder in folders)
             {
                 if (folder.Contains(Narrow))
@@ -130,18 +148,18 @@ namespace Cosplay_Academy
             return Choosen;
         }
 
-        public static List<string> Get_Outfits_From_Path(string FilePath, bool RemoveSets = true)
+        public static List<string> Get_Outfits_From_Path(string FilePath, string AlternativePath = null, bool RemoveSets = true)
         {
             List<string> Choosen = new List<string>();
             List<string> Paths = new List<string>
             {
                 FilePath //add parent folder to list
             };
-            //ExpandedOutfit.Logger.LogDebug(coordinatepath + "coordinate" + Narrow);
-            string[] folders = System.IO.Directory.GetDirectories(FilePath, "*", System.IO.SearchOption.AllDirectories); //grab child folders
-            if (folders.Length > 0)
+            Paths.AddRange(Directory.GetDirectories(FilePath, "*", SearchOption.AllDirectories)); //grab child folders
+            if (Settings.UseAlternativePath.Value && Directory.Exists(AlternativePath))
             {
-                Paths.AddRange(folders);
+                Paths.Add(AlternativePath);
+                Paths.AddRange(Directory.GetDirectories(AlternativePath, "*", SearchOption.AllDirectories));
             }
             //step through each folder and grab files
             foreach (string path in Paths)
@@ -150,7 +168,7 @@ namespace Cosplay_Academy
                 {
                     continue;
                 }
-                string[] files = System.IO.Directory.GetFiles(path, "*.png");
+                string[] files = Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }
             if (Choosen.Count == 0 && !FilePath.Contains(@"\Unorganized"))

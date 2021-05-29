@@ -45,13 +45,16 @@ namespace Cosplay_Academy
                     @"\Underwear"//4
 #endif
 };
+
         public static readonly string[] InputStrings2 = {
             @"\FirstTime", //0
             @"\Amateur", //1
             @"\Pro", //2
             @"\Lewd" //3
         };//Experience States; easy to make scale with size
+
         public static int Outfit_Size = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;//Number of outfits starting from uniform to nightwear
+
         public static readonly string[] Generic_Inclusion =
         {
             "a_n_headtop",//0
@@ -70,7 +73,9 @@ namespace Cosplay_Academy
             "a_n_hair_pin", //13
             "a_n_hair_pin_R" //14
         };
+
         public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
+
         public static string[] KCOX_Cat = {
             "ct_clothesTop",//0
             "ct_clothesBot",//1
@@ -82,6 +87,7 @@ namespace Cosplay_Academy
             "ct_shoes_inner",//7
             "ct_shoes_outer"//8
         };
+
         public static List<string>[] Inclusion = new List<string>[11]
 {
             new List<string> {"None"}, //0
@@ -99,8 +105,11 @@ namespace Cosplay_Academy
             new List<string> { "a_n_hand_L", "a_n_ind_L", "a_n_mid_L", "a_n_ring_L", "a_n_hand_R", "a_n_ind_R", "a_n_mid_R", "a_n_ring_R" },//9
             new List<string> { "a_n_dan", "a_n_kokan", "a_n_ana" }//10
 };
+
         public static string[] Kill_Data = new string[] { };
+
         public static Dictionary<string, bool> PluginResults = new Dictionary<string, bool>();
+
         private static readonly string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
 
         internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
@@ -115,7 +124,6 @@ namespace Cosplay_Academy
             }
             return false;
         }
-
     }
 
     public enum Hexp

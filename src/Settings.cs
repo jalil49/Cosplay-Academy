@@ -25,6 +25,9 @@ namespace Cosplay_Academy
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
+
+        public static ConfigEntry<bool> UseAlternativePath { get; private set; }
+        public static ConfigEntry<string> AlternativePath { get; private set; }
         public static ConfigEntry<bool> EnableSetting { get; private set; }
         public static ConfigEntry<bool> EnableSets { get; private set; }
         public static ConfigEntry<bool> IndividualSets { get; private set; }
@@ -181,6 +184,10 @@ namespace Cosplay_Academy
                 ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
+
+            //Alternative path for other games
+            AlternativePath = Config.Bind("Other Games", "Sunshine UserData", new DirectoryInfo(UserData.Path).FullName.ToString(), "UserData Path of Sunshine");
+            UseAlternativePath = Config.Bind("Other Games", "Pull outfits from Sunshine", false, "Use applicable outfits from Sunshine");
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
         }
