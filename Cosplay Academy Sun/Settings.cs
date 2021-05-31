@@ -82,7 +82,7 @@ namespace Cosplay_Academy
                 DirectoryFinder.Organize();
             }
 
-            CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID);
+            CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
 
             //Accessories
             ExtremeAccKeeper = Config.Bind("Accessories", "KEEP ALL ACCESSORIES", false, "Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories");

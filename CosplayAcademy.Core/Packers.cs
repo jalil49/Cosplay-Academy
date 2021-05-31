@@ -69,20 +69,6 @@ namespace Cosplay_Academy
             var Start = TimeWatch[3].ElapsedMilliseconds;
             TimeWatch[3].Start();
 #endif
-            ControllerReload_Loop("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", ChaControl);
-
-            if (Constants.PluginResults["Accessory_States"])
-                ControllerReload_Loop("Accessory_States.Core.CharaEvent, Accessory_States", ChaControl);
-
-            if (Constants.PluginResults["Additional_Card_Info"])
-                ControllerReload_Loop("Additional_Card_Info.Core.CharaEvent, Additional_Card_Info", ChaControl);
-
-            if (InsideMaker && Constants.PluginResults["Accessory_Themes"])
-                ControllerReload_Loop("Accessory_Themes.Core.CharaEvent, Accessory_Themes", ChaControl);
-
-            if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
-                ControllerReload_Loop("Accessory_Parents.Core.CharaEvent, Accessory_Parents", ChaControl);
-
             if (!ForceALL)
             {
 #if TRACE
@@ -93,6 +79,20 @@ namespace Cosplay_Academy
 #endif
                 return;
             }
+
+            ControllerReload_Loop("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", ChaControl);
+
+            if (Constants.PluginResults["Accessory_States"])
+                ControllerReload_Loop("Accessory_States.CharaEvent, Accessory_States", ChaControl);
+
+            if (Constants.PluginResults["Additional_Card_Info"])
+                ControllerReload_Loop("Additional_Card_Info.CharaEvent, Additional_Card_Info", ChaControl);
+
+            if (InsideMaker && Constants.PluginResults["Accessory_Themes"])
+                ControllerReload_Loop("Accessory_Themes.CharaEvent, Accessory_Themes", ChaControl);
+
+            if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
+                ControllerReload_Loop("Accessory_Parents.CharaEvent, Accessory_Parents", ChaControl);
 
             ControllerReload_Loop("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", ChaControl);
 
@@ -1414,13 +1414,18 @@ namespace Cosplay_Academy
             }
         }
 
-        private void ControllerCoordReload_Loop(Type Controller, ChaControl ChaControl, ChaFileCoordinate coordinate)
+        private void ControllerCoordReload_Loop(string Controller_Name, ChaControl ChaControl, ChaFileCoordinate coordinate)
         {
+            Type Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
             {
                 var temp = ChaControl.GetComponent(Controller);
                 object[] Input_Parameter = new object[2] { coordinate, false };
                 Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
+            }
+            else
+            {
+                Settings.Logger.LogError($"Controller {Controller_Name} not found");
             }
         }
 

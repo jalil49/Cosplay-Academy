@@ -855,12 +855,12 @@ namespace Cosplay_Academy
                 SaveData.data.Add("AccKeep", MessagePackSerializer.Serialize(ACCKeepResult));
 
                 ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
-                ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.Core.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
+                //ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
             }
 
             #endregion
 
-            ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
+            //ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
 
             if (Settings.HairMatch.Value)
             {
@@ -869,7 +869,7 @@ namespace Cosplay_Academy
                 Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(HairACCDictionary));
                 ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
 
-                ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
+                //ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
             }
         }
 
