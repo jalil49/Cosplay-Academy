@@ -83,7 +83,11 @@ namespace Cosplay_Academy
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
-            else if (ThisOutfitData.processed && GameAPI.InsideHScene)
+            else if (ThisOutfitData.processed
+#if !KKS
+                && GameAPI.InsideHScene
+#endif
+                )
             {
                 ThisOutfitData.Chafile = ChaFileControl;
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
