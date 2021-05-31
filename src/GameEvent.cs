@@ -28,14 +28,12 @@ namespace Cosplay_Academy
         {
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
-            Settings.Logger.LogInfo("Reset has applied");
         }
 
         protected override void OnNewGame()
         {
             Constants.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
-            Settings.Logger.LogInfo("Reset has applied");
         }
 
         protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
