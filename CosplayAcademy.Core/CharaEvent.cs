@@ -8,13 +8,16 @@ using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI.Sidebar;
 using MessagePack;
-using MoreAccessoriesKOI;
 using System.Collections.Generic;
 #if TRACE
 using System.Diagnostics;
 #endif
 using System.Linq;
+#if !KKS
+using MoreAccessoriesKOI;
 using ToolBox;
+#endif
+
 
 namespace Cosplay_Academy
 {
@@ -22,8 +25,9 @@ namespace Cosplay_Academy
     {
         private ChaDefault ThisOutfitData;
         private static bool Firstpass = true;
+#if !KKS
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-
+#endif
 #if TRACE
         private static readonly Stopwatch Time = new Stopwatch();
         private static readonly List<long> Average = new List<long>();
@@ -216,7 +220,7 @@ namespace Cosplay_Academy
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
                     }
-
+#if !KKS
                     if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out var SaveAccessory) == false)
                     {
                         SaveAccessory = new MoreAccessories.CharAdditionalData();
@@ -227,7 +231,9 @@ namespace Cosplay_Academy
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
                     }
-
+#else 
+                    var acclist = new List<ChaFileAccessory.PartsInfo>();
+#endif
                     var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
 

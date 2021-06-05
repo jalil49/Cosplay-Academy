@@ -4,15 +4,16 @@ using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI.Maker;
 using MessagePack;
-using MoreAccessoriesKOI;
-using System;
 using System.Collections.Generic;
+using UnityEngine;
 #if TRACE
 using System.Diagnostics;
 #endif
 using System.Linq;
+#if !KKS
+using MoreAccessoriesKOI;
 using ToolBox;
-using UnityEngine;
+#endif
 
 namespace Cosplay_Academy
 {
@@ -26,6 +27,7 @@ namespace Cosplay_Academy
         private static bool InsideMaker = false;
 
         #region MoreAccessories
+#if !KKS
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
         private MoreAccessories.CharAdditionalData More_Char_Data
         {
@@ -39,6 +41,7 @@ namespace Cosplay_Academy
             }
         }
         private static readonly Traverse InH_Field = Traverse.Create(MoreAccessories._self).Field("_inH");
+#endif
         #endregion
 
         #region Underwear stuff
@@ -105,8 +108,9 @@ namespace Cosplay_Academy
             ThisOutfitData.Finished.Clear();
 
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
+#if !KKS
             bool retain = (bool)InH_Field.GetValue();
-
+#endif
             Underwear.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
 
@@ -114,9 +118,9 @@ namespace Cosplay_Academy
 
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
             Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
-
+#if !KKS
             InH_Field.SetValue(false);
-
+#endif
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
@@ -142,7 +146,9 @@ namespace Cosplay_Academy
             Original_ME_Data(); //Load existing where applicable
 
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
+#if !KKS
             InH_Field.SetValue(retain);
+#endif
 #if TRACE
             TimeWatch[0].Stop();
             var temp = TimeWatch[0].ElapsedMilliseconds - Start;
@@ -247,13 +253,13 @@ namespace Cosplay_Academy
                     UnderClothingKeep[i] = true;
                 }
             }
-
+#if !KKS
             var Local_More_Char = More_Char_Data;
             if (Local_More_Char.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
             {
                 NewRAW = new List<ChaFileAccessory.PartsInfo>();
             }
-
+#endif
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
@@ -367,7 +373,13 @@ namespace Cosplay_Academy
             {
                 foreach (var item in HairToColor)
                 {
-                    HairMatchProcess(outfitnum, item, haircolor, NewRAW);
+                    HairMatchProcess(outfitnum, item, haircolor,
+#if !KKS
+            NewRAW
+#else   
+                        new List<ChaFileAccessory.PartsInfo>()
+#endif
+                        );
                 }
             }
             int insert = 0;
@@ -420,10 +432,16 @@ namespace Cosplay_Academy
                     if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
                         info.ColorMatch = true;
-                        HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor,
+#if !KKS
+NewRAW
+#else
+                            new List<ChaFileAccessory.PartsInfo>()
+#endif
+);
                     }
                 }
-
+#if !KKS
                 //MoreAccessories
                 for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
                 {
@@ -472,7 +490,9 @@ namespace Cosplay_Academy
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, NewRAW);
                     }
                 }
+#endif
             }
+#if !KKS
             else
             {
                 ACCpostion = 20 + NewRAW.Count;
@@ -529,8 +549,9 @@ namespace Cosplay_Academy
 
                 ACCpostion++;
             }
-
+#endif
             HairAccessories.Add(outfitnum, HairAccInfo);
+#if !KKS
             while (Local_More_Char.infoAccessory.Count < Local_More_Char.nowAccessories.Count)
                 Local_More_Char.infoAccessory.Add(null);
             while (Local_More_Char.objAccessory.Count < Local_More_Char.nowAccessories.Count)
@@ -541,6 +562,7 @@ namespace Cosplay_Academy
                 Local_More_Char.cusAcsCmp.Add(null);
             while (Local_More_Char.showAccessories.Count < Local_More_Char.nowAccessories.Count)
                 Local_More_Char.showAccessories.Add(true);
+#endif
 
             ThisOutfitData.Finished.MaterialColorProperty.AddRange(Import_ME_Data.MaterialColorProperty);
 
@@ -591,8 +613,11 @@ namespace Cosplay_Academy
             #endregion
 
             //Apply pre-existing Accessories in any open slot or final slots.
+#if !KKS
             var Local_More = More_Char_Data;
             List<ChaFileAccessory.PartsInfo> MoreACCData = Local_More.nowAccessories;
+#endif
+
             ChaFileAccessory.PartsInfo[] OriginalData = ChaControl.nowCoordinate.accessory.parts;
 
             #region Reassign Existing Accessories
@@ -644,6 +669,8 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
             }
+#if !KKS
+
             for (int n = MoreACCData.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
             {
                 Empty = MoreACCData[ACCpostion - 20].type == 120;
@@ -684,6 +711,7 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
             }
+
 
             bool print = true;
 
@@ -743,6 +771,7 @@ namespace Cosplay_Academy
                 Local_More.cusAcsCmp.Add(null);
             while (Local_More.showAccessories.Count < Local_More.nowAccessories.Count)
                 Local_More.showAccessories.Add(true);
+#endif
             #endregion
 
             #region Pack
