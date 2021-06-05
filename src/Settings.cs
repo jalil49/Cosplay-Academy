@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Logging;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
@@ -18,25 +17,9 @@ namespace Cosplay_Academy
     [BepInProcess("Koikatsu Party VR")]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency("com.joan6694.illusionplugins.moreaccessories", BepInDependency.DependencyFlags.HardDependency)]
-    public class Settings : BaseUnityPlugin
+    public partial class Settings : BaseUnityPlugin
     {
-        public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.8.2";
-        public static Settings Instance;
-        internal static new ManualLogSource Logger { get; private set; }
-
-
-        public static ConfigEntry<bool> UseAlternativePath { get; private set; }
-        public static ConfigEntry<string> AlternativePath { get; private set; }
-        public static ConfigEntry<bool> EnableSetting { get; private set; }
-        public static ConfigEntry<bool> EnableSets { get; private set; }
-        public static ConfigEntry<bool> IndividualSets { get; private set; }
-        public static ConfigEntry<bool> EnableDefaults { get; private set; }
-        public static ConfigEntry<bool> StoryModeChange { get; private set; }
-        public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
-
         public static ConfigEntry<bool> TeacherDress { get; private set; }
-
 
         public static ConfigEntry<bool> MatchUniform { get; private set; }
         public static ConfigEntry<bool> AfterUniform { get; private set; }
@@ -52,40 +35,19 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> MatchNightwear { get; private set; }
         public static ConfigEntry<bool> MatchUnderwear { get; private set; }
 
-        public static ConfigEntry<bool> HairMatch { get; private set; }
-
         public static ConfigEntry<bool> GrabUniform { get; private set; }
         public static ConfigEntry<bool> GrabSwimsuits { get; private set; }
         public static ConfigEntry<bool> SundayDate { get; private set; }
-        public static ConfigEntry<bool> Makerview { get; private set; }
-        public static ConfigEntry<bool> FullSet { get; private set; }
         public static ConfigEntry<bool> KoiClub { get; private set; }
-        public static ConfigEntry<bool> ResetMaker { get; set; }
-
-        public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
         public static ConfigEntry<int> KoiChance { get; private set; }
-        public static ConfigEntry<int>[] HStateWeights { get; private set; } = new ConfigEntry<int>[Enum.GetValues(typeof(HStates)).Length];
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
-        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
-
-
-        public static ConfigEntry<bool> AccKeeper { get; private set; }
-        public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
-        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
-        public static ConfigEntry<bool> UnderwearStates { get; private set; }
-        public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
-
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
         public static ConfigEntry<bool> ChangeToClubatKoi { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
-        public static ConfigEntry<HStates> MakerHstate { get; private set; }
         public static ConfigEntry<Club> ClubChoice { get; private set; }
-        public static ConfigEntry<string>[] ListOverride { get; private set; } = new ConfigEntry<string>[Constants.InputStrings.Length];
-        public static ConfigEntry<bool>[] ListOverrideBool { get; private set; } = new ConfigEntry<bool>[Constants.InputStrings.Length];
-
         public void Awake()
         {
             if (StudioAPI.InsideStudio)
@@ -109,16 +71,8 @@ namespace Cosplay_Academy
                 DirectoryFinder.Organize();
             }
             GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
-            CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
-
-            //Accessories
-            ExtremeAccKeeper = Config.Bind("Accessories", "KEEP ALL ACCESSORIES", false, "Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories");
-            HairMatch = Config.Bind("Accessories", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
 
             //Main Game
-            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, "Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Academy Ready character marked by Additional Card Info");
-            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
-            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
 
             //StoryMode
@@ -157,12 +111,7 @@ namespace Cosplay_Academy
 
             //Probability
             KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
-            H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.Randomize, "Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?");
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
-            for (int i = 0; i < HStateWeights.Length; i++)
-            {
-                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100)));
-            }
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable Maker Mode", false);
@@ -175,19 +124,10 @@ namespace Cosplay_Academy
             //Other Mods
             UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
-            //Overrides
-            string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
-            for (int i = 0; i < ListOverride.Length; i++)
-            {
-                ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
-                ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
-            }
-
             //Alternative path for other games
             AlternativePath = Config.Bind("Other Games", "Sunshine UserData", new DirectoryInfo(UserData.Path).FullName.ToString(), "UserData Path of Sunshine");
+            AlternativePath.SettingChanged += AlternativePath_SettingChanged;
             UseAlternativePath = Config.Bind("Other Games", "Pull outfits from Sunshine", false, "Use applicable outfits from Sunshine");
-            MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
-            MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
         }
     }
 }
