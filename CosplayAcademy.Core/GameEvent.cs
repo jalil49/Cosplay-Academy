@@ -1,4 +1,5 @@
-﻿using ActionGame;
+﻿#if !KKS
+using ActionGame;
 using KKAPI.MainGame;
 namespace Cosplay_Academy
 {
@@ -59,3 +60,4 @@ namespace Cosplay_Academy
         }
     }
 }
+#endif
