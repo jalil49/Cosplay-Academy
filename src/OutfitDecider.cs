@@ -152,8 +152,8 @@ namespace Cosplay_Academy
                     string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
                     if (!Settings.EnableSets.Value || !result.Contains(@"\Sets\"))
                     {
-                        string choosen = Grabber(Input1, result);
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(coordinatepath + "coordinate" + choosen + Input2, Settings.AlternativePath.Value + "coordinate" + choosen + Input2, Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
+                        string choosen = Grabber(Input1, result, coordinatepath + "coordinate", Input2);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(choosen, string.Copy(choosen).Replace(coordinatepath, Settings.AlternativePath.Value), Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
                         if (Settings.EnableDefaults.Value && temp2.Count != 1)
                         {
                             temp2.Add("Defaults");
@@ -313,7 +313,7 @@ namespace Cosplay_Academy
             }
         }
 
-        private static string Grabber(string Input1, string result)
+        private static string Grabber(string Input1, string result, string Coordinatepath, string input2)
         {
             if (Input1 == @"\AfterSchool")
             {
@@ -326,7 +326,7 @@ namespace Cosplay_Academy
                     }
                     else if (split[i] == "School Uniform")
                     {
-                        return @"\School Uniform";
+                        return Coordinatepath + @"\School Uniform" + input2;
                     }
                 }
             }
@@ -342,13 +342,12 @@ namespace Cosplay_Academy
                     }
                     else if (split[i] == "Swimsuit")
                     {
-                        return @"\Swimsuit";
+                        return Coordinatepath + @"\Swimsuit" + input2;
                     }
                 }
             }
             return Input1;
         }
-
     }
 }
 

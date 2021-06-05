@@ -13,7 +13,6 @@ namespace Cosplay_Academy
             foreach (var item in PluginList)
             {
                 PluginResults[item] = TryfindPluginInstance(item);
-                //Settings.Logger.LogWarning($"Found {item}: {PluginResults[item]}");
             }
         }
 
@@ -21,8 +20,7 @@ namespace Cosplay_Academy
         //I'd imagine it's possible to scale clubs easily
         public static readonly string[] InputStrings =
             {
-#if !KKS
-            
+#if !KKS            
                     @"\School Uniform", //0
                     @"\AfterSchool", //1
                     @"\Gym" ,//2
@@ -37,7 +35,7 @@ namespace Cosplay_Academy
                     @"\Club\Koi", //11
                     @"\Underwear"//12
                  
-#elif Sun
+#elif KKS
                     @"\Casual", //0
                     @"\Swimsuit", //1
                     @"\Nightwear", //2
@@ -45,6 +43,28 @@ namespace Cosplay_Academy
                     @"\Underwear"//4
 #endif
 };
+        public static readonly string[] AllCoordinatePaths =
+            {
+                    @"\School Uniform", //0
+                    @"\AfterSchool", //1
+                    @"\Gym" ,//2
+                    @"\Swimsuit" , //3
+                    @"\Club" , //4
+                    @"\Casual" , //5
+                    @"\Nightwear", //6
+                    @"\Underwear",//7                 
+                    @"\Bathroom", //8
+};
+        public static readonly string[] ClubPaths =
+        {
+                    @"\Home" , //0
+                    @"\Swim" , //1
+                    @"\Manga", //2
+                    @"\Cheer", //3
+                    @"\Tea", //4
+                    @"\Track", //5
+                    @"\Koi", //6
+        };
 
         public static readonly string[] InputStrings2 = {
             @"\FirstTime", //0
@@ -112,15 +132,12 @@ namespace Cosplay_Academy
 
         private static readonly string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
 
-        internal static bool TryfindPluginInstance(string pluginName, Version minimumVersion = null)
+        internal static bool TryfindPluginInstance(string pluginName)
         {
             BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
             if (null != target)
             {
-                if (target.Metadata.Version >= minimumVersion)
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
