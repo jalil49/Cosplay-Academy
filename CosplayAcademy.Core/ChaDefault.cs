@@ -121,11 +121,21 @@ namespace Cosplay_Academy
                     club = (int)Settings.ClubChoice.Value;
 
                 LastClub = club;
+
+                if (heroine == null ? Settings.KoiClub.Value : heroine.isStaff && Settings.KeepOldBehavior.Value)
+                {
+                    if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                    {
+                        v[coordinate] = KoiOutfitpath;
+                    }
+                }
+
                 if (club == 0)
                 {
                     v[coordinate] = v[0];
                     return;
                 }
+
                 v[coordinate] = alloutfitpaths[datanum + club];
             }
 #endif

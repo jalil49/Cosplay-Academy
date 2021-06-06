@@ -70,20 +70,13 @@ namespace Cosplay_Academy
         private static void SpecialProcess()
         {
             ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(HExperience, Settings.MatchGeneric[9].Value);
-            if (ThisOutfitData.heroine == null ? Settings.KoiClub.Value : ThisOutfitData.heroine.isStaff && Settings.KeepOldBehavior.Value)
-            {
-                if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
-                {
-                    ThisOutfitData.alloutfitpaths[4] = ThisOutfitData.KoiOutfitpath;
-                }
-            }
 
             //If Characters can use casual outfits after school
             if (Settings.AfterSchoolCasual.Value)
             {
                 if (UnityEngine.Random.Range(1, 101) <= Settings.AfterSchoolcasualchance.Value)
                 {
-                    ThisOutfitData.alloutfitpaths[1] = ThisOutfitData.alloutfitpaths[5];//assign casual outfit to afterschool
+                    ThisOutfitData.alloutfitpaths[1] = ThisOutfitData.alloutfitpaths[10];//assign casual outfit to afterschool
                 }
             }
         }
