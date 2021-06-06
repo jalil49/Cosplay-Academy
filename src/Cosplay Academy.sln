@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosplay Academy", "Cosplay 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KK_KKP", "KK_KKP", "{9E5CC147-5D24-4D8B-9E9F-18A3214C67A0}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CosplayAcademy.Core", "..\CosplayAcademy.Core\CosplayAcademy.Core.shproj", "{D16032F2-42BE-414E-A4CC-AF5F170EF1D9}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Cosplay_Academy.Core", "..\CosplayAcademy.Core\Cosplay_Academy.Core.shproj", "{D16032F2-42BE-414E-A4CC-AF5F170EF1D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KKS", "KKS", "{10A1A7EE-C5B6-4466-BAEA-C8290FC77E22}"
 EndProject

@@ -23,7 +23,7 @@ namespace Cosplay_Academy
         private readonly ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
-
+        private static int underwearindex = Constants.InputStrings.ToList().IndexOf(@"\Underwear");
         private static bool InsideMaker = false;
 
         #region MoreAccessories
@@ -106,13 +106,13 @@ namespace Cosplay_Academy
 
             Extract_Personal_Data();
             ThisOutfitData.Finished.Clear();
-
+            ThisOutfitData.FillOutfitpaths();
             int holdoutfitstate = ChaControl.fileStatus.coordinateType;
 #if !KKS
             bool retain = (bool)InH_Field.GetValue();
 #endif
-            Underwear.LoadFile(ThisOutfitData.outfitpath[Constants.Outfit_Size]);
-            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.outfitpath[Constants.Outfit_Size]);
+            Underwear.LoadFile(ThisOutfitData.alloutfitpaths[underwearindex]);
+            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.alloutfitpaths[underwearindex]);
 
             Underwear_ME_Data = new ME_List(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, true);
 
@@ -124,13 +124,13 @@ namespace Cosplay_Academy
 
             for (int i = 0; i < Constants.Outfit_Size; i++)
             {
-                ValidOutfits[i] = ThisOutfitData.outfitpath[i].EndsWith(".png");
+                ValidOutfits[i] = ThisOutfitData.outfitpaths[i].EndsWith(".png");
                 if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
                 {
                     GeneralizedLoad(i, ValidOutfits[i]);
                     if (ValidOutfits[i])
                     {
-                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + ThisOutfitData.outfitpath[i]);
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + ThisOutfitData.outfitpaths[i]);
                     }
                     else
                     {
@@ -212,7 +212,7 @@ namespace Cosplay_Academy
                 TextureQueue = new Queue<MaterialTextureProperty>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialTextureProperty);
                 ShaderQueue = new Queue<MaterialShader>(ThisOutfitData.Original_Accessory_Data[outfitnum].MaterialShader);
 
-                ThisCoordinate.LoadFile(ThisOutfitData.outfitpath[outfitnum]);
+                ThisCoordinate.LoadFile(ThisOutfitData.outfitpaths[outfitnum]);
             }
 
             int UnderwearAccessoryStart = PartsQueue.Count();
@@ -385,8 +385,9 @@ namespace Cosplay_Academy
             int insert = 0;
             int ACCpostion = 0;
             bool Empty;
+#if !KKS
             bool print = true;
-
+#endif
             //Don't Skip if inside Maker
             if (MakerAPI.InsideMaker)
             {

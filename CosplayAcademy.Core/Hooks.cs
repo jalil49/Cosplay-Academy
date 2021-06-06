@@ -1,4 +1,5 @@
-﻿using ActionGame;
+﻿#if !KKS
+using ActionGame;
 using ActionGame.Chara;
 using HarmonyLib;
 using Illusion.Extensions;
@@ -106,8 +107,8 @@ namespace Cosplay_Academy
             {
                 if (ThisOutfitData.ChangeKoiToClub)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.ClubOutfitPath;
-                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
+                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
                     ThisOutfitData.ChangeKoiToClub = false;
                     ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
@@ -116,15 +117,15 @@ namespace Cosplay_Academy
             }
             else if (ThisOutfitData.ChangeClubToKoi && __instance.MapNo == 22)
             {
-                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpath[4];
-                ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
+                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
+                ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
                 int num = ThisOutfitData.heroine.isDresses.Check(false);
                 if (num == -1)
                 {
                     num = 0;
                 }
                 ThisOutfitData.heroine.coordinates[num] = 4;
-                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
+                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
                 ThisOutfitData.ChangeClubToKoi = false;
                 ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
@@ -136,14 +137,14 @@ namespace Cosplay_Academy
                 int remainThreshold = (ThisOutfitData.heroine.lewdness / (4 - (int)ThisOutfitData.heroine.HExperience));
                 if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.ClubOutfitPath;
+                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
                     int num = ThisOutfitData.heroine.isDresses.Check(false);
                     if (num == -1)
                     {
                         num = 0;
                     }
                     ThisOutfitData.heroine.coordinates[num] = 4;
-                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
                     ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
                     ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
@@ -253,9 +254,9 @@ namespace Cosplay_Academy
             ThisOutfitData.ChangeClubToKoi = false;
             if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
             {
-                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpath[4];
-                ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
-                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpath[4].EndsWith(".png"));
+                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
+                ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
+                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
                 ThisOutfitData.heroine.coordinates[0] = 4;
                 ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
                 ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
@@ -282,3 +283,4 @@ namespace Cosplay_Academy
         //}
     }
 }
+#endif

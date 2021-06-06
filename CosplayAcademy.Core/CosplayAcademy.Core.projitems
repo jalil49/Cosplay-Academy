@@ -12,9 +12,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)ChaDefault.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClothingLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigClass.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Definitions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DirectoryFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OutfitData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutfitDecider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Standard Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\ACC_State_Sync.cs" />

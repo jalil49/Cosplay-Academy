@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using System;
 using System.Collections.Generic;
-#if !KKS
+#if KK
 using System.ComponentModel;
 #endif
 namespace Cosplay_Academy
@@ -16,11 +16,30 @@ namespace Cosplay_Academy
             }
         }
 
+        internal static void ExpandedOutfit()
+        {
+            for (int i = 0; i < InputStrings.Length; i++)
+            {
+                if (OutfitnumPairs.ContainsKey(i))
+                {
+                    continue;
+                }
+#if KK
+                if (i == 4)
+                {
+                    OutfitnumPairs.Add(i, 6);
+                    continue;
+                }
+#endif
+                OutfitnumPairs.Add(i, 1);
+            }
+        }
+
         //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
         //I'd imagine it's possible to scale clubs easily
         public static readonly string[] InputStrings =
             {
-#if !KKS            
+#if KK
                     @"\School Uniform", //0
                     @"\AfterSchool", //1
                     @"\Gym" ,//2
@@ -30,11 +49,10 @@ namespace Cosplay_Academy
                     @"\Club\Cheer", //6
                     @"\Club\Tea", //7
                     @"\Club\Track", //8
-                    @"\Casual" , //9
-                    @"\Nightwear", //10
-                    @"\Club\Koi", //11
-                    @"\Underwear"//12
-                 
+                    @"\Club\Koi", //9
+                    @"\Casual" , //10
+                    @"\Nightwear", //11
+                    @"\Underwear"//12                 
 #elif KKS
                     @"\Casual", //0
                     @"\Swimsuit", //1
@@ -141,6 +159,8 @@ namespace Cosplay_Academy
             }
             return false;
         }
+
+        public static SortedDictionary<int, int> OutfitnumPairs = new SortedDictionary<int, int>();
     }
 
     public enum Hexp

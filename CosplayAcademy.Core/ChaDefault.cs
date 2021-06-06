@@ -12,17 +12,18 @@ namespace Cosplay_Academy
         internal ChaControl ChaControl;
         internal ChaFile Chafile;
 
-        const int Number_Of_Extra_Outfits = 1; //underwear
-
         internal bool firstpass = true;
         internal bool processed = false;
 
         internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.Outfit_Size];
-        internal string[] outfitpath = new string[Constants.Outfit_Size + Number_Of_Extra_Outfits];
+        internal string[] alloutfitpaths = new string[Constants.InputStrings.Length];
+        internal readonly string[] outfitpaths = new string[Constants.Outfit_Size];
+
         internal int Personality;
         internal string BirthDay;
         internal string FullName;
-#if !KKS
+#if KK
+        internal static int LastClub = -1;
         internal SaveData.Heroine heroine;
         internal string KoiOutfitpath;
         internal string ClubOutfitPath;
@@ -62,7 +63,7 @@ namespace Cosplay_Academy
             {
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
-                outfitpath[i] = " ";
+                alloutfitpaths[i] = " ";
                 HairKeepQueue[i] = new List<bool>();
                 ACCKeepQueue[i] = new List<bool>();
                 HairKeepReturn[i] = new List<int>();
@@ -86,5 +87,49 @@ namespace Cosplay_Academy
             ME.TextureDictionary.Clear();
             Finished.Clear();
         }
+
+        public void FillOutfitpaths()
+        {
+            var datanum = 0;
+            for (int i = 0; i < Constants.Outfit_Size; i++)
+            {
+                var count = Constants.OutfitnumPairs[i];
+                if (count == 1)
+                {
+                    outfitpaths[i] = alloutfitpaths[datanum];
+                }
+                else
+                {
+                    SpecialCondition(i, outfitpaths, datanum);
+                }
+                datanum += count;
+            }
+        }
+
+        private void SpecialCondition(int coordinate, string[] v, int datanum)
+        {
+#if KK
+            if (coordinate == 4)
+            {
+                var club = 0;
+                bool heroinenull = heroine == null;
+                if (!heroinenull)
+                    club = heroine.clubActivities;
+                else if (heroinenull && LastClub != -1)
+                    club = LastClub;
+                else
+                    club = (int)Settings.ClubChoice.Value;
+
+                LastClub = club;
+                if (club == 0)
+                {
+                    v[coordinate] = v[0];
+                    return;
+                }
+                v[coordinate] = alloutfitpaths[datanum + club];
+            }
+#endif
+        }
+
     }
 }

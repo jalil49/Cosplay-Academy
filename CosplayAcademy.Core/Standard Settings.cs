@@ -11,9 +11,12 @@ namespace Cosplay_Academy
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.8.2";
+        public const string Version = "0.8.3";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
+
+
+        public static ConfigEntry<bool>[] MatchGeneric = new ConfigEntry<bool>[Constants.InputStrings.Length];
 
         public static ConfigEntry<bool> UseAlternativePath { get; private set; }
         public static ConfigEntry<string> AlternativePath { get; private set; }
@@ -51,8 +54,8 @@ namespace Cosplay_Academy
         {
             Instance = this;
             Logger = base.Logger;
-            StartCoroutine(Wait());
             DirectoryFinder.CheckMissingFiles();
+            StartCoroutine(Wait());
             IEnumerator Wait()
             {
                 yield return null;
@@ -64,6 +67,7 @@ namespace Cosplay_Academy
                 yield return null;
                 DirectoryFinder.Organize();
             }
+            Constants.ExpandedOutfit();
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
 
             //Accessories
@@ -85,11 +89,6 @@ namespace Cosplay_Academy
             IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, "Don't look for other sets that are shared per coordinate type");
             FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, "Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found");
 
-            //match uniforms
-            MatchCasual = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, "It's an option");
-            MatchNightwear = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
-            MatchUnderwear = Config.Bind("Match Outfit", "Coordinated Underwear", false, "It's an option");
-
             //Additional Outfit
             EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, "Adds default outfit to roll tables");
 
@@ -97,7 +96,7 @@ namespace Cosplay_Academy
             H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.Randomize, "Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?");
             for (int i = 0; i < HStateWeights.Length; i++)
             {
-                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100)));
+                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { ShowRangeAsPercent = false }));
             }
 
             //Maker
@@ -116,10 +115,6 @@ namespace Cosplay_Academy
                 ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
-
-            //Alternative path for other games
-
-
 
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();

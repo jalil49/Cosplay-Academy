@@ -1,123 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Cosplay_Academy
 {
-    public static class OutfitDecider
+    public static partial class OutfitDecider
     {
-        private static readonly OutfitData[] outfitData;
-        private static bool IsInitialized;
-
-        private static ChaDefault ThisOutfitData;
-        private static int HExperience;
-        private static int RandHExperience;
-        private static int LastHeroineClub = -1;
-
-        static OutfitDecider()
-        {
-            IsInitialized = false;
-            outfitData = new OutfitData[Constants.InputStrings.Length];
-            for (int i = 0, n = outfitData.Length; i < n; i++)
-            {
-                outfitData[i] = new OutfitData();
-            }
-        }
-
-        public static void ResetDecider()
-        {
-            if (IsInitialized)
-            {
-                foreach (OutfitData data in outfitData)
-                {
-                    data.Clear();
-                }
-            }
-            Constants.ChaDefaults.ForEach(x => x.processed = false);
-            IsInitialized = false;
-            LastHeroineClub = -1;
-            Settings.Logger.LogInfo("Reset has occured");
-        }
-
-        public static void Decision(string name, ChaDefault cha)
-        {
-            ThisOutfitData = cha;
-            SaveData.Heroine person = ThisOutfitData.heroine;
-            if (!IsInitialized)
-            {
-                OutfitData.Anger = false;
-                Get_Outfits();
-                IsInitialized = true;
-                foreach (var data in outfitData)
-                {
-                    data.Coordinate();
-                }
-            }
-            if (person != null)
-            {
-                OutfitData.Anger = person.isAnger;
-                HExperience = (int)person.HExperience;
-            }
-            else
-            {
-                OutfitData.Anger = false;
-                HExperience = (int)Settings.MakerHstate.Value;
-            }
-            RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
-            UnderwearChoice();
-            Settings.Logger.LogDebug("Underwear completed");
-
-            if (Settings.RandomizeUnderwearOnly.Value)
-            {
-                if (person != null)
-                {
-                    Settings.Logger.LogDebug(name + " is processed.");
-                }
-                return;
-            }
-
-            //Set up Normal uniform
-            UniformOutfit();
-
-            //set up after school outfit
-            AfterSchoolOutfit();
-
-            //set up gym outfits
-            GymOutfit();
-
-            //set up swim outfit
-            SwimOutfit();
-
-            //set up Club outfits
-            if (person == null && LastHeroineClub != -1)
-            {
-                ClubOutfit(LastHeroineClub);
-            }
-            else
-            {
-                LastHeroineClub = (person == null ? (int)Settings.ClubChoice.Value : person.clubActivities);
-                ClubOutfit(LastHeroineClub);
-            }
-
-            CasualOutfit();
-
-            NightOutfit();
-
-            //If Characters can use casual outfits after school
-            if (Settings.AfterSchoolCasual.Value)
-            {
-                if (UnityEngine.Random.Range(1, 101) <= Settings.AfterSchoolcasualchance.Value)
-                {
-                    ThisOutfitData.outfitpath[1] = ThisOutfitData.outfitpath[5];//assign casual outfit to afterschool
-                }
-            }
-            if (person != null)
-            {
-                Settings.Logger.LogDebug(name + " is processed.");
-            }
-        }
-
         private static void Get_Outfits()
         {
             List<string> temp2;
@@ -169,7 +56,7 @@ namespace Cosplay_Academy
                         {
                             Setsfunction(array);
                         }
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, result.Replace(coordinatepath, Settings.AlternativePath.Value), false);
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, string.Copy(result).Replace(coordinatepath, Settings.AlternativePath.Value), false);
                         if (Settings.EnableDefaults.Value && temp2.Count != 1)
                         {
                             temp2.Add("Defaults");
@@ -180,173 +67,25 @@ namespace Cosplay_Academy
             }
         }
 
-        private static void Setsfunction(string[] result)
+        private static void SpecialProcess()
         {
-            foreach (string item in result)
-            {
-                string[] split = item.Split('\\');
-                int exp = 0;
-                foreach (var folder in split.Reverse())//reverse cause it's probably faster to start at rear, but rear can be longer than forward; for loop might be faster tho
-                {
-                    try
-                    {
-                        HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
-                        if (Enum.IsDefined(typeof(HStates), temp))
-                        {
-                            exp = (int)temp;
-                            break;
-                        }
-                    }
-                    catch
-                    { }
-                }
-                for (int j = 0, n = outfitData.Length; j < n; j++)
-                {
-                    if (item.Contains(Constants.InputStrings[j]))
-                    {
-                        if (Settings.FullSet.Value && outfitData[j].IsSet(exp))
-                        {
-                            break;
-                        }
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, item.Replace(new DirectoryInfo(UserData.Path).FullName, Settings.AlternativePath.Value), false);
-                        outfitData[j].Insert(exp, temp.ToArray(), true);
-                        break;
-                    }
-                    else if (j == outfitData.Length - 1)
-                    {
-                        Settings.Logger.LogWarning("Fail :" + item + " Hexp: " + exp);
-                    }
-                }
-            }
-        }
-
-        private static void UniformOutfit()
-        {
-            Generalized_Assignment(Settings.MatchUniform.Value, 0, 0);
-        }
-
-        private static void AfterSchoolOutfit()
-        {
-            if (Settings.AfterUniform.Value /*|| ExpandedOutfit.EnableSets.Value && Constants.outfitpath[1].Contains(@"\Sets\")*/)
-            {
-                Generalized_Assignment(Settings.AfterUniform.Value, 1, 1);
-            }
-            else
-            {
-                ThisOutfitData.outfitpath[1] = ThisOutfitData.outfitpath[0];
-            }
-        }
-
-        private static void GymOutfit()
-        {
-            Generalized_Assignment(Settings.MatchGym.Value, 2, 2);
-        }
-
-        private static void SwimOutfit()
-        {
-            Generalized_Assignment(Settings.MatchSwim.Value, 3, 3);
-        }
-
-        private static void ClubOutfit(int club)
-        {
-            switch (club)
-            {
-                case 1:
-                    Generalized_Assignment(Settings.MatchSwimClub.Value, 4, 4);
-                    break;
-
-                case 2:
-                    Generalized_Assignment(Settings.MatchMangaClub.Value, 4, 5);
-                    break;
-
-                case 3:
-                    Generalized_Assignment(Settings.MatchCheerClub.Value, 4, 6);
-                    break;
-
-                case 4:
-                    Generalized_Assignment(Settings.MatchTeaClub.Value, 4, 7);
-                    break;
-
-                case 5:
-                    Generalized_Assignment(Settings.MatchTrackClub.Value, 4, 8);
-                    break;
-
-                default:
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.outfitpath[0];
-                    break;
-            }
-            ThisOutfitData.KoiOutfitpath = outfitData[11].RandomSet(HExperience, Settings.MatchKoiClub.Value);
+            ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(HExperience, Settings.MatchGeneric[9].Value);
             if (ThisOutfitData.heroine == null ? Settings.KoiClub.Value : ThisOutfitData.heroine.isStaff && Settings.KeepOldBehavior.Value)
             {
                 if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                 {
-                    ThisOutfitData.outfitpath[4] = ThisOutfitData.KoiOutfitpath;
+                    ThisOutfitData.alloutfitpaths[4] = ThisOutfitData.KoiOutfitpath;
                 }
             }
-        }
 
-        private static void CasualOutfit()
-        {
-            Generalized_Assignment(Settings.MatchCasual.Value, 5, 9);
-        }
-
-        private static void NightOutfit()
-        {
-            Generalized_Assignment(Settings.MatchNightwear.Value, 6, 10);
-        }
-
-        private static void UnderwearChoice()
-        {
-            Generalized_Assignment(Settings.MatchUnderwear.Value, Constants.Outfit_Size, 12);
-        }
-
-        private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
-        {
-            switch (Settings.H_EXP_Choice.Value)
+            //If Characters can use casual outfits after school
+            if (Settings.AfterSchoolCasual.Value)
             {
-                case Hexp.RandConstant:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type);
-                case Hexp.Maximize:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type);
-                default:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
-            }
-        }
-
-        private static string Grabber(string Input1, string result, string Coordinatepath, string input2)
-        {
-            if (Input1 == @"\AfterSchool")
-            {
-                string[] split = result.Split('\\');
-                for (int i = split.Length - 1; i >= 0; i--)
+                if (UnityEngine.Random.Range(1, 101) <= Settings.AfterSchoolcasualchance.Value)
                 {
-                    if (split[i] == "AfterSchool")
-                    {
-                        break;
-                    }
-                    else if (split[i] == "School Uniform")
-                    {
-                        return Coordinatepath + @"\School Uniform" + input2;
-                    }
+                    ThisOutfitData.alloutfitpaths[1] = ThisOutfitData.alloutfitpaths[5];//assign casual outfit to afterschool
                 }
             }
-            else if (Input1 == @"\Club\Swim")
-            {
-                string[] split = result.Split('\\');
-
-                for (int i = split.Length - 1; i >= 0; i--)
-                {
-                    if (split[i] == @"Swim")
-                    {
-                        break;
-                    }
-                    else if (split[i] == "Swimsuit")
-                    {
-                        return Coordinatepath + @"\Swimsuit" + input2;
-                    }
-                }
-            }
-            return Input1;
         }
     }
 }

@@ -36,11 +36,13 @@ namespace Cosplay_Academy
         public static void MakerAPI_MakerExiting()
         {
             Firstpass = true;
+#if !KKS
             if (!MakerAPI.IsInsideClassMaker())
             {
                 Constants.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
+#endif
         }
 
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
@@ -134,7 +136,7 @@ namespace Cosplay_Academy
                     FullName = ChaControl.fileParam.fullname,
                     BirthDay = ChaControl.fileParam.strBirthDay,
                     Personality = ChaControl.fileParam.personality,
-#if !KKS
+#if KK
                     heroine = ChaControl.GetHeroine()
 #endif
                 };
@@ -147,7 +149,7 @@ namespace Cosplay_Academy
         public void Process(GameMode currentGameMode)
         {
             ThisOutfitDataProcess();
-#if !KKS
+#if KK
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
@@ -231,7 +233,7 @@ namespace Cosplay_Academy
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
                     }
-#else 
+#else
                     var acclist = new List<ChaFileAccessory.PartsInfo>();
 #endif
                     var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
@@ -305,13 +307,12 @@ namespace Cosplay_Academy
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)
         {
-            ChaFileCoordinate Temp = new ChaFileCoordinate
+            return new ChaFileCoordinate
             {
                 clothes = OriginalCoordinate.clothes,
                 makeup = OriginalCoordinate.makeup,
-                enableMakeup = OriginalCoordinate.enableMakeup
-            };
-            return Temp;
+                enableMakeup = OriginalCoordinate.enableMakeup,
+            }; ;
         }
     }
 }

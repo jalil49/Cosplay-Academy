@@ -160,14 +160,18 @@ namespace Cosplay_Academy
             return Choosen;
         }
 
-        public static List<string> Get_Outfits_From_Path(string FilePath, string AlternativePath = null, bool RemoveSets = true)
+        public static List<string> Get_Outfits_From_Path(string OriginalPath, string AlternativePath = null, bool RemoveSets = true)
         {
             List<string> Choosen = new List<string>();
-            List<string> Paths = new List<string>
+            List<string> Paths = new List<string>();
+            if (Directory.Exists(OriginalPath))
             {
-                FilePath //add parent folder to list
-            };
-            Paths.AddRange(Directory.GetDirectories(FilePath, "*", SearchOption.AllDirectories)); //grab child folders
+                Paths.Add(OriginalPath);
+                Paths.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
+            }
+            Settings.Logger.LogWarning("Get_Outfits_From_Path");
+            Settings.Logger.LogWarning(OriginalPath);
+            Settings.Logger.LogWarning(AlternativePath);
             if (AlternativePath != null && Settings.UseAlternativePath.Value && Directory.Exists(AlternativePath))
             {
                 Paths.Add(AlternativePath);
@@ -185,12 +189,12 @@ namespace Cosplay_Academy
                 string[] files = Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }
-            if (Choosen.Count == 0 && !FilePath.Contains(@"\Unorganized"))
+            if (Choosen.Count == 0 && !OriginalPath.Contains(@"\Unorganized"))
             {
                 Choosen.Add("Default");
-                Settings.Logger.LogWarning("No files found in :" + FilePath);
+                Settings.Logger.LogWarning("No files found in :" + OriginalPath);
             }
-            Settings.Logger.LogDebug($"Files found in : {FilePath} + {Choosen.Count}");
+            Settings.Logger.LogDebug($"Files found in : {OriginalPath} + {Choosen.Count}");
             return Choosen;
         }
     }

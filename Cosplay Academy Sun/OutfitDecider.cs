@@ -5,79 +5,8 @@ using System.Linq;
 
 namespace Cosplay_Academy
 {
-    public static class OutfitDecider
+    public static partial class OutfitDecider
     {
-        private static readonly OutfitData[] outfitData;
-        private static bool IsInitialized;
-
-        private static ChaDefault ThisOutfitData;
-        private static int HExperience;
-        private static int RandHExperience;
-
-        static OutfitDecider()
-        {
-            IsInitialized = false;
-            outfitData = new OutfitData[Constants.InputStrings.Length];
-            for (int i = 0, n = outfitData.Length; i < n; i++)
-            {
-                outfitData[i] = new OutfitData();
-            }
-        }
-
-        public static void ResetDecider()
-        {
-            if (IsInitialized)
-            {
-                foreach (OutfitData data in outfitData)
-                {
-                    data.Clear();
-                }
-            }
-            Constants.ChaDefaults.ForEach(x => x.processed = false);
-            IsInitialized = false;
-            Settings.Logger.LogInfo("Reset has occured");
-        }
-
-        public static void Decision(string name, ChaDefault cha)
-        {
-            ThisOutfitData = cha;
-            if (!IsInitialized)
-            {
-                OutfitData.Anger = false;
-                Get_Outfits();
-                IsInitialized = true;
-                foreach (var data in outfitData)
-                {
-                    data.Coordinate();
-                }
-            }
-            OutfitData.Anger = false;
-            HExperience = (int)Settings.MakerHstate.Value;
-            RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
-            //UnderwearChoice();
-            Generalized_Assignment(Settings.MatchUnderwear.Value, 4, 4);
-            Settings.Logger.LogDebug("Underwear completed");
-
-            if (Settings.RandomizeUnderwearOnly.Value)
-            {
-                return;
-            }
-
-            //CasualOutfit();
-            Generalized_Assignment(Settings.MatchCasual.Value, 0, 0);
-
-            //SwimOutfit();
-            Generalized_Assignment(Settings.MatchSwim.Value, 1, 1);
-
-            //NightOutfit();
-            Generalized_Assignment(Settings.MatchNightwear.Value, 2, 2);
-
-            //Bathroom
-            Generalized_Assignment(Settings.MatchSwim.Value, 1, 1);
-
-            Settings.Logger.LogDebug(name + " is processed.");
-        }
-
         private static void Get_Outfits()
         {
             List<string> temp2;
@@ -131,57 +60,9 @@ namespace Cosplay_Academy
             }
         }
 
-        private static void Setsfunction(string[] result)
+        private static void SpecialProcess()
         {
-            foreach (string item in result)
-            {
-                string[] split = item.Split('\\');
-                int exp = 0;
-                foreach (var folder in split.Reverse())//reverse cause it's probably faster to start at rear, but rear can be longer than forward; for loop might be faster tho
-                {
-                    try
-                    {
-                        HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
-                        if (Enum.IsDefined(typeof(HStates), temp))
-                        {
-                            exp = (int)temp;
-                            break;
-                        }
-                    }
-                    catch
-                    { }
-                }
-                for (int j = 0, n = outfitData.Length; j < n; j++)
-                {
-                    if (item.Contains(Constants.InputStrings[j]))
-                    {
-                        if (Settings.FullSet.Value && outfitData[j].IsSet(exp))
-                        {
-                            break;
-                        }
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, string.Copy(item).Replace(new DirectoryInfo(UserData.Path).FullName, Settings.AlternativePath.Value), false);
-                        outfitData[j].Insert(exp, temp.ToArray(), true);
-                        break;
-                    }
-                    else if (j == outfitData.Length - 1)
-                    {
-                        Settings.Logger.LogWarning("Fail :" + item + " Hexp: " + exp);
-                    }
-                }
-            }
-        }
 
-        private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
-        {
-            switch (Settings.H_EXP_Choice.Value)
-            {
-                case Hexp.RandConstant:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type);
-                case Hexp.Maximize:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type);
-                default:
-                    return ThisOutfitData.outfitpath[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
-            }
         }
     }
 }
