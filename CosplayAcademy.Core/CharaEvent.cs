@@ -24,7 +24,7 @@ namespace Cosplay_Academy
     public class CharaEvent : CharaCustomFunctionController
     {
         private ChaDefault ThisOutfitData;
-        private static bool Firstpass = true;
+        internal static int Firstpass = 0;
 #if !KKS
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
 #endif
@@ -33,9 +33,9 @@ namespace Cosplay_Academy
         private static readonly List<long> Average = new List<long>();
 #endif
         public static bool inH = false; //hopefully code that will work if additional heroines are loaded in H actively. such as in Kplug, Not tested.
-        public static void MakerAPI_MakerExiting()
+        internal static void MakerAPI_MakerExiting()
         {
-            Firstpass = true;
+            Firstpass = 0;
 #if !KKS
             if (!MakerAPI.IsInsideClassMaker())
             {
@@ -100,10 +100,10 @@ namespace Cosplay_Academy
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
-            if (IsMaker && Firstpass || inH)
+
+            if (IsMaker && Firstpass++ < 2 || inH)
             {
                 ChaControl.ChangeCoordinateTypeAndReload();
-                Firstpass = false;
             }
 #if TRACE
             if (Time.IsRunning)

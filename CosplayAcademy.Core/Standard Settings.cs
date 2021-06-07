@@ -117,6 +117,7 @@ namespace Cosplay_Academy
 
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
+            MakerAPI.MakerStartedLoading += (s, e) => CharaEvent.Firstpass = 0;
         }
     }
 }
