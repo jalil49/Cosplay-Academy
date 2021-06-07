@@ -62,16 +62,16 @@ namespace Cosplay_Academy
             MatchGeneric[4] = Config.Bind("Match Outfit", "Coordinated Swim Club outfits", true, "Everyone wears same uniform during Swim Club");
             MatchGeneric[5] = Config.Bind("Match Outfit", "Coordinated Cheerleader Uniforms", true, "Everyone wears same uniform during Cheerleading");
             MatchGeneric[6] = Config.Bind("Match Outfit", "Coordinated Track & Field Uniforms", true, "Everyone wears same uniform during Track & Field");
-            MatchGeneric[7] = Config.Bind("Match Outfit", "Coordinated Manga Cosplay", false, "Everyone wears same uniform during clubs");
-            MatchGeneric[8] = Config.Bind("Match Outfit", "Coordinated Tea Ceremony Uniforms", false, "Everyone wears same uniform during clubs");
-            MatchGeneric[9] = Config.Bind("Match Outfit", "Coordinated Koikatsu Uniforms", false, "Everyone wears same uniform during clubs");
+            MatchGeneric[7] = Config.Bind("Match Outfit", "Coordinated Manga Cosplay", false, "Everyone wears same uniform during Manga club");
+            MatchGeneric[8] = Config.Bind("Match Outfit", "Coordinated Tea Ceremony Uniforms", false, "Everyone wears same uniform during Tea Ceremony club");
+            MatchGeneric[9] = Config.Bind("Match Outfit", "Coordinated Koikatsu Uniforms", false, "Everyone wears same uniform during Koikatsu club");
             MatchGeneric[10] = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, "It's an option");
             MatchGeneric[11] = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
             MatchGeneric[12] = Config.Bind("Match Outfit", "Coordinated Underwear", false, "It's an option");
 
             //Additional Outfit
             GrabSwimsuits = Config.Bind("Additional Outfits", "Grab Swimsuits for Swim club", true);
-            GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true, "Uses Casual getup afterschool");
+            GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true);
             AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, "Everyone can be in casual wear after school");
 
             //Probability
@@ -88,11 +88,6 @@ namespace Cosplay_Academy
 
             //Other Mods
             UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
-
-            //Alternative path for other games
-            AlternativePath = Config.Bind("Other Games", "Sunshine UserData", new DirectoryInfo(UserData.Path).FullName.ToString(), "UserData Path of Sunshine");
-            AlternativePath.SettingChanged += AlternativePath_SettingChanged;
-            UseAlternativePath = Config.Bind("Other Games", "Pull outfits from Sunshine", false, "Use applicable outfits from Sunshine");
         }
     }
 }

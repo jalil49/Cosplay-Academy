@@ -19,7 +19,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool>[] MatchGeneric = new ConfigEntry<bool>[Constants.InputStrings.Length];
 
         public static ConfigEntry<bool> UseAlternativePath { get; private set; }
-        public static ConfigEntry<string> AlternativePath { get; private set; }
+        public static ConfigEntry<string> CoordinatePath { get; private set; }
         public static ConfigEntry<bool> EnableSetting { get; private set; }
         public static ConfigEntry<bool> EnableSets { get; private set; }
         public static ConfigEntry<bool> IndividualSets { get; private set; }
@@ -54,20 +54,6 @@ namespace Cosplay_Academy
         {
             Instance = this;
             Logger = base.Logger;
-            DirectoryFinder.CheckMissingFiles();
-            StartCoroutine(Wait());
-            IEnumerator Wait()
-            {
-                yield return null;
-                Constants.PluginCheck();
-                if (!Constants.PluginResults["Additional_Card_Info"]) //provide access to info even if plugin-doesn't exist
-                {
-                    CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
-                }
-                yield return null;
-                DirectoryFinder.Organize();
-            }
-            Constants.ExpandedOutfit();
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
 
             //Accessories
@@ -79,10 +65,6 @@ namespace Cosplay_Academy
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Expanded Outfit plugin");
             RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
             EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, "Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color");
-
-            //StoryMode
-            StoryModeChange = Config.Bind("Story Mode", "Koikatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
-            KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behavior", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, "Outfits in set folders can be pulled from a group for themed sets");
@@ -108,24 +90,33 @@ namespace Cosplay_Academy
             //Other Mods
             UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
+            CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate", "Coordinate Path");
+
             //Overrides
-            string coordinatepath = new DirectoryInfo(UserData.Path).FullName + @"coordinate";
+            string coordinatepath = CoordinatePath.Value;
             for (int i = 0; i < ListOverride.Length; i++)
             {
                 ListOverride[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' '), coordinatepath + Constants.InputStrings[i], "Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here");
                 ListOverrideBool[i] = Config.Bind("Outfit Folder Override", Constants.InputStrings[i].Trim('\\').Replace('\\', ' ') + " Enable override", false, "Enables the above folder override");
             }
 
+            DirectoryFinder.CheckMissingFiles();
+            StartCoroutine(Wait());
+            IEnumerator Wait()
+            {
+                yield return null;
+                Constants.PluginCheck();
+                if (!Constants.PluginResults["Additional_Card_Info"]) //provide access to info even if plugin-doesn't exist
+                {
+                    CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
+                }
+                yield return null;
+                DirectoryFinder.Organize();
+            }
+            Constants.ExpandedOutfit();
+
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
-        }
-
-        private void AlternativePath_SettingChanged(object sender, EventArgs e)
-        {
-            if (!AlternativePath.Value.EndsWith(@"\"))
-            {
-                AlternativePath.Value += '\\';
-            }
         }
     }
 }

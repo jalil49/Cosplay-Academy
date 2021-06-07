@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using KKAPI;
 using KKAPI.Studio;
-using System.IO;
 namespace Cosplay_Academy
 {
     [BepInProcess("KoikatsuSunshineTrial")]
@@ -15,6 +14,7 @@ namespace Cosplay_Academy
             {
                 return;
             }
+
             StandardSettings();
 
             //match uniforms
@@ -23,11 +23,6 @@ namespace Cosplay_Academy
             MatchGeneric[2] = Config.Bind("Match Outfit", "Coordinated Nightwear", false, "It's an option");
             MatchGeneric[3] = Config.Bind("Match Outfit", "Coordinated Bathroom outfits", false, "Everyone wears same Bathroom outfit");
             MatchGeneric[4] = Config.Bind("Match Outfit", "Coordinated Underwear", false, "It's an option");
-
-            //Alternative path for other games
-            AlternativePath = Config.Bind("Other Games", "KK or KKP UserData", new DirectoryInfo(UserData.Path).FullName.ToString(), "UserData Path of KK or KKP");
-            UseAlternativePath = Config.Bind("Other Games", "Pull outfits from KK or KKP", false, "Use applicable outfits from Sunshine");
-            AlternativePath.SettingChanged += AlternativePath_SettingChanged;
         }
     }
 }

@@ -40,6 +40,63 @@ namespace Cosplay_Academy
             }
         }
 
+        private static void Get_Outfits()
+        {
+            List<string> temp2;
+            string coordinatepath = Settings.CoordinatePath.Value;
+            int set = -1;//-1 so it can be on top of foreach
+            foreach (string Input1 in Constants.InputStrings)
+            {
+                set++;
+                int exp = -1;
+                foreach (string Input2 in Constants.InputStrings2)
+                {
+                    exp++;
+                    if (Settings.ListOverrideBool[set].Value)
+                    {
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(Settings.ListOverride[set].Value, false); //when sets are enabled don't include them in rolls, but do if disabled
+                        outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
+                        continue;
+                    }
+                    if (outfitData[set].IsSet(exp))//Skip set items
+                    {
+                        continue;
+                    }
+                    temp2 = DirectoryFinder.Grab_All_Directories(coordinatepath + Input1 + Input2);
+#if KK
+                    Grabber(temp2, set, Input2);
+#endif
+                    string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
+                    if (!Settings.EnableSets.Value || !result.Contains(@"\Sets\"))
+                    {
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
+                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
+                        {
+                            temp2.Add("Defaults");
+                        }
+                        outfitData[set].Insert(exp, temp2.ToArray(), false);//Assign "not" set and store data
+                    }
+                    else
+                    {
+                        string[] split = result.Split('\\');
+                        temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
+                        string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
+                        if (!Settings.IndividualSets.Value)
+                        {
+                            Setsfunction(array);
+                        }
+                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
+                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
+                        {
+                            temp2.Add("Defaults");
+                        }
+                        outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
+                    }
+                }
+            }
+        }
+
+
         public static void Decision(string name, ChaDefault cha)
         {
             ThisOutfitData = cha;
@@ -102,8 +159,8 @@ namespace Cosplay_Academy
                         {
                             break;
                         }
-                        var coordinatepath = new DirectoryInfo(UserData.Path).FullName;
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(string.Copy(item).Replace(Settings.AlternativePath.Value, coordinatepath), string.Copy(item).Replace(coordinatepath, Settings.AlternativePath.Value), false);
+                        var coordinatepath = Settings.CoordinatePath.Value;
+                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, false);
                         outfitData[j].Insert(exp, temp.ToArray(), true);
                         break;
                     }
@@ -126,42 +183,6 @@ namespace Cosplay_Academy
                 default:
                     return ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
             }
-        }
-
-        private static string Grabber(string Input1, string result, string Coordinatepath, string input2)
-        {
-            if (Input1 == @"\AfterSchool")
-            {
-                string[] split = result.Split('\\');
-                for (int i = split.Length - 1; i >= 0; i--)
-                {
-                    if (split[i] == "AfterSchool")
-                    {
-                        break;
-                    }
-                    else if (split[i] == "School Uniform")
-                    {
-                        return Coordinatepath + @"\School Uniform" + input2;
-                    }
-                }
-            }
-            else if (Input1 == @"\Club\Swim")
-            {
-                string[] split = result.Split('\\');
-
-                for (int i = split.Length - 1; i >= 0; i--)
-                {
-                    if (split[i] == @"Swim")
-                    {
-                        break;
-                    }
-                    else if (split[i] == "Swimsuit")
-                    {
-                        return Coordinatepath + @"\Swimsuit" + input2;
-                    }
-                }
-            }
-            return result;
         }
     }
 }
