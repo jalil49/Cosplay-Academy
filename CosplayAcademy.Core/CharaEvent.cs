@@ -131,7 +131,7 @@ namespace Cosplay_Academy
             if (ThisOutfitData == null)
             {
                 //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chano {ChaControl.fileParam.strBirthDay} name {ChaControl.fileParam.personality}");
-                ThisOutfitData = new ChaDefault
+                ThisOutfitData = new ChaDefault(ChaControl, ChaFileControl)
                 {
                     FullName = ChaControl.fileParam.fullname,
                     BirthDay = ChaControl.fileParam.strBirthDay,
@@ -141,6 +141,7 @@ namespace Cosplay_Academy
 #endif
                 };
                 Constants.ChaDefaults.Add(ThisOutfitData);
+                return;
             }
             ThisOutfitData.ChaControl = ChaControl;
             ThisOutfitData.Chafile = ChaFileControl;
@@ -185,10 +186,10 @@ namespace Cosplay_Academy
                 #region Queue accessories to keep
 
                 #region ACI Data
-                List<int>[] HairKeep = new List<int>[Constants.Outfit_Size];
-                List<int>[] ACCKeep = new List<int>[Constants.Outfit_Size];
+                List<int>[] HairKeep = new List<int>[ThisOutfitData.Outfit_Size];
+                List<int>[] ACCKeep = new List<int>[ThisOutfitData.Outfit_Size];
 
-                for (int i = 0; i < Constants.Outfit_Size; i++)
+                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                 {
                     HairKeep[i] = new List<int>();
                     ACCKeep[i] = new List<int>();
@@ -214,7 +215,7 @@ namespace Cosplay_Academy
                 #endregion
 
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
-                for (int outfitnum = 0, n = Constants.Outfit_Size; outfitnum < n; outfitnum++)
+                for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
 

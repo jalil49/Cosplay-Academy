@@ -317,7 +317,7 @@ namespace Cosplay_Academy.ME
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
                         {
                             if (LoadAll)
-                                for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
+                                for (int outfitnum_loop = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
 
                             else if (outfitnum > -1)
@@ -341,7 +341,7 @@ namespace Cosplay_Academy.ME
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
                         {
                             if (LoadAll)
-                                for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
+                                for (int outfitnum_loop = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
 
                             else if (outfitnum > -1)
@@ -365,7 +365,7 @@ namespace Cosplay_Academy.ME
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
                         {
                             if (LoadAll)
-                                for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
+                                for (int outfitnum_loop = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                             else if (outfitnum > -1)
                             {
@@ -388,7 +388,7 @@ namespace Cosplay_Academy.ME
                         if (objectTypesToLoad.Contains(loadedProperty.ObjectType))
                         {
                             if (LoadAll)
-                                for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
+                                for (int outfitnum_loop = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
                             else if (outfitnum > -1)
                             {
@@ -414,7 +414,7 @@ namespace Cosplay_Academy.ME
                             if (loadedProperty.TexID != null)
                                 texID = importDictionaryList[(int)loadedProperty.TexID];
                             if (LoadAll)
-                                for (int outfitnum_loop = 0; i < Constants.Outfit_Size; i++)
+                                for (int outfitnum_loop = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum_loop, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
                             else if (outfitnum > -1)
                             {

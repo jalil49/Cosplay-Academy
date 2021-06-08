@@ -23,7 +23,7 @@ namespace Cosplay_Academy
         private readonly ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
-        private static int underwearindex = Constants.InputStrings.ToList().IndexOf(@"\Underwear");
+        private static readonly int underwearindex = Constants.InputStrings.ToList().IndexOf(@"\Underwear");
         private static bool InsideMaker = false;
 
         #region MoreAccessories
@@ -46,20 +46,20 @@ namespace Cosplay_Academy
 
         #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
-        private readonly bool[][] Underwearbools = new bool[Constants.Outfit_Size][]; //0: not bot; 1: notbra; 2: notshorts
-        private readonly List<int>[] UnderwearAccessoriesLocations = new List<int>[Constants.Outfit_Size];
+        private readonly bool[][] Underwearbools; //0: not bot; 1: notbra; 2: notshorts
+        private readonly List<int>[] UnderwearAccessoriesLocations;
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private ME_List Underwear_ME_Data;
         #endregion
 
         #region ACI_Data
-        private bool[] CharacterClothingKeep = new bool[] { false, false, false, false, false, false, false, false, false };
-        private bool[][] CharacterClothingKeep_Coordinate = new bool[Constants.Outfit_Size][];
-        private bool[] MakeUpKeep = new bool[] { false, false, false, false, false, false, false, false };
+        private bool[] CharacterClothingKeep;
+        private bool[][] CharacterClothingKeep_Coordinate;
+        private bool[] MakeUpKeep;
         public bool Character_Cosplay_Ready = false;
         #endregion
 
-        private readonly List<int>[] ME_Dont_Touch = new List<int>[Constants.Outfit_Size];
+        private readonly List<int>[] ME_Dont_Touch;
 
 #if TRACE
         #region StopWatches
@@ -68,7 +68,7 @@ namespace Cosplay_Academy
         private static List<long>[] Average;
         #endregion
 #endif
-        private readonly bool[] ValidOutfits = new bool[Constants.Outfit_Size];
+        private readonly bool[] ValidOutfits;
 
         public ClothingLoader(ChaDefault ThisOutfitData)
         {
@@ -84,14 +84,20 @@ namespace Cosplay_Academy
                 }
             }
 #endif
-
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            this.ThisOutfitData = ThisOutfitData;
+            CharacterClothingKeep = new bool[ThisOutfitData.Outfit_Size];
+            UnderwearAccessoriesLocations = new List<int>[ThisOutfitData.Outfit_Size];
+            Underwearbools = new bool[ThisOutfitData.Outfit_Size][];
+            MakeUpKeep = new bool[ThisOutfitData.Outfit_Size];
+            CharacterClothingKeep_Coordinate = new bool[ThisOutfitData.Outfit_Size][];
+            ValidOutfits = new bool[ThisOutfitData.Outfit_Size];
+            ME_Dont_Touch = new List<int>[ThisOutfitData.Outfit_Size];
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 UnderwearAccessoriesLocations[i] = new List<int>();
                 CharacterClothingKeep_Coordinate[i] = new bool[9];
                 ME_Dont_Touch[i] = new List<int>();
             }
-            this.ThisOutfitData = ThisOutfitData;
         }
 
         public void FullLoad(ChaControl character, ChaFile file)
@@ -122,7 +128,7 @@ namespace Cosplay_Academy
             InH_Field.SetValue(false);
 #endif
 
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 ValidOutfits[i] = ThisOutfitData.outfitpaths[i].EndsWith(".png");
                 if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
@@ -1113,9 +1119,9 @@ NewRAW
 
         private void Original_ME_Data()
         {
-            var KeepCloth = new List<int>[Constants.Outfit_Size];
+            var KeepCloth = new List<int>[ThisOutfitData.Outfit_Size];
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 KeepCloth[outfitnum] = new List<int>();
                 for (int i = 0; i < 9; i++)
@@ -1131,7 +1137,7 @@ NewRAW
 
             var ME_Data = new ME_List(Original_ME_Data, ThisOutfitData, KeepCloth);
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 foreach (var index in KeepCloth[outfitnum])
                 {

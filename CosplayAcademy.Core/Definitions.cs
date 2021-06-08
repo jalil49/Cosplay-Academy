@@ -91,8 +91,6 @@ namespace Cosplay_Academy
             @"\Lewd" //3
         };//Experience States; easy to make scale with size
 
-        public static int Outfit_Size = Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length;//Number of outfits starting from uniform to nightwear
-
         public static readonly string[] Generic_Inclusion =
         {
             "a_n_headtop",//0

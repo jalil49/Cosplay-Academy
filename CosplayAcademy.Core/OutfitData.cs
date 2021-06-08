@@ -1,7 +1,4 @@
-﻿using Cosplay_Academy.Hair;
-using Cosplay_Academy.ME;
-using ExtensibleSaveFormat;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Cosplay_Academy

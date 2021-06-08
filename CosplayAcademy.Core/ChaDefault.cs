@@ -1,9 +1,7 @@
 ﻿using Cosplay_Academy.Hair;
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Cosplay_Academy
 {
@@ -15,9 +13,11 @@ namespace Cosplay_Academy
         internal bool firstpass = true;
         internal bool processed = false;
 
-        internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Constants.Outfit_Size];
+        internal int Outfit_Size;
+
+        internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue;
         internal string[] alloutfitpaths = new string[Constants.InputStrings.Length];
-        internal readonly string[] outfitpaths = new string[Constants.Outfit_Size];
+        internal readonly string[] outfitpaths;
 
         internal int Personality;
         internal string BirthDay;
@@ -34,32 +34,43 @@ namespace Cosplay_Academy
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
 
-        internal ChaFileCoordinate[] Original_Coordinates = new ChaFileCoordinate[Constants.Outfit_Size];
+        internal ChaFileCoordinate[] Original_Coordinates;
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
         internal ClothingLoader ClothingLoader;
-        internal List<bool>[] HairKeepQueue = new List<bool>[Constants.Outfit_Size];
-        internal List<bool>[] ACCKeepQueue = new List<bool>[Constants.Outfit_Size];
+        internal List<bool>[] HairKeepQueue;
+        internal List<bool>[] ACCKeepQueue;
 
         #region hair accessories
-        public List<HairSupport.HairAccessoryInfo>[] HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Constants.Outfit_Size];
+        public List<HairSupport.HairAccessoryInfo>[] HairAccQueue;
         #endregion
 
         #region Material Editor Save
-        public ME_List[] Original_Accessory_Data = new ME_List[Constants.Outfit_Size];
+        public ME_List[] Original_Accessory_Data;
         #endregion
 
         #region Material Editor Return
         public ME_List Finished = new ME_List();
         #endregion
 
-        internal List<int>[] HairKeepReturn = new List<int>[Constants.Outfit_Size];
-        internal List<int>[] ACCKeepReturn = new List<int>[Constants.Outfit_Size];
+        internal List<int>[] HairKeepReturn;
+        internal List<int>[] ACCKeepReturn;
 
-        public ChaDefault()
+        public ChaDefault(ChaControl chaControl, ChaFile cha)
         {
+            Outfit_Size = cha.coordinate.Length;
+
+            CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Outfit_Size];
+            outfitpaths = new string[Outfit_Size];
+            Original_Coordinates = new ChaFileCoordinate[Outfit_Size];
+            HairKeepReturn = new List<int>[Outfit_Size];
+            ACCKeepReturn = new List<int>[Outfit_Size];
+            HairKeepQueue = new List<bool>[Outfit_Size];
+            ACCKeepQueue = new List<bool>[Outfit_Size];
+            HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Outfit_Size];
+            Original_Accessory_Data = new ME_List[Outfit_Size];
             ClothingLoader = new ClothingLoader(this);
 
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < Outfit_Size; i++)
             {
                 HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                 CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
@@ -74,7 +85,7 @@ namespace Cosplay_Academy
 
         public void Clear_Firstpass()
         {
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < Outfit_Size; i++)
             {
                 HairKeepQueue[i].Clear();
                 ACCKeepQueue[i].Clear();
@@ -91,7 +102,7 @@ namespace Cosplay_Academy
         public void FillOutfitpaths()
         {
             var datanum = 0;
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < Outfit_Size; i++)
             {
                 var count = Constants.OutfitnumPairs[i];
                 if (count == 1)

@@ -1,13 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using KKAPI;
-using KKAPI.Chara;
 using KKAPI.MainGame;
-using KKAPI.Maker;
 using KKAPI.Studio;
-using System;
-using System.Collections;
-using System.IO;
 namespace Cosplay_Academy
 {
     [BepInPlugin(GUID, "Cosplay Academy", Version)]
@@ -52,7 +47,6 @@ namespace Cosplay_Academy
             TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, "Teachers probably would like to dress up if everyone does it.");
             UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
             SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday");
-
 
             //match uniforms
             MatchGeneric[0] = Config.Bind("Match Outfit", "Coordinated Uniforms", true, "Everyone wears same uniform");

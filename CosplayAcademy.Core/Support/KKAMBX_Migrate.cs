@@ -11,6 +11,7 @@ namespace Cosplay_Academy.Support
     {
         private const string ExtDataBoneDataKey = "boneData";
 
+
         public static List<BoneModifier> MigrateOldExtData(PluginData pluginData)
         {
             if (pluginData == null) return null;
@@ -75,9 +76,9 @@ namespace Cosplay_Academy.Support
                 if (coordinateModifiers.Count == 0)
                     continue;
 
-                if (coordinateModifiers.Count > Constants.Outfit_Size)
-                    coordinateModifiers.RemoveRange(0, coordinateModifiers.Count - Constants.Outfit_Size);
-                if (coordinateModifiers.Count > 1 && coordinateModifiers.Count < Constants.Outfit_Size)
+                if (coordinateModifiers.Count > 7)
+                    coordinateModifiers.RemoveRange(0, coordinateModifiers.Count - 7);
+                if (coordinateModifiers.Count > 1 && coordinateModifiers.Count < 7)
                     coordinateModifiers.RemoveRange(0, coordinateModifiers.Count - 1);
 
                 results.Add(new BoneModifier(groupedBoneDataEntries.Key, coordinateModifiers.ToArray()));

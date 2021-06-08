@@ -124,7 +124,7 @@ namespace Cosplay_Academy
                 if (ChafileData?.data != null && ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
                 {
                     var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Cosplay_Academy.Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
-                    for (int i = 0; i < Constants.Outfit_Size; i++)
+                    for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                     {
                         if (!ValidOutfits[i] || !original.ContainsKey(i))
                         {
@@ -149,7 +149,7 @@ namespace Cosplay_Academy
             if (!ME_Chafile.NoData)
             {
                 var FailedOutfits = new List<int>();
-                for (int i = 0; i < Constants.Outfit_Size; i++)
+                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                 {
                     if (!ValidOutfits[i])
                     {
@@ -232,7 +232,7 @@ namespace Cosplay_Academy
                 CharacterData = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
             }
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!CharacterData.TryGetValue((CoordinateType)outfitnum, out var CurrentCharacterData))
                 {
@@ -372,7 +372,7 @@ namespace Cosplay_Academy
             PluginData SavedData;
             Dictionary<int, bool> Final = new Dictionary<int, bool>();
             bool result;
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 result = false;
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
@@ -430,7 +430,7 @@ namespace Cosplay_Academy
             PluginData SavedData;
             Dictionary<int, Pushup.ClothData> FinalBra = new Dictionary<int, Pushup.ClothData>();
             Dictionary<int, Pushup.ClothData> FinalTop = new Dictionary<int, Pushup.ClothData>();
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 newBraData = new Pushup.ClothData();
                 newTopData = new Pushup.ClothData();
@@ -514,16 +514,16 @@ namespace Cosplay_Academy
                     Modifiers = new List<BoneModifier>();
                 }
                 //unknown
-                //for (int i = 0; i < Constants.Outfit_Size; i++)
+                //for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                 //{
                 //    if (ValidOutfits[i])                    
                 //        continue;
                 //}
                 //Modifiers.AddRange(Modifiers.Where(x => !x.IsCoordinateSpecific()));
             }
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");
                 if (SavedData != null && SavedData.data.TryGetValue("boneData", out bytes) && bytes != null)
                 {
                     Dictionary<string, BoneModifierData> import;
@@ -567,7 +567,7 @@ namespace Cosplay_Academy
             if (ValidOutfits.Any(x => !x))
             {
                 List<int> Invalid = new List<int>();
-                for (int i = 0; i < Constants.Outfit_Size; i++)
+                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                     if (!ValidOutfits[i])
                     {
                         Invalid.Add(i);
@@ -581,9 +581,9 @@ namespace Cosplay_Academy
                 }
             }
             PluginData SavedData;
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
-                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");//use thisoutfit instead of chafle from the controller not sure if extended data is attached to it since textures don't render
+                SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");
                 if (SavedData != null && SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes is byte[] byteArr)
                 {
                     List<DynamicBoneData> import;
@@ -622,7 +622,7 @@ namespace Cosplay_Academy
                     if (ExtendedData.version < 2)
                     {
                         var OldCharaTriggerInfo = MessagePackSerializer.Deserialize<List<AccStateSync.OutfitTriggerInfoV1>>((byte[])loadedOutfitTriggerInfo);
-                        for (int i = 0; i < Constants.Outfit_Size; i++)
+                        for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                         {
                             OriginalCharaTriggerInfo[i] = AccStateSync.UpgradeOutfitTriggerInfoV1(OldCharaTriggerInfo[i]);
                         }
@@ -637,9 +637,9 @@ namespace Cosplay_Academy
                             if (ExtendedData.version < 2)
                             {
                                 var OldCharaVirtualGroupNames = MessagePackSerializer.Deserialize<List<Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
-                                if (OldCharaVirtualGroupNames.Count() == Constants.Outfit_Size)
+                                if (OldCharaVirtualGroupNames.Count() == 7)
                                 {
-                                    for (int i = 0; i < Constants.Outfit_Size; i++)
+                                    for (int i = 0; i < 7; i++)
                                     {
                                         Dictionary<string, string> VirtualGroupNames = AccStateSync.UpgradeVirtualGroupNamesV1(OldCharaVirtualGroupNames[i]);
                                         OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(VirtualGroupNames);
@@ -649,7 +649,7 @@ namespace Cosplay_Academy
                             else
                             {
                                 Dictionary<int, Dictionary<string, string>> CharaVirtualGroupNames = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<string, string>>>((byte[])loadedCharaVirtualGroupNames);
-                                for (int i = 0; i < Constants.Outfit_Size; i++)
+                                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
                                     OriginalCharaVirtualGroupInfo[i] = AccStateSync.UpgradeVirtualGroupNamesV2(CharaVirtualGroupNames[i]);
                             }
                         }
@@ -673,7 +673,7 @@ namespace Cosplay_Academy
                 AccStateSync.CoordinateProcess(UnderwearExtended, (byte[])ByteData, out UnderwearTrigger, out UnderwearGroups);
             }
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 CharaTriggerInfo.Add(outfitnum, new AccStateSync.OutfitTriggerInfo(outfitnum));
                 CharaVirtualGroupInfo.Add(outfitnum, new Dictionary<string, AccStateSync.VirtualGroupInfo>());
@@ -871,14 +871,14 @@ namespace Cosplay_Academy
         {
             PluginData SavedData = new PluginData();
 
-            List<string>[] ThemeNames = new List<string>[Constants.Outfit_Size];
-            List<bool>[] RelativeThemeBool = new List<bool>[Constants.Outfit_Size];
-            List<Color[]>[] colors = new List<Color[]>[Constants.Outfit_Size];
-            Dictionary<int, int>[] ACC_Theme_Dictionary = new Dictionary<int, int>[Constants.Outfit_Size];
-            Dictionary<int, List<int[]>>[] Relative_ACC_Dictionary = new Dictionary<int, List<int[]>>[Constants.Outfit_Size];
-            bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
+            List<string>[] ThemeNames = new List<string>[ThisOutfitData.Outfit_Size];
+            List<bool>[] RelativeThemeBool = new List<bool>[ThisOutfitData.Outfit_Size];
+            List<Color[]>[] colors = new List<Color[]>[ThisOutfitData.Outfit_Size];
+            Dictionary<int, int>[] ACC_Theme_Dictionary = new Dictionary<int, int>[ThisOutfitData.Outfit_Size];
+            Dictionary<int, List<int[]>>[] Relative_ACC_Dictionary = new Dictionary<int, List<int[]>>[ThisOutfitData.Outfit_Size];
+            bool[][] CoordinateSaveBools = new bool[ThisOutfitData.Outfit_Size][];
 
-            for (int i = 0; i < Constants.Outfit_Size; i++)
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 ThemeNames[i] = new List<string>() { "None" };
                 RelativeThemeBool[i] = new List<bool>() { false };
@@ -913,7 +913,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 var MyData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_Themes");
                 if (MyData != null)
@@ -955,24 +955,24 @@ namespace Cosplay_Academy
 
         private void Additional_Card_Info_Repack(ChaControl ChaControl)
         {
-            List<int>[] AccKeep = new List<int>[Constants.Outfit_Size];
-            List<int>[] HairAcc = new List<int>[Constants.Outfit_Size];
-            bool[][] CoordinateSaveBools = new bool[Constants.Outfit_Size][];
-            Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
-            Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
-            Dictionary<int, int>[] Interest_Restriction = new Dictionary<int, int>[Constants.Outfit_Size];
-            int[] HstateType_Restriction = new int[Constants.Outfit_Size];
-            int[] ClubType_Restriction = new int[Constants.Outfit_Size];
-            bool[][] Height_Restriction = new bool[Constants.Outfit_Size][];
-            bool[][] Breastsize_Restriction = new bool[Constants.Outfit_Size][];
-            int[] CoordinateType = new int[Constants.Outfit_Size];
-            int[] CoordinateSubType = new int[Constants.Outfit_Size];
-            string[] CreatorNames = new string[Constants.Outfit_Size];
-            string[] SetNames = new string[Constants.Outfit_Size];
-            string[] SubSetNames = new string[Constants.Outfit_Size];
-            int[] GenderType = new int[Constants.Outfit_Size];
+            List<int>[] AccKeep = new List<int>[ThisOutfitData.Outfit_Size];
+            List<int>[] HairAcc = new List<int>[ThisOutfitData.Outfit_Size];
+            bool[][] CoordinateSaveBools = new bool[ThisOutfitData.Outfit_Size][];
+            Dictionary<int, int>[] PersonalityType_Restriction = new Dictionary<int, int>[ThisOutfitData.Outfit_Size];
+            Dictionary<int, int>[] TraitType_Restriction = new Dictionary<int, int>[ThisOutfitData.Outfit_Size];
+            Dictionary<int, int>[] Interest_Restriction = new Dictionary<int, int>[ThisOutfitData.Outfit_Size];
+            int[] HstateType_Restriction = new int[ThisOutfitData.Outfit_Size];
+            int[] ClubType_Restriction = new int[ThisOutfitData.Outfit_Size];
+            bool[][] Height_Restriction = new bool[ThisOutfitData.Outfit_Size][];
+            bool[][] Breastsize_Restriction = new bool[ThisOutfitData.Outfit_Size][];
+            int[] CoordinateType = new int[ThisOutfitData.Outfit_Size];
+            int[] CoordinateSubType = new int[ThisOutfitData.Outfit_Size];
+            string[] CreatorNames = new string[ThisOutfitData.Outfit_Size];
+            string[] SetNames = new string[ThisOutfitData.Outfit_Size];
+            string[] SubSetNames = new string[ThisOutfitData.Outfit_Size];
+            int[] GenderType = new int[ThisOutfitData.Outfit_Size];
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 AccKeep[outfitnum] = new List<int>();
                 HairAcc[outfitnum] = new List<int>();
@@ -1009,7 +1009,7 @@ namespace Cosplay_Academy
                 }
             }
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 var ACI_Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Additional_Card_Info");
                 if (ACI_Data != null)
@@ -1109,11 +1109,11 @@ namespace Cosplay_Academy
 
         private void Accessory_Parents_Repack(ChaControl ChaControl)
         {
-            Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[Constants.Outfit_Size];
-            Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[Constants.Outfit_Size];
-            Dictionary<int, Vector3[,]>[] Relative_Data = new Dictionary<int, Vector3[,]>[Constants.Outfit_Size];
+            Dictionary<int, List<int>>[] Bindings = new Dictionary<int, List<int>>[ThisOutfitData.Outfit_Size];
+            Dictionary<string, int>[] Custom_Names = new Dictionary<string, int>[ThisOutfitData.Outfit_Size];
+            Dictionary<int, Vector3[,]>[] Relative_Data = new Dictionary<int, Vector3[,]>[ThisOutfitData.Outfit_Size];
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 Bindings[outfitnum] = new Dictionary<int, List<int>>();
                 Custom_Names[outfitnum] = new Dictionary<string, int>();
@@ -1138,7 +1138,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 var Data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_Parents");
                 if (Data != null)
@@ -1174,7 +1174,7 @@ namespace Cosplay_Academy
             Dictionary<int, string>[] ACC_Name_Dictionary = new Dictionary<int, string>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
             Dictionary<int, bool>[] ACC_Parented_Dictionary = new Dictionary<int, bool>[Enum.GetNames(typeof(ChaFileDefine.CoordinateType)).Length];
 
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 ACC_Binding_Dictionary[outfitnum] = new Dictionary<int, int>();
                 ACC_State_array[outfitnum] = new Dictionary<int, int[]>();
@@ -1229,7 +1229,7 @@ namespace Cosplay_Academy
                     Under_Parented_Dictionary = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])ByteData);
                 }
             }
-            for (int outfitnum = 0; outfitnum < Constants.Outfit_Size; outfitnum++)
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 State_data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
                 if (State_data != null)
