@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Cosplay_Academy
@@ -95,7 +94,6 @@ namespace Cosplay_Academy
                 }
             }
         }
-
 
         public static void Decision(string name, ChaDefault cha)
         {

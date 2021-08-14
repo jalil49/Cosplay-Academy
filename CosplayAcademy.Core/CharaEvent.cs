@@ -9,6 +9,7 @@ using KKAPI.Maker;
 using KKAPI.Maker.UI.Sidebar;
 using MessagePack;
 using System.Collections.Generic;
+using UniRx;
 #if TRACE
 using System.Diagnostics;
 #endif
@@ -23,7 +24,8 @@ namespace Cosplay_Academy
 {
     public class CharaEvent : CharaCustomFunctionController
     {
-        private ChaDefault ThisOutfitData;
+        internal ChaDefault ThisOutfitData;
+        private ClothingLoader ClothingLoader => ThisOutfitData.ClothingLoader;
         internal static int Firstpass = 0;
 #if !KKS
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
@@ -32,7 +34,8 @@ namespace Cosplay_Academy
         private static readonly Stopwatch Time = new Stopwatch();
         private static readonly List<long> Average = new List<long>();
 #endif
-        public static bool inH = false; //hopefully code that will work if additional heroines are loaded in H actively. such as in Kplug, Not tested.
+        internal static bool inH = false; //hopefully code that will work if additional heroines are loaded in H actively. such as in Kplug, Not tested.
+
         internal static void MakerAPI_MakerExiting()
         {
             Firstpass = 0;
@@ -48,21 +51,11 @@ namespace Cosplay_Academy
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
             var owner = Settings.Instance;
-            e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", Settings.Makerview.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => Settings.Makerview.Value,
-                (controller, value) => Settings.Makerview.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand outfits", Settings.ChangeOutfit.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => Settings.ChangeOutfit.Value,
-                (controller, value) => Settings.ChangeOutfit.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => Settings.RandomizeUnderwear.Value,
-                (controller, value) => Settings.RandomizeUnderwear.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Reset Sets", Settings.ResetMaker.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => Settings.ResetMaker.Value,
-                (controller, value) => Settings.ResetMaker.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).BindToFunctionController<CharaEvent, bool>(
-                (controller) => Settings.RandomizeUnderwearOnly.Value,
-                (controller, value) => Settings.RandomizeUnderwearOnly.Value = value);
+            e.AddSidebarControl(new SidebarToggle("Enable Cosplay Academy", Settings.Makerview.Value, owner)).ValueChanged.Subscribe(value => Settings.Makerview.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Rand outfits", Settings.ChangeOutfit.Value, owner)).ValueChanged.Subscribe(value => Settings.ChangeOutfit.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwear.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Reset Sets", Settings.ResetMaker.Value, owner)).ValueChanged.Subscribe(value => Settings.ResetMaker.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwearOnly.Value = value);
         }
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
@@ -71,6 +64,7 @@ namespace Cosplay_Academy
             {
                 return;
             }
+            bool IsMaker = currentGameMode == GameMode.Maker;
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
             if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
@@ -82,14 +76,13 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            bool IsMaker = currentGameMode == GameMode.Maker;
-            if (IsMaker || ThisOutfitData == null || !ThisOutfitData.processed)
+            if (IsMaker || !IsMaker && (ThisOutfitData == null || ThisOutfitData != null && !ThisOutfitData.processed))
             {
                 Process(currentGameMode);
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
-            else if (ThisOutfitData.processed
+            else if (ThisOutfitData != null && ThisOutfitData.processed
 #if !KKS
                 && GameAPI.InsideHScene
 #endif
@@ -101,7 +94,7 @@ namespace Cosplay_Academy
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
 
-            if (IsMaker && Firstpass++ < 2 || inH)
+            if (IsMaker && Firstpass++ == 0 || inH)
             {
                 ChaControl.ChangeCoordinateTypeAndReload();
             }
@@ -131,11 +124,13 @@ namespace Cosplay_Academy
             if (ThisOutfitData == null)
             {
                 //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chano {ChaControl.fileParam.strBirthDay} name {ChaControl.fileParam.personality}");
-                ThisOutfitData = new ChaDefault(ChaControl, ChaFileControl)
+                ThisOutfitData = new ChaDefault(ChaControl)
                 {
                     FullName = ChaControl.fileParam.fullname,
                     BirthDay = ChaControl.fileParam.strBirthDay,
                     Personality = ChaControl.fileParam.personality,
+                    Chafile = ChaFileControl,
+                    ChaControl = ChaControl,
 #if KK
                     heroine = ChaControl.GetHeroine()
 #endif
@@ -186,50 +181,79 @@ namespace Cosplay_Academy
                 #region Queue accessories to keep
 
                 #region ACI Data
-                List<int>[] HairKeep = new List<int>[ThisOutfitData.Outfit_Size];
-                List<int>[] ACCKeep = new List<int>[ThisOutfitData.Outfit_Size];
+                Additional_Card_Info.DataStruct ACI_data = new Additional_Card_Info.DataStruct();
 
-                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+                for (int i = 0, n = ThisOutfitData.Outfit_Size; i < n; i++)
                 {
-                    HairKeep[i] = new List<int>();
-                    ACCKeep[i] = new List<int>();
+                    ACI_data.Createoutfit(i);
                 }
 
                 bool Cosplay_Academy_Ready = false;
                 var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
                 if (Required_Support != null)
                 {
-                    if (Required_Support.data.TryGetValue("HairAcc", out var Bytedata))
+                    switch (Required_Support.version)
                     {
-                        HairKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Bytedata);
-                    }
-                    if (Required_Support.data.TryGetValue("AccKeep", out Bytedata))
-                    {
-                        ACCKeep = MessagePackSerializer.Deserialize<List<int>[]>((byte[])Bytedata);
-                    }
-                    if (Required_Support.data.TryGetValue("Cosplay_Academy_Ready", out Bytedata))
-                    {
-                        ThisOutfitData.ClothingLoader.Character_Cosplay_Ready = Cosplay_Academy_Ready = MessagePackSerializer.Deserialize<bool>((byte[])Bytedata);
+                        case 0:
+                            Additional_Card_Info.Migrator.MigrateV0(Required_Support, ref ACI_data);
+                            break;
+                        case 1:
+                            if (Required_Support.data.TryGetValue("CardInfo", out var ByteData) && ByteData != null)
+                            {
+                                ACI_data.CardInfo = MessagePackSerializer.Deserialize<Additional_Card_Info.Cardinfo>((byte[])ByteData);
+                            }
+                            if (Required_Support.data.TryGetValue("CoordinateInfo", out ByteData) && ByteData != null)
+                            {
+                                ACI_data.CoordinateInfo = MessagePackSerializer.Deserialize<Dictionary<int, Additional_Card_Info.CoordinateInfo>>((byte[])ByteData);
+                            }
+                            break;
+                        default:
+                            Settings.Logger.LogWarning("New version of Additional Card Info found, please update");
+                            break;
                     }
                 }
+                var CardInfo = ACI_data.CardInfo;
+                var CoordinateInfo = ACI_data.CoordinateInfo;
+
+                ClothingLoader.Character_Cosplay_Ready = Cosplay_Academy_Ready = CardInfo.CosplayReady;
+                ClothingLoader.MakeUpKeep = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.MakeUpKeep);
+                ClothingLoader.PersonalClothingBools = CardInfo.PersonalClothingBools;
+
+                ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
                 #endregion
 
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
+
+#if !KKS
+                MoreAccessories.CharAdditionalData SaveAccessory;
+                if (MakerAPI.InsideMaker)
+                {
+                    SaveAccessory = MoreAccessories._self._charaMakerData;
+                }
+                else
+                {
+                    if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out SaveAccessory) == false)
+                    {
+                        SaveAccessory = new MoreAccessories.CharAdditionalData();
+                        _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
+                    }
+                }
+#endif
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
-
+                    var HairKeep = new List<int>();
+                    var ACCKeep = new List<int>();
+                    if (CoordinateInfo.ContainsKey(outfitnum))
+                    {
+                        HairKeep = CoordinateInfo[outfitnum].HairAcc;
+                        ACCKeep = CoordinateInfo[outfitnum].AccKeep;
+                    }
                     if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
                     }
 #if !KKS
-                    if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out var SaveAccessory) == false)
-                    {
-                        SaveAccessory = new MoreAccessories.CharAdditionalData();
-                        _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
-                    }
-
                     if (SaveAccessory.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> acclist) == false)
                     {
                         acclist = new List<ChaFileAccessory.PartsInfo>();
@@ -244,7 +268,7 @@ namespace Cosplay_Academy
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep[outfitnum].Contains(i) || ACCKeep[outfitnum].Contains(i))
+                        if (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep.Contains(i) || ACCKeep.Contains(i))
                         {
                             if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
                             {
@@ -266,8 +290,8 @@ namespace Cosplay_Academy
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
 
                             #region ACI_Data
-                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep[outfitnum].Contains(i));
-                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep[outfitnum].Contains(i));
+                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep.Contains(i));
+                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep.Contains(i));
                             #endregion
                         }
                     }
@@ -303,7 +327,7 @@ namespace Cosplay_Academy
             {
                 return;
             }//if disabled don't run
-            ThisOutfitData.ClothingLoader.CoordinateLoad(coordinate, ChaControl);
+            ClothingLoader.CoordinateLoad(coordinate, ChaControl);
         }
 
         private ChaFileCoordinate CloneCoordinate(ChaFileCoordinate OriginalCoordinate)

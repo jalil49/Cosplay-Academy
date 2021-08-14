@@ -74,26 +74,16 @@
       <HintPath>packages\ExtensibleSaveFormat.Koikatu.16.3.1\lib\net35\ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKABMX, Version=4.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ABMX.KKABMX.4.4.1\lib\net35\KKABMX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="KKAPI, Version=1.20.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\IllusionModdingAPI.KKAPI.1.20.0\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KK_DynamicBoneEditor">
-      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_DynamicBoneEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="KK_MaterialEditor, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_MaterialEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="KK_Pushup">
-      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\KK_Plugins\KK_Pushup.dll</HintPath>
-    </Reference>
     <Reference Include="MoreAccessories">
       <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\MoreAccessories.dll</HintPath>
+    </Reference>
+    <Reference Include="Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Sideloader.Koikatu.16.4.0\lib\net35\Sideloader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.XML" />

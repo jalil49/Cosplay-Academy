@@ -1,6 +1,6 @@
 ﻿using BepInEx;
-using System;
 using System.Collections.Generic;
+using Sideloader.AutoResolver;
 #if KK
 using System.ComponentModel;
 #endif
@@ -32,6 +32,40 @@ namespace Cosplay_Academy
                 }
 #endif
                 OutfitnumPairs.Add(i, 1);
+            }
+
+            foreach (var item in IgnoredTops_Original_A)
+            {
+                var intlist = new List<int>();
+                foreach (var resolve in item.Value)
+                {
+                    var result = UniversalAutoResolver.TryGetResolutionInfo(resolve.Slot, resolve.CategoryNo, resolve.GUID);
+                    if (result != null)
+                    {
+                        intlist.Add(result.LocalSlot);
+                    }
+                }
+                IgnoredTopIDs_A[item.Key] = intlist;
+            }
+
+            foreach (var item in IgnoredTops_Mods_Main)
+            {
+                var main = UniversalAutoResolver.TryGetResolutionInfo(item.Slot, item.CategoryNo, item.GUID);
+                if (main == null)
+                {
+                    continue;
+                }
+                IgnoredTopIDs_Main.Add(main.LocalSlot);
+            }
+
+            foreach (var item in IgnoredBots_Mods)
+            {
+                var main = UniversalAutoResolver.TryGetResolutionInfo(item.Slot, item.CategoryNo, item.GUID);
+                if (main == null)
+                {
+                    continue;
+                }
+                IgnoredBotsIDs_Main.Add(main.LocalSlot);
             }
         }
 
@@ -159,6 +193,91 @@ namespace Cosplay_Academy
         }
 
         public static SortedDictionary<int, int> OutfitnumPairs = new SortedDictionary<int, int>();
+
+        public static readonly List<int> IgnoredTopIDs_Main = new List<int>() { 0, 31, 53, 59, 60, 222 };
+        public static readonly List<int> IgnoredBotsIDs_Main = new List<int>() { 0, 38, 40, };
+
+        public static readonly Dictionary<int, List<int>> IgnoredTopIDs_A = new Dictionary<int, List<int>>();
+
+        private static Dictionary<int, List<ResolveInfo>> IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
+        {
+            [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100) },
+            [2] = new List<ResolveInfo>() { ResolveInfo("nakay.Top jacket", 210, 6), ResolveInfo("yu000.ShirtlessUniform", 210, 100) },
+        };
+
+        private static List<ResolveInfo> IgnoredTops_Mods_Main = new List<ResolveInfo>()
+        {
+           ResolveInfo("WaTaFuk.WMO",105,3001),
+           ResolveInfo("mat.Tops",105,1214),
+           ResolveInfo("mat.Corset",105,1200),
+           ResolveInfo("gyobobo.AngelaSet",105,1643),
+           ResolveInfo("[Ω-G16] HS2-KK Set",105,15110),
+           ResolveInfo("yamadamod.texchange",105,512),
+           ResolveInfo("gyobobo.GantzSuitSet3",105,1602),
+           ResolveInfo("gyobobo.GantzSuitSet3",105,1603),
+           ResolveInfo("gyobobo.GantzSuitSet3",105,1604),
+           ResolveInfo("GaryuX.Wu Zetian",105,70010),
+           ResolveInfo("earthship.CutoutQipao",105,69),
+           ResolveInfo("com.nammiyoo.shibari",105,2929222),
+           ResolveInfo("com.nammiyoo.shibari",105,2929223),
+           ResolveInfo("xne_mdsweater",105,9225),
+           ResolveInfo("xne_mdsweater",105,9226),
+           ResolveInfo("xne_mdsweater",105,9227),
+           ResolveInfo("xne_mdsweater",105,9228),
+           ResolveInfo("xne_mdsweater",105,9229),
+           ResolveInfo("xne_dksweater",105,9207),
+           ResolveInfo("xne_dksweater",105,9208),
+           ResolveInfo("xne_dksweater",105,9209),
+           ResolveInfo("xne_dksweater",105,9210),
+           ResolveInfo("xne_skdrs01",105,9212),
+           ResolveInfo("xne_skdrs01",105,9213),
+           ResolveInfo("xne_skdrs01",105,9214),
+           ResolveInfo("xne_sukecami",105,9211),
+           ResolveInfo("xne_minichina",105,9203),
+           ResolveInfo("xne_minichina",105,9204),
+           ResolveInfo("xne_minichina",105,9205),
+           ResolveInfo("xne_minichina",105,9206),
+           ResolveInfo("xne_egyptianset",105,9218),
+           ResolveInfo("xne_dabotsyatu",105,9221),
+           ResolveInfo("xne_dabotsyatu",105,9222),
+           ResolveInfo("xne_altbunny",105,9230),
+           ResolveInfo("xne_altbunny",105,9231),
+           ResolveInfo("xne_altbunny",105,9232),
+           ResolveInfo("shinyBunny",105,997),
+        };
+
+        private static List<ResolveInfo> IgnoredBots_Mods = new List<ResolveInfo>()
+        {
+            ResolveInfo("xne_fobtms",106,9211),
+            ResolveInfo("xne_fobtms",106,9212),
+            ResolveInfo("xne_fobtms",106,9213),
+            ResolveInfo("xne_skcdg",106,9214),
+            ResolveInfo("xne_skcdg",106,9215),
+            ResolveInfo("xne_skcdg",106,9216),
+            ResolveInfo("xne_dancepjmset",106,9211),
+            ResolveInfo("xne_dancepjmset",106,9212),
+            ResolveInfo("xne_dancepjmset",106,9213),
+            ResolveInfo("xne_dancepjmset",106,9214),
+            ResolveInfo("xne_egyptianset",106,9201),
+            ResolveInfo("xne_egyptianset",106,9202),
+            ResolveInfo("xne_egyptianset",106,9203),
+            ResolveInfo("US01",106,3680),
+            ResolveInfo("US01",106,3681),
+            ResolveInfo("US01",106,3682),
+            ResolveInfo("Mint_E403",106,802),
+            ResolveInfo("Mint_E403",106,803),
+            ResolveInfo("hayashi.OpenFrontSkirt",106,884),
+            ResolveInfo("hayashi.OpenFrontSkirt",106,885),
+            ResolveInfo("com.Quokka.kimonodressskirtopen",106,101),
+        };
+
+        private static ResolveInfo ResolveInfo(int category, int slot, string property) => ResolveInfo("", category, slot, property);
+        private static ResolveInfo ResolveInfo(string guid, int category, int slot) => ResolveInfo(guid, category, slot, "");
+
+        private static ResolveInfo ResolveInfo(string guid, int category, int slot, string property)
+        {
+            return new ResolveInfo() { GUID = guid, Slot = slot, CategoryNo = (ChaListDefine.CategoryNo)category, Property = property };
+        }
     }
 
     public enum Hexp

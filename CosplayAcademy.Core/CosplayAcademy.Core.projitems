@@ -6,7 +6,7 @@
     <SharedGUID>d16032f2-42be-414e-a4cc-af5f170ef1d9</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>CosplayAcademy.Core</Import_RootNamespace>
+    <Import_RootNamespace>CosplayAcademy</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ChaDefault.cs" />
@@ -21,12 +21,26 @@
     <Compile Include="$(MSBuildThisFileDirectory)OutfitDecider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Standard Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\DynamicBone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Parents\DataStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Parents\Migrator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory States\Data.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory States\Migrator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Themes\DataStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Themes\Migrator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\ACC_State_Sync.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Additional Card Info\DataStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Additional Card Info\Migrator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Dummy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Hair_Accessory_Support.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Support\KKAMBX_Migrate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\ABMX.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\ME_Support.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MoreAccessories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Overlay_Support.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\PushUp.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Support\MakerTools\" />
   </ItemGroup>
 </Project>

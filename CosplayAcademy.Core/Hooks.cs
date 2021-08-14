@@ -90,130 +90,149 @@ namespace Cosplay_Academy
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(WaitPoint), "SetWait")]
-        private static void ChangeOutfitAtWaitPoint(WaitPoint __instance)
+        internal static void ChangeOutfitAtWaitPoint(WaitPoint __instance)
         {
-            Base Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
-            if (Chara == null || Chara.chaCtrl || Chara.heroine == null || !Settings.StoryModeChange.Value || Chara.heroine.isTeacher)
+            try
             {
-                return;
-            }
-            ChaFileParameter ChaPara = Chara.chaCtrl.fileParam;
-            var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-            if (ThisOutfitData == null || !ThisOutfitData.processed)
-            {
-                return;
-            }
-            if (__instance.MapNo == 46)
-            {
-                if (ThisOutfitData.ChangeKoiToClub)
+                Base Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
+                if (Chara == null || Chara.chaCtrl || Chara.heroine == null || !Settings.StoryModeChange.Value || Chara.heroine.isTeacher)
                 {
-                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
-                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
-                    ThisOutfitData.ChangeKoiToClub = false;
-                    ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
-                    ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
-                    Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                    return;
                 }
-            }
-            else if (ThisOutfitData.ChangeClubToKoi && __instance.MapNo == 22)
-            {
-                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
-                ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
-                int num = ThisOutfitData.heroine.isDresses.Check(false);
-                if (num == -1)
+                var heroine = Chara.heroine;
+                ChaFileParameter ChaPara = Chara.chaCtrl.fileParam;
+                var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
+                if (ThisOutfitData == null || !ThisOutfitData.processed)
                 {
-                    num = 0;
+                    return;
                 }
-                ThisOutfitData.heroine.coordinates[num] = 4;
-                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
-                ThisOutfitData.ChangeClubToKoi = false;
-                ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
-                Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                //Chara.chaCtrl.SetAccessoryStateAll(true);
-            }
-            else if (ThisOutfitData.ChangeKoiToClub && __instance.MapNo != 22)
-            {
-                int remainThreshold = (ThisOutfitData.heroine.lewdness / (4 - (int)ThisOutfitData.heroine.HExperience));
-                if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
+                ThisOutfitData.heroine = heroine;
+                if (__instance.MapNo == 46)
                 {
-                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
-                    int num = ThisOutfitData.heroine.isDresses.Check(false);
+                    if (ThisOutfitData.ChangeKoiToClub)
+                    {
+                        ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
+                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                        ThisOutfitData.ChangeKoiToClub = false;
+                        ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
+                        ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
+                        Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                    }
+                }
+                else if (ThisOutfitData.ChangeClubToKoi && __instance.MapNo == 22)
+                {
+                    ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
+                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
+                    int num = heroine.isDresses.Check(false);
                     if (num == -1)
                     {
                         num = 0;
                     }
-                    ThisOutfitData.heroine.coordinates[num] = 4;
+                    heroine.coordinates[num] = 4;
                     ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                    ThisOutfitData.ChangeClubToKoi = false;
                     ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
-                    ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
+                    Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                    //Chara.chaCtrl.SetAccessoryStateAll(true);
                 }
-                ThisOutfitData.ChangeKoiToClub = false;
+                else if (ThisOutfitData.ChangeKoiToClub && __instance.MapNo != 22)
+                {
+                    int remainThreshold = (heroine.lewdness / (4 - (int)heroine.HExperience));
+                    if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
+                    {
+                        ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
+                        int num = heroine.isDresses.Check(false);
+                        if (num == -1)
+                        {
+                            num = 0;
+                        }
+                        heroine.coordinates[num] = 4;
+                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                        ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
+                        ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
+                        ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                        //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
+                    }
+                    ThisOutfitData.ChangeKoiToClub = false;
+                }
+                //ExpandedOutfit.Logger.LogWarning($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
+
             }
-            //ExpandedOutfit.Logger.LogWarning($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
+            catch (Exception ex)
+            {
+                Settings.Logger.LogError("ChangeOutfitAtWaitPoint fail - " + ex);
+            }
         }
 
         [HarmonyPatch]
         static class SetNextOutfitAtMove
         {
             public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp"), "SetWaitPoint");//Assembly Name because it hates me now that I didn't want to use it
-            static void Postfix(WaitPoint wp, NPC _npc)
+            internal static void Postfix(WaitPoint wp, NPC _npc)
             {
-                if (wp == null || _npc == null || !Settings.StoryModeChange.Value)
+                try
                 {
-                    return;
-                }
-                ActionScene actScene = Singleton<Game>.Instance.actScene;
-                if (actScene != null)
-                {
-                    ActionControl actCtrl = actScene.actCtrl;
-                    if (actCtrl != null)
+                    if (wp == null || _npc == null || !Settings.StoryModeChange.Value)
                     {
-                        ChaFileParameter ChaPara = _npc.chaCtrl.fileParam;
-                        var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-                        if (ThisOutfitData == null)
+                        return;
+                    }
+                    ActionScene actScene = Singleton<Game>.Instance.actScene;
+                    if (actScene != null)
+                    {
+                        ActionControl actCtrl = actScene.actCtrl;
+                        if (actCtrl != null)
                         {
-                            return;
-                        }
-                        if (wp.MapNo == 22 && _npc.mapNo != 22) //characters who walk to clubroom should be expected to change to koioutfit maybe.
-                        {
-                            if (ThisOutfitData.Changestate)
+                            ChaFileParameter ChaPara = _npc.chaCtrl.fileParam;
+                            var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
+                            if (ThisOutfitData == null)
                             {
-                                ThisOutfitData.Changestate = false;
                                 return;
                             }
-                            //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
-                            //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
-                            //tempcoord.Add(4);
-                            //tempdress.Add(false);
-                            //ThisOutfitData.heroine.coordinates = tempcoord.ToArray();
-                            //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
-                            //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
-                            //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
-                            if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                            if (wp.MapNo == 22 && _npc.mapNo != 22) //characters who walk to clubroom should be expected to change to koioutfit maybe.
                             {
-                                ThisOutfitData.ChangeClubToKoi = true;
+                                if (ThisOutfitData.Changestate)
+                                {
+                                    ThisOutfitData.Changestate = false;
+                                    return;
+                                }
+                                //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
+                                //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
+                                //tempcoord.Add(4);
+                                //tempdress.Add(false);
+                                //ThisOutfitData.heroine.coordinates = tempcoord.ToArray();
+                                //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
+                                //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
+                                //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
+                                if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                                {
+                                    ThisOutfitData.ChangeClubToKoi = true;
+                                }
+                            }
+                            else if (_npc.mapNo == 22 && wp.MapNo == 46)
+                            {
+                                ThisOutfitData.ChangeKoiToClub = true;
+                            }
+                            else if (_npc.mapNo == 22 && wp.MapNo != 22)
+                            {
+                                ThisOutfitData.ChangeKoiToClub = true;
+                                //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
+                                //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
+                                //tempcoord.Add(4);
+                                //tempdress.Add(false);
+                                //ThisOutfitData.heroine.coordinates = tempcoord.ToArray();
+                                //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
+                                //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
+                                //ThisOutfitData.ChangeKoiToClub = true;
                             }
                         }
-                        else if (_npc.mapNo == 22 && wp.MapNo == 46)
-                        {
-                            ThisOutfitData.ChangeKoiToClub = true;
-                        }
-                        else if (_npc.mapNo == 22 && wp.MapNo != 22)
-                        {
-                            ThisOutfitData.ChangeKoiToClub = true;
-                            //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
-                            //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
-                            //tempcoord.Add(4);
-                            //tempdress.Add(false);
-                            //ThisOutfitData.heroine.coordinates = tempcoord.ToArray();
-                            //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
-                            //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
-                            //ThisOutfitData.ChangeKoiToClub = true;
-                        }
                     }
+
+                }
+                catch (Exception ex)
+                {
+
+                    Settings.Logger.LogError("SetWaitPoint fail - " + ex);
                 }
             }
         }
@@ -233,37 +252,46 @@ namespace Cosplay_Academy
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(NPC), "ReStart")]
-        private static void NPCRestart(NPC __instance)
+        internal static void NPCRestart(NPC __instance)
         {
-            //change NPC's who start at club room to a koi outfit
-            var ChaPara = __instance.chaCtrl.fileParam;
-            var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-            if (ThisOutfitData == null || !ThisOutfitData.processed || __instance.heroine.isTeacher)
+            try
             {
-                if (!Settings.StoryModeChange.Value)
+                var ChaPara = __instance.chaCtrl.fileParam;
+                var ThisOutfitData = Constants.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
+                if (ThisOutfitData == null || !ThisOutfitData.processed || __instance.heroine.isTeacher)
                 {
-                    if (Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
+                    if (!Settings.StoryModeChange.Value)
                     {
-                        __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                        __instance.heroine.coordinates[0] = 4;
+                        if (Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
+                        {
+                            __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                            __instance.heroine.coordinates[0] = 4;
+                        }
+                        return;
                     }
-                    return;
                 }
+                ThisOutfitData.ChangeKoiToClub = false;
+                ThisOutfitData.ChangeClubToKoi = false;
+                if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                {
+                    ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
+                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                    __instance.heroine.coordinates[0] = 4;
+                    ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
+                    __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                    //__instance.chaCtrl.SetAccessoryStateAll(true);
+                    //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
+                }
+
             }
-            ThisOutfitData.ChangeKoiToClub = false;
-            ThisOutfitData.ChangeClubToKoi = false;
-            if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+            catch (Exception ex)
             {
-                ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
-                ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
-                ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
-                ThisOutfitData.heroine.coordinates[0] = 4;
-                ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
-                ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
-                __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                //__instance.chaCtrl.SetAccessoryStateAll(true);
-                //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
+
+                Settings.Logger.LogError("ReStart fail - " + ex);
             }
+            //change NPC's who start at club room to a koi outfit
         }
 
         //[HarmonyPrefix]

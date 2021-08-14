@@ -47,76 +47,104 @@ namespace Cosplay_Academy
                     Organizer.LoadFile(Coordinate);
                     var ACI_Data = ExtendedSave.GetExtendedDataById(Organizer, "Additional_Card_Info");
 
-                    if (ACI_Data?.data != null)
+                    if (ACI_Data == null)
                     {
+                        continue;
+                    }
 
-                        var CoordinateSubType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateSubType"]);
-                        if (CoordinateSubType != 0 && CoordinateSubType != 10)
+                    Additional_Card_Info.CoordinateInfo coordiante;
+
+                    if (ACI_Data.version == 1)
+                    {
+                        if (ACI_Data.data.TryGetValue("CoordinateInfo", out var ByteData) && ByteData != null)
+                        {
+                            coordiante = MessagePackSerializer.Deserialize<Additional_Card_Info.CoordinateInfo>((byte[])ByteData);
+                        }
+                        else
                         {
                             continue;
                         }
-                        int CoordinateType = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["CoordinateType"]);
-                        string SubSetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["SubSetNames"]);
-                        string SetNames = MessagePackSerializer.Deserialize<string>((byte[])ACI_Data.data["Set_Name"]);
-                        int HstateType_Restriction = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["HstateType_Restriction"]);
-                        string Result;
-                        string ClubResult = "";
-                        string SubPath = @"\";
-                        if (SetNames.Length > 0)
+                    }
+                    else if (ACI_Data.version < 1)
+                    {
+                        coordiante = Additional_Card_Info.Migrator.CoordinateMigrateV0(ACI_Data);
+                    }
+                    else
+                    {
+                        Settings.Logger.LogWarning("New version Detected please update Cosplay Academy");
+                        continue;
+                    }
+                    var restriction = coordiante.RestrictionInfo;
+                    var CoordinateSubType = restriction.CoordinateSubType;
+
+                    if (CoordinateSubType != 0 && CoordinateSubType != 10)
+                    {
+                        continue;
+                    }
+
+                    var CoordinateType = restriction.CoordinateType;
+                    int HstateType_Restriction = restriction.HstateType_Restriction;
+                    string SetNames = coordiante.SetNames;
+                    string SubSetNames = coordiante.SubSetNames;
+                    string Result;
+                    string ClubResult = "";
+                    string SubPath = @"\";
+                    if (SetNames.Length > 0)
+                    {
+                        SubPath += @"Sets\" + SetNames;
+                    }
+                    if (SubSetNames.Length > 0)
+                    {
+                        if (!SubPath.EndsWith(@"\"))
                         {
-                            SubPath += @"Sets\" + SetNames;
+                            SubPath += @"\";
                         }
-                        if (SubSetNames.Length > 0)
-                        {
-                            if (!SubPath.EndsWith(@"\"))
-                            {
-                                SubPath += @"\";
-                            }
-                            SubPath += SubSetNames;
-                        }
-                        var FileName = @"\" + Coordinate.Split('\\').Last();
-                        if (CoordinateSubType == 10)
-                        {
-                            Result = coordinatepath + Constants.InputStrings[7] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
-                            if (!Directory.Exists(Result))
-                                Directory.CreateDirectory(Result);
-                            Result += FileName;
-                            File.Copy(Coordinate, Result, true);
-                            File.Delete(Coordinate);
-                            continue;
-                        }
-                        if (CoordinateType > 0)
-                        {
-                            CoordinateType++;
-                        }
-                        if (CoordinateType == 4)
-                        {
-                            var club = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["ClubType_Restriction"]);
-                            if (club < 0)
-                            {
-                                Settings.Logger.LogWarning($"Coordinate {FileName} is defined as a club type with no club type assigned");
-                                continue;
-                            }
-                            ClubResult = Constants.ClubPaths[club];
-                        }
-                        Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + ClubResult + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                        SubPath += SubSetNames;
+                    }
+                    var FileName = @"\" + Coordinate.Split('\\').Last();
+                    if (CoordinateSubType == 10)
+                    {
+                        Result = coordinatepath + Constants.InputStrings[7] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
                         if (!Directory.Exists(Result))
                             Directory.CreateDirectory(Result);
                         Result += FileName;
                         File.Copy(Coordinate, Result, true);
                         File.Delete(Coordinate);
+                        continue;
                     }
+                    if (CoordinateType > 0)
+                    {
+                        CoordinateType++;
+                    }
+                    if (CoordinateType == 4)
+                    {
+                        var club = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["ClubType_Restriction"]);
+                        if (club < 0)
+                        {
+                            Settings.Logger.LogWarning($"Coordinate {FileName} is defined as a club type with no club type assigned");
+                            continue;
+                        }
+                        ClubResult = Constants.ClubPaths[club];
+                    }
+                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + ClubResult + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                    if (!Directory.Exists(Result))
+                        Directory.CreateDirectory(Result);
+                    Result += FileName;
+                    File.Copy(Coordinate, Result, true);
+                    File.Delete(Coordinate);
                 }
             }
         }
 
         public static List<string> Grab_All_Directories(string OriginalPath)
         {
-            List<string> FoldersPath = new List<string>
+            List<string> FoldersPath = new List<string>();
+            bool originalpathexists = Directory.Exists(OriginalPath);
+            if (originalpathexists)
             {
-                OriginalPath
-            };
-            FoldersPath.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
+                FoldersPath.Add(OriginalPath);
+                FoldersPath.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
+            }
             for (int i = 0; i < FoldersPath.Count; i++)
             {
                 if (FoldersPath[i].EndsWith(@"\Sets"))
@@ -129,7 +157,7 @@ namespace Cosplay_Academy
                     FoldersPath.RemoveAt(i--);
                 }
             }
-            if (FoldersPath.Count == 0)
+            if (FoldersPath.Count == 0 && originalpathexists)
             {
                 FoldersPath.Add(OriginalPath);
             }
@@ -141,6 +169,10 @@ namespace Cosplay_Academy
         {
             List<string> Choosen = new List<string>();
             string coordinatepath = Settings.CoordinatePath.Value;
+            if (Directory.Exists(coordinatepath))
+            {
+                return Choosen;
+            }
             var folders = Directory.GetDirectories(coordinatepath, "*", SearchOption.AllDirectories).ToList(); //grab child folders
             foreach (string folder in folders)
             {
@@ -169,10 +201,12 @@ namespace Cosplay_Academy
                 string[] files = Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }
-            if (Choosen.Count == 0 && !OriginalPath.Contains(@"\Unorganized"))
+            bool choosenempty = Choosen.Count == 0;
+            if ((choosenempty || Settings.EnableDefaults.Value) && !OriginalPath.Contains(@"\Unorganized"))
             {
                 Choosen.Add("Default");
-                Settings.Logger.LogWarning("No files found in :" + OriginalPath);
+                if (choosenempty)
+                    Settings.Logger.LogWarning("No files found in :" + OriginalPath);
             }
             Settings.Logger.LogDebug($"Files found in : {OriginalPath} + {Choosen.Count}");
             return Choosen;

@@ -13,11 +13,11 @@ namespace Cosplay_Academy
         internal bool firstpass = true;
         internal bool processed = false;
 
-        internal int Outfit_Size;
+        internal Dictionary<int, List<ChaFileAccessory.PartsInfo>> CoordinatePartsQueue = new Dictionary<int, List<ChaFileAccessory.PartsInfo>>();
+        internal Dictionary<int, string> alloutfitpaths = new Dictionary<int, string>();
+        internal readonly Dictionary<int, string> outfitpaths = new Dictionary<int, string>();
 
-        internal List<ChaFileAccessory.PartsInfo>[] CoordinatePartsQueue;
-        internal string[] alloutfitpaths = new string[Constants.InputStrings.Length];
-        internal readonly string[] outfitpaths;
+        internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
         internal int Personality;
         internal string BirthDay;
@@ -34,59 +34,49 @@ namespace Cosplay_Academy
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
 
-        internal ChaFileCoordinate[] Original_Coordinates;
-        internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
         internal ClothingLoader ClothingLoader;
-        internal List<bool>[] HairKeepQueue;
-        internal List<bool>[] ACCKeepQueue;
+        internal Dictionary<int, ChaFileCoordinate> Original_Coordinates = new Dictionary<int, ChaFileCoordinate>();
+        internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
+        internal Dictionary<int, List<bool>> HairKeepQueue = new Dictionary<int, List<bool>>();
+        internal Dictionary<int, List<bool>> ACCKeepQueue = new Dictionary<int, List<bool>>();
 
         #region hair accessories
-        public List<HairSupport.HairAccessoryInfo>[] HairAccQueue;
+        public Dictionary<int, List<HairSupport.HairAccessoryInfo>> HairAccQueue = new Dictionary<int, List<HairSupport.HairAccessoryInfo>>();
         #endregion
 
         #region Material Editor Save
-        public ME_List[] Original_Accessory_Data;
+        public Dictionary<int, ME_List> Original_Accessory_Data = new Dictionary<int, ME_List>();
         #endregion
 
         #region Material Editor Return
         public ME_List Finished = new ME_List();
         #endregion
 
-        internal List<int>[] HairKeepReturn;
-        internal List<int>[] ACCKeepReturn;
+        internal Dictionary<int, List<int>> HairKeepReturn = new Dictionary<int, List<int>>();
+        internal Dictionary<int, List<int>> ACCKeepReturn = new Dictionary<int, List<int>>();
 
-        public ChaDefault(ChaControl chaControl, ChaFile cha)
+        public ChaDefault(ChaControl chaControl)
         {
-            Outfit_Size = cha.coordinate.Length;
-
-            CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>[Outfit_Size];
-            outfitpaths = new string[Outfit_Size];
-            Original_Coordinates = new ChaFileCoordinate[Outfit_Size];
-            HairKeepReturn = new List<int>[Outfit_Size];
-            ACCKeepReturn = new List<int>[Outfit_Size];
-            HairKeepQueue = new List<bool>[Outfit_Size];
-            ACCKeepQueue = new List<bool>[Outfit_Size];
-            HairAccQueue = new List<HairSupport.HairAccessoryInfo>[Outfit_Size];
-            Original_Accessory_Data = new ME_List[Outfit_Size];
+            ChaControl = chaControl;
             ClothingLoader = new ClothingLoader(this);
-
-            for (int i = 0; i < Outfit_Size; i++)
-            {
-                HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
-                CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
-                alloutfitpaths[i] = " ";
-                HairKeepQueue[i] = new List<bool>();
-                ACCKeepQueue[i] = new List<bool>();
-                HairKeepReturn[i] = new List<int>();
-                ACCKeepReturn[i] = new List<int>();
-                Original_Accessory_Data[i] = new ME_List();
-            }
         }
 
         public void Clear_Firstpass()
         {
-            for (int i = 0; i < Outfit_Size; i++)
+            for (int i = 0, n = Outfit_Size; i < n; i++)
             {
+                if (!HairKeepQueue.ContainsKey(i))
+                {
+                    HairKeepQueue[i] = new List<bool>();
+                    ACCKeepQueue[i] = new List<bool>();
+                    HairKeepReturn[i] = new List<int>();
+                    ACCKeepReturn[i] = new List<int>();
+                    Original_Accessory_Data[i] = new ME_List();
+                    HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
+                    CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
+                    continue;
+                }
+
                 HairKeepQueue[i].Clear();
                 ACCKeepQueue[i].Clear();
                 HairKeepReturn[i].Clear();
@@ -94,6 +84,16 @@ namespace Cosplay_Academy
                 Original_Accessory_Data[i].Clear();
                 HairAccQueue[i].Clear();
                 CoordinatePartsQueue[i].Clear();
+            }
+            for (int i = Outfit_Size, n = HairKeepQueue.Keys.Count; i < n; i++)
+            {
+                HairKeepQueue.Remove(i);
+                ACCKeepQueue.Remove(i);
+                HairKeepReturn.Remove(i);
+                ACCKeepReturn.Remove(i);
+                Original_Accessory_Data.Remove(i);
+                HairAccQueue.Remove(i);
+                CoordinatePartsQueue.Remove(i);
             }
             ME.TextureDictionary.Clear();
             Finished.Clear();
@@ -117,7 +117,7 @@ namespace Cosplay_Academy
             }
         }
 
-        private void SpecialCondition(int coordinate, string[] v, int datanum)
+        private void SpecialCondition(int coordinate, Dictionary<int, string> outfitpath, int datanum)
         {
 #if KK
             if (coordinate == 4)
@@ -137,20 +137,19 @@ namespace Cosplay_Academy
                 {
                     if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                     {
-                        v[coordinate] = KoiOutfitpath;
+                        outfitpath[coordinate] = KoiOutfitpath;
                     }
                 }
 
                 if (club == 0)
                 {
-                    v[coordinate] = v[0];
+                    outfitpath[coordinate] = outfitpath[0];
                     return;
                 }
 
-                v[coordinate] = alloutfitpaths[datanum + club];
+                outfitpath[coordinate] = alloutfitpaths[datanum + club];
             }
 #endif
         }
-
     }
 }

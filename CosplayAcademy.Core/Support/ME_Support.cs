@@ -721,6 +721,16 @@ namespace Cosplay_Academy.ME
         }
     }
 
+    //public class MaterialEditor
+    //{
+    //    List<RendererProperty> RendererProperties;
+    //    List<MaterialFloatProperty> materialFloatProperties1;
+    //    List<MaterialColorProperty> materialColorProperties1;
+    //    List<MaterialTextureProperty> materialTextureProperties1;
+    //    List<MaterialShader> materialShaders;
+
+    //}
+
     [Serializable]
     [MessagePackObject]
     public class RendererProperty

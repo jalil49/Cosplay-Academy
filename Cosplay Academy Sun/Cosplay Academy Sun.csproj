@@ -59,23 +59,17 @@
       <HintPath>..\src\packages\IllusionLibs.BepInEx.Harmony.2.3.2\lib\net35\BepInEx.Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKSABMX, Version=4.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\src\packages\ABMX.KKSABMX.4.4.2\lib\net46\KKSABMX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="KKSAPI, Version=1.20.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\src\packages\IllusionModdingAPI.KKSAPI.1.20.2\lib\net46\KKSAPI.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="KKS_DynamicBoneEditor">
-      <HintPath>C:\[ScrewThisNoise] Koikatsu Sunshine BetterRepack R0.1\BepInEx\plugins\KKS_DynamicBoneEditor.dll</HintPath>
     </Reference>
     <Reference Include="KKS_ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\src\packages\ExtensibleSaveFormat.KoikatsuSunshine.16.3.1\lib\net46\KKS_ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKS_Pushup">
-      <HintPath>C:\[ScrewThisNoise] Koikatsu Sunshine BetterRepack R0.1\BepInEx\plugins\KKS_Pushup.dll</HintPath>
+    <Reference Include="KKS_Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\src\packages\Sideloader.KoikatsuSunshine.16.4.0\lib\net46\KKS_Sideloader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
