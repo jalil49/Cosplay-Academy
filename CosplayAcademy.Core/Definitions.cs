@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using System.Collections.Generic;
 using Sideloader.AutoResolver;
+using System;
 #if KK
 using System.ComponentModel;
 #endif
@@ -13,6 +14,10 @@ namespace Cosplay_Academy
             foreach (var item in PluginList)
             {
                 PluginResults[item] = TryfindPluginInstance(item);
+            }
+            foreach (var item in PluginVersionList)
+            {
+                PluginVersionCheck(item);
             }
         }
 
@@ -192,6 +197,26 @@ namespace Cosplay_Academy
             return false;
         }
 
+        private static void PluginVersionCheck(PluginCheckData plugin)
+        {
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(plugin.GUID, out PluginInfo target);
+            if (null != target)
+            {
+                if (target.Metadata.Version < plugin.version)
+                    Settings.Logger.LogMessage($"{plugin.Name} version {target.Metadata.Version} is installed, but support is considered outdated and should be updated to at least {plugin.version}");
+
+            }
+        }
+
+        private readonly static List<PluginCheckData> PluginVersionList = new List<PluginCheckData>()
+        {
+            new PluginCheckData("Additional_Card_Info","Additional Card Info", "1.3"),
+            new PluginCheckData("Accessory_States","Accessory States", "1.3"),
+            new PluginCheckData("Accessory_Themes","Accessory Themes", "1.4"),
+            new PluginCheckData("Accessory_Parents","Accessory Parents", "1.4"),
+            new PluginCheckData("madevil.kk.ass","AccStateSync", "4.0.0.0"),
+        };
+
         public static SortedDictionary<int, int> OutfitnumPairs = new SortedDictionary<int, int>();
 
         public static readonly List<int> IgnoredTopIDs_Main = new List<int>() { 0, 31, 53, 59, 60, 222 };
@@ -277,6 +302,19 @@ namespace Cosplay_Academy
         private static ResolveInfo ResolveInfo(string guid, int category, int slot, string property)
         {
             return new ResolveInfo() { GUID = guid, Slot = slot, CategoryNo = (ChaListDefine.CategoryNo)category, Property = property };
+        }
+        private class PluginCheckData
+        {
+            public string GUID;
+            public string Name;
+            public Version version;
+
+            public PluginCheckData(string guid, string name, string _version)
+            {
+                GUID = guid;
+                Name = name;
+                version = new Version(_version);
+            }
         }
     }
 
