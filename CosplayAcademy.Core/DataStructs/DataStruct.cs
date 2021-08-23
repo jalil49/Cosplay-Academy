@@ -68,6 +68,7 @@ namespace Cosplay_Academy
             if (CreateFile())
             {
                 Load(Settings.CoordinatePath.Value);
+                OutfitDecider.ResetDecider();
 #if TRACE
                 Stopwatch.Stop();
                 Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to create data");
@@ -75,6 +76,7 @@ namespace Cosplay_Academy
                 return;
             }
             ReadFile();
+            OutfitDecider.ResetDecider();
 #if TRACE
             Stopwatch.Stop();
             Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to load data");

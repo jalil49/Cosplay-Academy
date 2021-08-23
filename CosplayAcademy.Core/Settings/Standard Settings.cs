@@ -61,8 +61,6 @@ namespace Cosplay_Academy
 #if TRACE
         private static Stopwatch Stopwatch = new Stopwatch();
 #endif
-
-
         internal void StandardSettings()
         {
             Instance = this;
@@ -176,6 +174,7 @@ namespace Cosplay_Academy
         private readonly static GUIContent FindNewCards = new GUIContent("Find New Cards", "Only Find New cards");
         private readonly static GUIContent UpdateAllCards = new GUIContent("Update Cache", "Force Update All Cards");
         private readonly static GUIContent ResetCards = new GUIContent("Reset Cache", "Reset Cache and start with Coordinate Location Path");
+        private readonly static GUIContent RerollSets = new GUIContent("Reroll Choosen Sets", "Reset character outfits.");
 
         private void UpdateCacheData(ConfigEntryBase configEntry)
         {
@@ -192,6 +191,8 @@ namespace Cosplay_Academy
             {
                 DataStruct.Reset();
             }
+            if (GUILayout.Button(RerollSets))
+                OutfitDecider.ResetDecider();
             GUILayout.EndVertical();
         }
 
