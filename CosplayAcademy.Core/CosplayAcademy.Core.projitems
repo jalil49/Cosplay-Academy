@@ -6,21 +6,26 @@
     <SharedGUID>d16032f2-42be-414e-a4cc-af5f170ef1d9</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>CosplayAcademy</Import_RootNamespace>
+    <Import_RootNamespace>Cosplay_Academy</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ChaDefault.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CharaEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ClothingLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigClass.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\ChaDefault.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Characustom\CharaEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Characustom\ClothingLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\FolderData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\CardData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\MainFolderStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\HFolderStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\ConfigClass.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\DataStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Definitions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DirectoryFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hooks.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OutfitData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\OutfitData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OutfitDecider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Standard Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Characustom\Packers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\Standard Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\DynamicBone.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Parents\DataStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Accessory Parents\Migrator.cs" />
@@ -32,7 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Additional Card Info\DataStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Additional Card Info\Migrator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Dummy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Support\MakerTools\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Hair_Accessory_Support.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\ABMX.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\ME_Support.cs" />
@@ -41,6 +46,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Support\PushUp.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Characustom\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Settings\" />
     <Folder Include="$(MSBuildThisFileDirectory)Support\MakerTools\" />
   </ItemGroup>
 </Project>

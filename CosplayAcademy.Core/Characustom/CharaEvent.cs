@@ -10,6 +10,7 @@ using KKAPI.Maker.UI.Sidebar;
 using MessagePack;
 using System.Collections.Generic;
 using UniRx;
+using Extensions;
 #if TRACE
 using System.Diagnostics;
 #endif
@@ -24,6 +25,8 @@ namespace Cosplay_Academy
 {
     public class CharaEvent : CharaCustomFunctionController
     {
+        public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
+
         internal ChaDefault ThisOutfitData;
         private ClothingLoader ClothingLoader => ThisOutfitData.ClothingLoader;
         internal static int Firstpass = 0;
@@ -42,7 +45,7 @@ namespace Cosplay_Academy
 #if !KKS
             if (!MakerAPI.IsInsideClassMaker())
             {
-                Constants.ChaDefaults.Clear();
+                ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
 #endif
@@ -120,22 +123,19 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            ThisOutfitData = Constants.ChaDefaults.Find(x => ChaControl.fileParam.personality == x.Personality && x.FullName == ChaControl.fileParam.fullname && x.BirthDay == ChaControl.fileParam.strBirthDay);
+            ThisOutfitData = ChaDefaults.Find(x => x.Parameter.Compare(ChaControl.fileParam));
             if (ThisOutfitData == null)
             {
-                //ExpandedOutfit.Logger.LogWarning($"{ChaControl.fileParam.fullname} made new default; chano {ChaControl.fileParam.strBirthDay} name {ChaControl.fileParam.personality}");
                 ThisOutfitData = new ChaDefault(ChaControl)
                 {
-                    FullName = ChaControl.fileParam.fullname,
-                    BirthDay = ChaControl.fileParam.strBirthDay,
-                    Personality = ChaControl.fileParam.personality,
+                    Parameter = ChaControl.fileParam,
                     Chafile = ChaFileControl,
                     ChaControl = ChaControl,
 #if KK
                     heroine = ChaControl.GetHeroine()
 #endif
                 };
-                Constants.ChaDefaults.Add(ThisOutfitData);
+                ChaDefaults.Add(ThisOutfitData);
                 return;
             }
             ThisOutfitData.ChaControl = ChaControl;
@@ -175,7 +175,7 @@ namespace Cosplay_Academy
                 PluginData MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
                 #region ME Acc Import
-                var Chafile_ME_Data = new ME_List(MaterialEditorData, ThisOutfitData);
+                var Chafile_ME_Data = ThisOutfitData.Finished = new ME_List(MaterialEditorData, ThisOutfitData);
                 #endregion
 
                 #region Queue accessories to keep
@@ -215,10 +215,9 @@ namespace Cosplay_Academy
                 var CardInfo = ACI_data.CardInfo;
                 var CoordinateInfo = ACI_data.CoordinateInfo;
 
-                ClothingLoader.Character_Cosplay_Ready = Cosplay_Academy_Ready = CardInfo.CosplayReady;
+                ClothingLoader.CardInfo = CardInfo;
+                Cosplay_Academy_Ready = CardInfo.CosplayReady;
                 ClothingLoader.MakeUpKeep = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.MakeUpKeep);
-                ClothingLoader.PersonalClothingBools = CardInfo.PersonalClothingBools;
-
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
                 #endregion
 
@@ -265,6 +264,12 @@ namespace Cosplay_Academy
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
 
                     var ME_ACC_Storage = ThisOutfitData.Original_Accessory_Data[outfitnum];
+
+                    if (!Chafile_ME_Data.Coordinates.TryGetValue(outfitnum, out var coord))
+                    {
+                        coord = new ME_Coordinate();
+                    }
+                    var ME_ACC_Data = coord.AccessoryProperties;
                     for (int i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
@@ -279,11 +284,13 @@ namespace Cosplay_Academy
                             }
 
                             #region ME_Data
-                            ME_ACC_Storage.MaterialColorProperty.AddRange(Chafile_ME_Data.Color_FindAll(ObjectTypeList, i, outfitnum));
-                            ME_ACC_Storage.MaterialFloatProperty.AddRange(Chafile_ME_Data.Float_FindAll(ObjectTypeList, i, outfitnum));
-                            ME_ACC_Storage.MaterialShader.AddRange(Chafile_ME_Data.Shader_FindAll(ObjectTypeList, i, outfitnum));
-                            ME_ACC_Storage.MaterialTextureProperty.AddRange(Chafile_ME_Data.Texture_FindAll(ObjectTypeList, i, outfitnum));
-                            ME_ACC_Storage.RendererProperty.AddRange(Chafile_ME_Data.Render_FindAll(ObjectTypeList, i, outfitnum));
+
+                            #region ME_Data
+                            if (!ME_ACC_Data.TryGetValue(i, out var editorProperties))
+                            {
+                                editorProperties = new MaterialEditorProperties();
+                            }
+                            ME_ACC_Storage.Add(editorProperties);
                             #endregion
 
                             ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
@@ -340,4 +347,5 @@ namespace Cosplay_Academy
             }; ;
         }
     }
+    #endregion
 }

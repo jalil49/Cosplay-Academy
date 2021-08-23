@@ -1,5 +1,4 @@
 ﻿using Extensions;
-using Extensions;
 using MessagePack;
 using System;
 using System.Collections.Generic;

@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cosplay_Academy
 {
     public static partial class OutfitDecider
     {
-        private static void Grabber(List<string> temp2, int set, string Input2)
+        private static void Grabber(ref List<FolderData> temp2, int set, int exp)
         {
-            string coordinatepath = Settings.CoordinatePath.Value;
             if (set == 1 && Settings.GrabUniform.Value)
             {
-                temp2.AddRange(DirectoryFinder.Grab_All_Directories(coordinatepath + Constants.InputStrings[0] + Input2));
+                temp2.AddRange(DataStruct.DefaultFolder[set].FolderData[exp].GetAllFolders());
+                return;
             }
-            else if (set == 4 && Settings.GrabSwimsuits.Value)
+            if (set == 4 && Settings.GrabSwimsuits.Value)
             {
-                temp2.AddRange(DirectoryFinder.Grab_All_Directories(coordinatepath + Constants.InputStrings[3] + Input2));
+                temp2.AddRange(DataStruct.DefaultFolder[set].FolderData[exp].GetAllFolders());
+                return;
             }
         }
 
         private static void SpecialProcess()
         {
-            ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(HExperience, Settings.MatchGeneric[9].Value);
+            ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(HExperience, Settings.MatchGeneric[9].Value, false, ThisOutfitData.ChaControl.fileParam.personality, ThisOutfitData.Chafile.parameter.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory()).GetFullPath();
 
             if (!Settings.MatchGeneric[1].Value)
             {
