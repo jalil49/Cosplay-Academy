@@ -8,9 +8,11 @@ namespace Cosplay_Academy
 {
     static class DirectoryFinder
     {
+        private static readonly char sep = Path.DirectorySeparatorChar;
+
         public static void CheckMissingFiles()
         {
-            string[] InputStrings3 = { @"\Sets", "" };
+            string[] InputStrings3 = { $"{sep}Sets", "" };
             string coordinatepath = Settings.CoordinatePath.Value;
             foreach (string input in Constants.InputStrings)
             {
@@ -18,25 +20,27 @@ namespace Cosplay_Academy
                 {
                     foreach (string input3 in InputStrings3)
                     {
-                        if (!Directory.Exists(coordinatepath + input + input2 + input3))
+                        var path = coordinatepath + input + input2 + input3;
+                        if (!Directory.Exists(path))
                         {
-                            Settings.Logger.LogWarning("Folder not found, creating directory at " + "coordinate" + input + input2 + input3);
-                            Directory.CreateDirectory(coordinatepath + input + input2 + input3);
+                            Settings.Logger.LogWarning("Folder not found, creating directory at " + path);
+                            Directory.CreateDirectory(path);
                         }
                     }
                 }
             }
-            if (!Directory.Exists(coordinatepath + @"Unorganized"))
+            var path2 = coordinatepath + $"{sep}Unorganized";
+            if (!Directory.Exists(path2))
             {
-                Settings.Logger.LogWarning("Folder not found, creating directory at " + @"coordinate\Unorganized");
-                Directory.CreateDirectory(coordinatepath + @"\Unorganized");
+                Settings.Logger.LogWarning("Folder not found, creating directory at " + path2);
+                Directory.CreateDirectory(path2);
             }
         }
 
         public static void Organize()
         {
             string coordinatepath = Settings.CoordinatePath.Value;
-            var folders = Grab_All_Directories(coordinatepath + @"\Unorganized");
+            var folders = Grab_All_Directories(coordinatepath + $"{sep}Unorganized");
             foreach (var item in folders)
             {
                 var files = Get_Outfits_From_Path(item, false);
@@ -88,20 +92,20 @@ namespace Cosplay_Academy
                     string SubSetNames = coordiante.SubSetNames;
                     string Result;
                     string ClubResult = "";
-                    string SubPath = @"\";
+                    string SubPath = $"{sep}";
                     if (SetNames.Length > 0)
                     {
-                        SubPath += @"Sets\" + SetNames;
+                        SubPath += @"Sets{sep}" + SetNames;
                     }
                     if (SubSetNames.Length > 0)
                     {
-                        if (!SubPath.EndsWith(@"\"))
+                        if (!SubPath.EndsWith($"{sep}"))
                         {
-                            SubPath += @"\";
+                            SubPath += $"{sep}";
                         }
                         SubPath += SubSetNames;
                     }
-                    var FileName = @"\" + Coordinate.Split('\\').Last();
+                    var FileName = $"{sep}" + Coordinate.Split(sep).Last();
                     if (CoordinateSubType == 10)
                     {
                         Result = coordinatepath + Constants.InputStrings[7] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
@@ -147,7 +151,7 @@ namespace Cosplay_Academy
             }
             for (int i = 0; i < FoldersPath.Count; i++)
             {
-                if (FoldersPath[i].EndsWith(@"\Sets"))
+                if (FoldersPath[i].EndsWith($"{sep}Sets"))
                 {
                     FoldersPath.RemoveAt(i--);
                     continue;
@@ -157,12 +161,20 @@ namespace Cosplay_Academy
                     FoldersPath.RemoveAt(i--);
                 }
             }
-            if (FoldersPath.Count == 0 && originalpathexists)
-            {
-                FoldersPath.Add(OriginalPath);
-            }
-
             return FoldersPath;
+        }
+
+        public static List<string> Grab_Folder_Directories(string OriginalPath, bool self)
+        {
+            bool originalpathexists = Directory.Exists(OriginalPath);
+            var list = new List<string>();
+            if (originalpathexists)
+            {
+                if (self)
+                    list.Add(OriginalPath);
+                list.AddRange(Directory.GetDirectories(OriginalPath));//grab direct child folders
+            }
+            return list;
         }
 
         public static List<string> Get_Set_Paths(string Narrow)
@@ -194,7 +206,7 @@ namespace Cosplay_Academy
             //step through each folder and grab files
             foreach (string path in Paths)
             {
-                if (RemoveSets && path.Contains(@"\Sets"))
+                if (RemoveSets && path.Contains($"{sep}Sets"))
                 {
                     continue;
                 }
@@ -202,7 +214,7 @@ namespace Cosplay_Academy
                 Choosen.AddRange(files);
             }
             bool choosenempty = Choosen.Count == 0;
-            if ((choosenempty || Settings.EnableDefaults.Value) && !OriginalPath.Contains(@"\Unorganized"))
+            if ((choosenempty || Settings.EnableDefaults.Value) && !OriginalPath.Contains($"{sep}Unorganized"))
             {
                 Choosen.Add("Default");
                 if (choosenempty)

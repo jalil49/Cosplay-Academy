@@ -11,7 +11,7 @@ namespace Cosplay_Academy
             {
                 OutfitDecider.ResetDecider();
             }
-            foreach (var item in Constants.ChaDefaults)
+            foreach (var item in CharaEvent.ChaDefaults)
             {
                 item.Changestate = true;
             }
@@ -27,13 +27,13 @@ namespace Cosplay_Academy
 
         protected override void OnGameLoad(GameSaveLoadEventArgs args)
         {
-            Constants.ChaDefaults.Clear();
+            CharaEvent.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }
 
         protected override void OnNewGame()
         {
-            Constants.ChaDefaults.Clear();
+            CharaEvent.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }
 
@@ -53,7 +53,7 @@ namespace Cosplay_Academy
         {
             if (freeH)
             {
-                Constants.ChaDefaults.Clear();
+                CharaEvent.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
             CharaEvent.inH = false;

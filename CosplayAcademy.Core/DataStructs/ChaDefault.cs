@@ -2,6 +2,8 @@
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Cosplay_Academy
 {
@@ -14,14 +16,14 @@ namespace Cosplay_Academy
         internal bool processed = false;
 
         internal Dictionary<int, List<ChaFileAccessory.PartsInfo>> CoordinatePartsQueue = new Dictionary<int, List<ChaFileAccessory.PartsInfo>>();
-        internal Dictionary<int, string> alloutfitpaths = new Dictionary<int, string>();
+        internal Dictionary<int, CardData> alloutfitpaths = new Dictionary<int, CardData>();
         internal readonly Dictionary<int, string> outfitpaths = new Dictionary<int, string>();
 
         internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
-        internal int Personality;
-        internal string BirthDay;
-        internal string FullName;
+        internal ChaFileParameter Parameter;
+
+        internal int Hvalue = 0;
 #if KK
         internal static int LastClub = -1;
         internal SaveData.Heroine heroine;
@@ -45,11 +47,11 @@ namespace Cosplay_Academy
         #endregion
 
         #region Material Editor Save
-        public Dictionary<int, ME_List> Original_Accessory_Data = new Dictionary<int, ME_List>();
+        public Dictionary<int, List<MaterialEditorProperties>> Original_Accessory_Data = new Dictionary<int, List<MaterialEditorProperties>>();
         #endregion
 
         #region Material Editor Return
-        public ME_List Finished = new ME_List();
+        public ME_List Finished;
         #endregion
 
         internal Dictionary<int, List<int>> HairKeepReturn = new Dictionary<int, List<int>>();
@@ -59,6 +61,7 @@ namespace Cosplay_Academy
         {
             ChaControl = chaControl;
             ClothingLoader = new ClothingLoader(this);
+            Finished = new ME_List(Outfit_Size);
         }
 
         public void Clear_Firstpass()
@@ -71,7 +74,7 @@ namespace Cosplay_Academy
                     ACCKeepQueue[i] = new List<bool>();
                     HairKeepReturn[i] = new List<int>();
                     ACCKeepReturn[i] = new List<int>();
-                    Original_Accessory_Data[i] = new ME_List();
+                    Original_Accessory_Data[i] = new List<MaterialEditorProperties>();
                     HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                     CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
                     continue;
@@ -104,16 +107,93 @@ namespace Cosplay_Academy
             var datanum = 0;
             for (int i = 0; i < Outfit_Size; i++)
             {
-                var count = Constants.OutfitnumPairs[i];
+                if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
+                {
+                    break;
+                }
                 if (count == 1)
                 {
-                    outfitpaths[i] = alloutfitpaths[datanum];
+                    outfitpaths[i] = alloutfitpaths[datanum].GetFullPath();
+                    Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
                 }
                 else
                 {
                     SpecialCondition(i, outfitpaths, datanum);
                 }
                 datanum += count;
+            }
+            var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
+            bool simplenull = simpledirectory.IsNullOrEmpty();
+            bool advanced = ClothingLoader.CardInfo.AdvancedDirectory;
+            if (advanced || !simplenull)
+            {
+                var sep = Path.DirectorySeparatorChar;
+                List<FolderStruct> SimpleStruct = null;
+                List<FolderStruct> ADVStruct = null;
+                var defaultpath = Settings.CoordinatePath.Value;
+                var adv = ClothingLoader.CardInfo.AdvancedFolderDirectory;
+                if (!simplenull)
+                {
+                    var simplepath = defaultpath + sep + simpledirectory;
+                    if (DataStruct.FolderStructure.Any(x => x.Key.EndsWith(simpledirectory)))
+                    {
+                        SimpleStruct = DataStruct.FolderStructure.First(x => x.Key.EndsWith(simpledirectory)).Value;
+                    }
+                    else if (Directory.Exists(simplepath))
+                    {
+                        SimpleStruct = DataStruct.Load(simplepath);
+                    }
+                }
+                datanum = 0;
+                for (int i = 0; i < Outfit_Size; i++)
+                {
+                    if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
+                    {
+                        break;
+                    }
+                    if (SimpleStruct != null)
+                    {
+                        if (count == 1)
+                        {
+                            var cards = SimpleStruct[datanum].FolderData[Hvalue].GetAllCards();
+                            if (cards.Count > 0)
+                            {
+                                Settings.Logger.LogWarning($"grabed {cards.Count} from simple");
+                                outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
+                            }
+                        }
+                        else
+                        {
+                            SpecialCondition(i, outfitpaths, datanum);
+                        }
+                    }
+                    if (advanced)
+                    {
+                        if (adv.TryGetValue(Constants.SimplifiedCoordinateTypes[i], out var advdirectory) && !advdirectory.IsNullOrEmpty())
+                        {
+                            var advpath = defaultpath + sep + advdirectory;
+                            if (DataStruct.FolderStructure.Any(x => x.Key.EndsWith(advdirectory)))
+                            {
+                                ADVStruct = DataStruct.FolderStructure.First(x => x.Key.EndsWith(advdirectory)).Value;
+                            }
+                            else if (Directory.Exists(advpath))
+                            {
+                                ADVStruct = DataStruct.Load(advpath);
+                            }
+
+                            if (ADVStruct != null)
+                            {
+                                var cards = ADVStruct[datanum].FolderData[Hvalue].GetAllCards();
+                                if (cards.Count > 0)
+                                {
+                                    outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
+                                }
+                            }
+                        }
+                        ADVStruct = null;
+                    }
+                    datanum += count;
+                }
             }
         }
 
@@ -147,7 +227,7 @@ namespace Cosplay_Academy
                     return;
                 }
 
-                outfitpath[coordinate] = alloutfitpaths[datanum + club];
+                outfitpath[coordinate] = alloutfitpaths[datanum + club].GetFullPath();
             }
 #endif
         }

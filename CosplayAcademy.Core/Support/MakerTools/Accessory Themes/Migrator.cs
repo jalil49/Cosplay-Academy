@@ -16,7 +16,8 @@ namespace Cosplay_Academy
                     var temp = MessagePackSerializer.Deserialize<List<string>[]>((byte[])ByteData);
                     for (int i = 0; i < temp.Length; i++)
                     {
-                        temp[i].RemoveAt(0);
+                        if (temp[i].Count > 0)
+                            temp[i].RemoveAt(0);
                         var themes = data.Coordinate[i].Themes;
                         foreach (var item in temp[i])
                         {
@@ -44,7 +45,9 @@ namespace Cosplay_Academy
                     for (int i = 0; i < temp.Length; i++)
                     {
                         var list = temp[i];
-                        list.RemoveAt(0);
+                        if (list.Count > 0)
+                            list.RemoveAt(0);
+
                         var themes = data.Coordinate[i].Themes;
                         for (int j = 0; j < list.Count; j++)
                         {
@@ -58,7 +61,8 @@ namespace Cosplay_Academy
                     var temp = MessagePackSerializer.Deserialize<List<bool>[]>((byte[])ByteData);
                     for (int i = 0; i < temp.Length; i++)
                     {
-                        temp[i].RemoveAt(0);
+                        if (temp[i].Count > 0)
+                            temp[i].RemoveAt(0);
                         var themes = data.Coordinate[i].Themes;
                         for (int j = 0; j < temp[i].Count; j++)
                         {
@@ -83,7 +87,8 @@ namespace Cosplay_Academy
                 if (MyData.data.TryGetValue("Theme_Names", out var ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<string>>((byte[])ByteData);
-                    temp.RemoveAt(0);
+                    if (temp.Count > 0)
+                        temp.RemoveAt(0);
                     var themes = data.Themes;
                     foreach (var item in temp)
                     {
@@ -104,19 +109,20 @@ namespace Cosplay_Academy
                 if (MyData.data.TryGetValue("Color_Theme_dic", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<Color[]>>((byte[])ByteData);
-                    var list = temp;
-                    list.RemoveAt(0);
+                    if (temp.Count > 0)
+                        temp.RemoveAt(0);
                     var themes = data.Themes;
-                    for (int j = 0; j < list.Count; j++)
+                    for (int j = 0; j < temp.Count; j++)
                     {
-                        themes[j].Colors = list[j];
+                        themes[j].Colors = temp[j];
                     }
                 }
 
                 if (MyData.data.TryGetValue("Relative_Theme_Bools", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<bool>>((byte[])ByteData);
-                    temp.RemoveAt(0);
+                    if (temp.Count > 0)
+                        temp.RemoveAt(0);
                     var themes = data.Themes;
                     for (int j = 0; j < temp.Count; j++)
                     {
@@ -129,7 +135,6 @@ namespace Cosplay_Academy
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, List<int[]>>>((byte[])ByteData);
                     data.Relative_ACC_Dictionary = temp;
-
                 }
 
                 return data;

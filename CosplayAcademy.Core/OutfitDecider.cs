@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Cosplay_Academy
 {
     public static partial class OutfitDecider
     {
+        private readonly static char sep = Path.DirectorySeparatorChar;
         private static readonly OutfitData[] outfitData;
 
         private static ChaDefault ThisOutfitData;
@@ -27,7 +28,10 @@ namespace Cosplay_Academy
             {
                 data.Clear();
             }
-            Constants.ChaDefaults.ForEach(x => x.processed = false);
+            foreach (var item in CharaEvent.ChaDefaults)
+            {
+                item.processed = false;
+            }
 #if KK
             ChaDefault.LastClub = -1;
 #endif
@@ -39,58 +43,66 @@ namespace Cosplay_Academy
             }
         }
 
-        private static void Get_Outfits()
+        public static void Get_Outfits()
         {
-            List<string> temp2;
-            string coordinatepath = Settings.CoordinatePath.Value;
-            int set = -1;//-1 so it can be on top of foreach
-            foreach (string Input1 in Constants.InputStrings)
+            int hstatelen = Constants.InputStrings2.Length;
+            for (int sets = 0, setslen = Constants.InputStrings.Length; sets < setslen; sets++)
             {
-                set++;
-                int exp = -1;
-                foreach (string Input2 in Constants.InputStrings2)
+                for (int hstate = 0; hstate < hstatelen; hstate++)
                 {
-                    exp++;
-                    if (Settings.ListOverrideBool[set].Value)
+                    var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[hstate];
+
+                    if (Settings.ListOverrideBool[sets].Value)
                     {
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(Settings.ListOverride[set].Value, false); //when sets are enabled don't include them in rolls, but do if disabled
-                        outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
+                        var overridepath = Settings.ListOverride[sets].Value;
+                        var find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
+                        if (find == null)
+                        {
+                            hstatefolder.Populate(overridepath);
+                            find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
+                            if (find == null)
+                            {
+                                outfitData[sets].Insert(hstate, new List<CardData>(), true);//assign "is" set and store data
+                                continue;
+                            }
+                        }
+                        outfitData[sets].Insert(hstate, find.GetAllCards(), true);//assign "is" set and store data
                         continue;
                     }
-                    if (outfitData[set].IsSet(exp))//Skip set items
+
+                    if (outfitData[sets].IsSet(hstate))//Skip set items
                     {
                         continue;
                     }
-                    temp2 = DirectoryFinder.Grab_All_Directories(coordinatepath + Input1 + Input2);
+
+                    if (Settings.EnableSets.Value)
+                    {
+                        var AllFolder = hstatefolder.GetAllFolders();
 #if KK
-                    Grabber(temp2, set, Input2);
+                        Grabber(ref AllFolder, sets, hstate);
 #endif
-                    string result = temp2[UnityEngine.Random.Range(0, temp2.Count)];
-                    if (!Settings.EnableSets.Value || !result.Contains(@"\Sets\"))
-                    {
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, Settings.EnableSets.Value); //when sets are enabled don't include them in rolls, but do if disabled
-                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
+                        if (AllFolder.Count == 0)
                         {
-                            temp2.Add("Defaults");
+                            outfitData[sets].Insert(hstate, new List<CardData>(), false);
+                            continue;
                         }
-                        outfitData[set].Insert(exp, temp2.ToArray(), false);//Assign "not" set and store data
+
+                        var selectedfolder = AllFolder[UnityEngine.Random.Range(0, AllFolder.Count)];
+
+                        Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
+
+                        bool isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
+
+                        outfitData[sets].Insert(hstate, selectedfolder.GetAllCards(), isset);
+
+                        if (!Settings.IndividualSets.Value && isset)
+                        {
+                            Setsfunction(selectedfolder);
+                        }
+                        continue;
                     }
-                    else
-                    {
-                        string[] split = result.Split('\\');
-                        temp2 = DirectoryFinder.Get_Set_Paths(@"\Sets\" + split[split.Length - 1]);
-                        string[] array = temp2.ToArray();//this area of the code is unstable for unknown reason as temp2 will be corrupted by setsfunction have to store in array
-                        if (!Settings.IndividualSets.Value)
-                        {
-                            Setsfunction(array);
-                        }
-                        temp2 = DirectoryFinder.Get_Outfits_From_Path(result, false);
-                        if (Settings.EnableDefaults.Value && temp2.Count != 1)
-                        {
-                            temp2.Add("Defaults");
-                        }
-                        outfitData[set].Insert(exp, temp2.ToArray(), true);//assign "is" set and store data
-                    }
+
+                    outfitData[sets].Insert(hstate, hstatefolder.GetAllCards(), false);
                 }
             }
         }
@@ -129,57 +141,46 @@ namespace Cosplay_Academy
 #endif
         }
 
-        private static void Setsfunction(string[] result)
+        private static void Setsfunction(FolderData folderData)
         {
-            foreach (string item in result)
+            var sep = Path.DirectorySeparatorChar;
+            string split = sep + folderData.FolderPath.Split(new string[] { sep + "Sets" + sep }, System.StringSplitOptions.RemoveEmptyEntries).Last();
+            for (int sets = 0, n = outfitData.Length; sets < n; sets++)
             {
-                string[] split = item.Split('\\');
-                int exp = 0;
-                foreach (var folder in split.Reverse())//reverse cause it's probably faster to start at rear, but rear can be longer than forward; for loop might be faster tho
+                for (int hexp = 0; hexp < 4; hexp++)
                 {
-                    try
+                    if (Settings.FullSet.Value && outfitData[sets].IsSet(hexp) || Settings.ListOverrideBool[sets].Value)
                     {
-                        HStates temp = (HStates)Enum.Parse(typeof(HStates), folder, true);
-                        if (Enum.IsDefined(typeof(HStates), temp))
-                        {
-                            exp = (int)temp;
-                            break;
-                        }
+                        continue;
                     }
-                    catch
-                    { }
-                }
-                for (int j = 0, n = outfitData.Length; j < n; j++)
-                {
-                    if (item.Contains(Constants.InputStrings[j]))
+                    var find = DataStruct.DefaultFolder[sets].FolderData[hexp].GetAllFolders().Find(x => x.FolderPath.EndsWith(split));
+                    if (find == null)
                     {
-                        if (Settings.FullSet.Value && outfitData[j].IsSet(exp))
-                        {
-                            break;
-                        }
-                        var coordinatepath = Settings.CoordinatePath.Value;
-                        List<string> temp = DirectoryFinder.Get_Outfits_From_Path(item, false);
-                        outfitData[j].Insert(exp, temp.ToArray(), true);
-                        break;
+                        continue;
                     }
-                    else if (j == outfitData.Length - 1)
-                    {
-                        Settings.Logger.LogWarning("Fail :" + item + " Hexp: " + exp);
-                    }
+                    List<CardData> temp = find.GetAllCards();
+                    outfitData[sets].Insert(hexp, find.GetAllCards(), true);
                 }
             }
         }
 
-        private static string Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
+        private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
+            var status = ThisOutfitData.ChaControl.fileParam;
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:
-                    return ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type);
+                    ThisOutfitData.Hvalue = RandHExperience;
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    break;
                 case Hexp.Maximize:
-                    return ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type);
+                    ThisOutfitData.Hvalue = HExperience;
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    break;
                 default:
-                    return ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(HExperience, uniform_type);
+                    ThisOutfitData.Hvalue = UnityEngine.Random.RandomRangeInt(0, HExperience + 1);
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(ThisOutfitData.Hvalue, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    break;
             }
         }
     }

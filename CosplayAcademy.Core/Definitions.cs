@@ -1,14 +1,17 @@
 ﻿using BepInEx;
-using System.Collections.Generic;
 using Sideloader.AutoResolver;
+using System.Collections.Generic;
 using System;
 #if KK
 using System.ComponentModel;
 #endif
+
 namespace Cosplay_Academy
 {
-    static class Constants
+    public static class Constants
     {
+        private static readonly char sep = System.IO.Path.DirectorySeparatorChar;
+
         internal static void PluginCheck()
         {
             foreach (var item in PluginList)
@@ -79,55 +82,55 @@ namespace Cosplay_Academy
         public static readonly string[] InputStrings =
             {
 #if KK
-                    @"\School Uniform", //0
-                    @"\AfterSchool", //1
-                    @"\Gym" ,//2
-                    @"\Swimsuit" , //3
-                    @"\Club\Swim" , //4
-                    @"\Club\Manga", //5
-                    @"\Club\Cheer", //6
-                    @"\Club\Tea", //7
-                    @"\Club\Track", //8
-                    @"\Club\Koi", //9
-                    @"\Casual" , //10
-                    @"\Nightwear", //11
-                    @"\Underwear"//12                 
+                    $"{sep}School Uniform", //0
+                    $"{sep}AfterSchool", //1
+                    $"{sep}Gym" ,//2
+                    $"{sep}Swimsuit" , //3
+                    $"{sep}Club{sep}Swim" , //4
+                    $"{sep}Club{sep}Manga", //5
+                    $"{sep}Club{sep}Cheer", //6
+                    $"{sep}Club{sep}Tea", //7
+                    $"{sep}Club{sep}Track", //8
+                    $"{sep}Club{sep}Koi", //9
+                    $"{sep}Casual" , //10
+                    $"{sep}Nightwear", //11
+                    $"{sep}Underwear"//12                 
 #elif KKS
-                    @"\Casual", //0
-                    @"\Swimsuit", //1
-                    @"\Nightwear", //2
-                    @"\Bathroom", //3
-                    @"\Underwear"//4
+                    $"{sep}Casual", //0
+                    $"{sep}Swimsuit", //1
+                    $"{sep}Nightwear", //2
+                    $"{sep}Bathroom", //3
+                    $"{sep}Underwear"//4
 #endif
 };
         public static readonly string[] AllCoordinatePaths =
             {
-                    @"\School Uniform", //0
-                    @"\AfterSchool", //1
-                    @"\Gym" ,//2
-                    @"\Swimsuit" , //3
-                    @"\Club" , //4
-                    @"\Casual" , //5
-                    @"\Nightwear", //6
-                    @"\Underwear",//7                 
-                    @"\Bathroom", //8
+                    $"{sep}School Uniform", //0
+                    $"{sep}AfterSchool", //1
+                    $"{sep}Gym" ,//2
+                    $"{sep}Swimsuit" , //3
+                    $"{sep}Club" , //4
+                    $"{sep}Casual" , //5
+                    $"{sep}Nightwear", //6
+                    $"{sep}Underwear",//7                 
+                    $"{sep}Bathroom", //8
 };
         public static readonly string[] ClubPaths =
         {
-                    @"\Home" , //0
-                    @"\Swim" , //1
-                    @"\Manga", //2
-                    @"\Cheer", //3
-                    @"\Tea", //4
-                    @"\Track", //5
-                    @"\Koi", //6
+                    $"{sep}Home" , //0
+                    $"{sep}Swim" , //1
+                    $"{sep}Manga", //2
+                    $"{sep}Cheer", //3
+                    $"{sep}Tea", //4
+                    $"{sep}Track", //5
+                    $"{sep}Koi", //6
         };
 
         public static readonly string[] InputStrings2 = {
-            @"\FirstTime", //0
-            @"\Amateur", //1
-            @"\Pro", //2
-            @"\Lewd" //3
+            $"{sep}FirstTime", //0
+            $"{sep}Amateur", //1
+            $"{sep}Pro", //2
+            $"{sep}Lewd" //3
         };//Experience States; easy to make scale with size
 
         public static readonly string[] Generic_Inclusion =
@@ -148,8 +151,6 @@ namespace Cosplay_Academy
             "a_n_hair_pin", //13
             "a_n_hair_pin_R" //14
         };
-
-        public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
 
         public static string[] KCOX_Cat = {
             "ct_clothesTop",//0
@@ -220,17 +221,18 @@ namespace Cosplay_Academy
         public static SortedDictionary<int, int> OutfitnumPairs = new SortedDictionary<int, int>();
 
         public static readonly List<int> IgnoredTopIDs_Main = new List<int>() { 0, 31, 53, 59, 60, 222 };
+
         public static readonly List<int> IgnoredBotsIDs_Main = new List<int>() { 0, 38, 40, };
 
         public static readonly Dictionary<int, List<int>> IgnoredTopIDs_A = new Dictionary<int, List<int>>();
 
-        private static Dictionary<int, List<ResolveInfo>> IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
+        private static readonly Dictionary<int, List<ResolveInfo>> IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
         {
-            [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100) },
-            [2] = new List<ResolveInfo>() { ResolveInfo("nakay.Top jacket", 210, 6), ResolveInfo("yu000.ShirtlessUniform", 210, 100) },
+            [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100), },
+            [2] = new List<ResolveInfo>() { ResolveInfo("nakay.Top jacket", 210, 6), ResolveInfo("yu000.ShirtlessUniform", 210, 100), ResolveInfo("m14.FGO_BBLeotard", 210, 18), ResolveInfo("m14.FGO_QinLiangyuBodysuit", 210, 19), },
         };
 
-        private static List<ResolveInfo> IgnoredTops_Mods_Main = new List<ResolveInfo>()
+        private static readonly List<ResolveInfo> IgnoredTops_Mods_Main = new List<ResolveInfo>()
         {
            ResolveInfo("WaTaFuk.WMO",105,3001),
            ResolveInfo("mat.Tops",105,1214),
@@ -271,7 +273,7 @@ namespace Cosplay_Academy
            ResolveInfo("shinyBunny",105,997),
         };
 
-        private static List<ResolveInfo> IgnoredBots_Mods = new List<ResolveInfo>()
+        private static readonly List<ResolveInfo> IgnoredBots_Mods = new List<ResolveInfo>()
         {
             ResolveInfo("xne_fobtms",106,9211),
             ResolveInfo("xne_fobtms",106,9212),
@@ -296,13 +298,25 @@ namespace Cosplay_Academy
             ResolveInfo("com.Quokka.kimonodressskirtopen",106,101),
         };
 
-        private static ResolveInfo ResolveInfo(int category, int slot, string property) => ResolveInfo("", category, slot, property);
         private static ResolveInfo ResolveInfo(string guid, int category, int slot) => ResolveInfo(guid, category, slot, "");
 
         private static ResolveInfo ResolveInfo(string guid, int category, int slot, string property)
         {
             return new ResolveInfo() { GUID = guid, Slot = slot, CategoryNo = (ChaListDefine.CategoryNo)category, Property = property };
         }
+
+        public static string[] SimplifiedCoordinateTypes = new string[]
+        {
+           "School Uniform",
+           "After School",
+            "Gym",
+            "Swimsuit",
+            "Club",
+            "Casual",
+            "Nightwear",
+            "Bathroom"
+        };
+
         private class PluginCheckData
         {
             public string GUID;

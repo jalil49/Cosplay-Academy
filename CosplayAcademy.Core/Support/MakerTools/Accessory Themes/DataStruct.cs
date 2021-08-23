@@ -9,7 +9,6 @@ namespace Cosplay_Academy
 {
     public static partial class Accessory_Themes
     {
-
         public class DataStruct
         {
             public Dictionary<int, CoordinateData> Coordinate = new Dictionary<int, CoordinateData>();

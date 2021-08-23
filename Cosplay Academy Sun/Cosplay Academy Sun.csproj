@@ -59,6 +59,10 @@
       <HintPath>..\src\packages\IllusionLibs.BepInEx.Harmony.2.3.2\lib\net35\BepInEx.Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ConfigurationManager, Version=16.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\src\packages\BepInEx.ConfigurationManager.16.3.0\lib\net35\ConfigurationManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="KKSAPI, Version=1.20.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\src\packages\IllusionModdingAPI.KKSAPI.1.20.2\lib\net46\KKSAPI.dll</HintPath>
       <Private>False</Private>
