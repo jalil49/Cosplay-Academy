@@ -37,26 +37,31 @@ namespace Cosplay_Academy
             OutfitDecider.ResetDecider();
         }
 
-        protected override void OnStartH(HSceneProc hSceneProc, bool freeH)
+        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
         {
             if (Settings.EnableSetting.Value)
             {
-                foreach (var Heroine in hSceneProc.dataH.lstFemale)
+                foreach (var Heroine in hFlag.lstHeroine)
                 {
                     Heroine.chaCtrl.ChangeCoordinateTypeAndReload();
                 }
             }
             CharaEvent.inH = true;
+
+            base.OnStartH(proc, hFlag, vr);
         }
 
-        protected override void OnEndH(HSceneProc hSceneProc, bool freeH)
+        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
         {
-            if (freeH)
+            if (hFlag.isFreeH)
             {
+                //CharaEvent.FreeHHeroines.Clear();
                 CharaEvent.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
             CharaEvent.inH = false;
+
+            base.OnEndH(proc, hFlag, vr);
         }
     }
 }
