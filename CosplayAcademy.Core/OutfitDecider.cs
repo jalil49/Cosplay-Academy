@@ -89,7 +89,7 @@ namespace Cosplay_Academy
 
                         var selectedfolder = AllFolder[UnityEngine.Random.Range(0, AllFolder.Count)];
 
-                        Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
+                        //Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
 
                         bool isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
 

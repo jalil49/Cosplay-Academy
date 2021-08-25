@@ -524,17 +524,6 @@ namespace Cosplay_Academy
                 data.data.Add("Pushup_BodyData", MessagePackSerializer.Serialize(Body));
             }
             SetExtendedData("com.deathweasel.bepinex.pushup", data, ChaControl);
-
-            //data.data.Add("Overlays", MessagePackSerializer.Serialize(Final));
-            //SetExtendedData("KCOX", data, ChaControl);
-            //var KoiOverlay = typeof(KoiClothesOverlayController);
-            //if (KoiOverlay != null)
-            //{
-            //    //ExpandedOutfit.Logger.LogWarning("Coordinate Load: Hair Acc");
-            //    var temp = ChaControl.GetComponent(KoiOverlay);
-            //    object[] KoiInput = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-            //    Traverse.Create(temp).Method("OnReload", KoiInput).GetValue();
-            //}
         }
 
         private void KKABM_Repack(ChaControl ChaControl)
@@ -974,6 +963,16 @@ namespace Cosplay_Academy
 
             Accessory_Themes.DataStruct data = new Accessory_Themes.DataStruct();
 
+            var coordinate = data.Coordinate;
+
+            for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
+            {
+                if (!coordinate.ContainsKey(outfitnum))
+                {
+                    data.Createoutfit(outfitnum);
+                }
+            }
+
             var plugindata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Themes");
             if (plugindata != null)
             {
@@ -994,7 +993,7 @@ namespace Cosplay_Academy
                 }
             }
 
-            var coordinate = data.Coordinate;
+            coordinate = data.Coordinate;
 
             for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
             {
@@ -1045,6 +1044,13 @@ namespace Cosplay_Academy
             Additional_Card_Info.DataStruct data = new Additional_Card_Info.DataStruct();
 
             var CardInfo = data.CardInfo;
+            var CoordinateInfo = data.CoordinateInfo;
+
+            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            {
+                if (!CoordinateInfo.ContainsKey(i))
+                    data.Createoutfit(i);
+            }
 
             var Cha_ACI_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
             if (Cha_ACI_Data != null)
@@ -1070,7 +1076,7 @@ namespace Cosplay_Academy
                 }
             }
 
-            var CoordinateInfo = data.CoordinateInfo;
+            CoordinateInfo = data.CoordinateInfo;
 
             for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
             {
@@ -1121,6 +1127,12 @@ namespace Cosplay_Academy
         private void Accessory_Parents_Repack(ChaControl ChaControl)
         {
             var Parent_Data = new Dictionary<int, Accessory_Parents.CoordinateData>();
+
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            {
+                if (!Parent_Data.ContainsKey(outfitnum))
+                    Parent_Data[outfitnum] = new Accessory_Parents.CoordinateData();
+            }
 
             var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Parents");
             if (MyData != null)
@@ -1192,6 +1204,15 @@ namespace Cosplay_Academy
             PluginData SavedData = new PluginData() { version = 1 };
 
             Accessory_States.Data data = new Accessory_States.Data();
+            var Coordinate = data.Coordinate;
+
+            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            {
+                if (!Coordinate.ContainsKey(outfitnum))
+                {
+                    Coordinate[outfitnum] = new Accessory_States.CoordinateData();
+                }
+            }
 
             var Extended_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_States");
             if (Extended_Data != null)
@@ -1211,7 +1232,7 @@ namespace Cosplay_Academy
                         break;
                 }
             }
-            var Coordinate = data.Coordinate;
+            Coordinate = data.Coordinate;
             var underwear = new Accessory_States.CoordinateData();
 
             var State_data = ExtendedSave.GetExtendedDataById(Underwear, "Accessory_States");

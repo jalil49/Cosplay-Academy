@@ -114,7 +114,7 @@ namespace Cosplay_Academy
                 if (count == 1)
                 {
                     outfitpaths[i] = alloutfitpaths[datanum].GetFullPath();
-                    Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
+                    //Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
                 }
                 else
                 {

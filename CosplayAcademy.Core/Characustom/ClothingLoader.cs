@@ -392,13 +392,13 @@ namespace Cosplay_Academy
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
             {
 #if KKS
-var emptylist=new List<ChaFileAccessory.PartsInfo>();
+                var emptylist = new List<ChaFileAccessory.PartsInfo>();
 #endif
                 foreach (var item in HairToColor)
                 {
                     HairMatchProcess(outfitnum, item, haircolor, ref
 #if !KKS
-             NewRAW
+                        NewRAW
 #else
                         emptylist
 #endif
@@ -450,7 +450,7 @@ var emptylist=new List<ChaFileAccessory.PartsInfo>();
                     if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
 #if KKS
-var emptylist=new List<ChaFileAccessory.PartsInfo>();
+                        var emptylist = new List<ChaFileAccessory.PartsInfo>();
 #endif
                         info.ColorMatch = true;
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, ref
@@ -576,7 +576,7 @@ var emptylist=new List<ChaFileAccessory.PartsInfo>();
             TimeWatch[1].Stop();
             var temp = TimeWatch[1].ElapsedMilliseconds - Start;
             Average[1].Add(temp);
-            Settings.Logger.LogWarning($"\tGeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
+            Settings.Logger.LogWarning($"\t{(ChaFileDefine.CoordinateType)outfitnum} GeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
 #endif
         }
 

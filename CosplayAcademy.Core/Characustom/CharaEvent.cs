@@ -140,7 +140,9 @@ namespace Cosplay_Academy
                     heroine = heroine
 #endif
                 };
+#if DEBUG
                 Settings.Logger.LogWarning($"Heroine null? {heroine == null}\nInH? {inH}");
+#endif
                 ChaDefaults.Add(ThisOutfitData);
                 return;
             }
