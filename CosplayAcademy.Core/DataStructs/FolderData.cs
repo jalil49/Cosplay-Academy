@@ -41,8 +41,11 @@ namespace Cosplay_Academy
             FolderPath = path;
             char sep = Path.DirectorySeparatorChar;
             PartofSet = path.Contains(sep + "Sets" + sep);
-            FindCards();
-            FindSubFolders();
+            if (Directory.Exists(path))
+            {
+                FindCards();
+                FindSubFolders();
+            }
         }
 
         public void FindCards()

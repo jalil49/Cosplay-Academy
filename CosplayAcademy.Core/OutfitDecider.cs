@@ -48,6 +48,7 @@ namespace Cosplay_Academy
             int hstatelen = Constants.InputStrings2.Length;
             for (int sets = 0, setslen = Constants.InputStrings.Length; sets < setslen; sets++)
             {
+                FolderData overridefolder = null;
                 for (int hstate = 0; hstate < hstatelen; hstate++)
                 {
                     var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[hstate];
@@ -58,15 +59,19 @@ namespace Cosplay_Academy
                         var find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
                         if (find == null)
                         {
-                            hstatefolder.Populate(overridepath);
-                            find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
+                            if (overridefolder == null)
+                            {
+                                overridefolder = new FolderData(overridepath);
+                            }
+                            find = overridefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
                             if (find == null)
                             {
                                 outfitData[sets].Insert(hstate, new List<CardData>(), false);//assign "is" set and store data
                                 continue;
                             }
                         }
-                        outfitData[sets].Insert(hstate, find.GetAllCards(), true);//assign "is" set and store data
+                        var cards = find.GetAllCards();
+                        outfitData[sets].Insert(hstate, cards, cards.Count > 0);//assign "is" set and store data
                         continue;
                     }
 
@@ -104,6 +109,7 @@ namespace Cosplay_Academy
 
                     outfitData[sets].Insert(hstate, hstatefolder.GetAllCards(), false);
                 }
+                overridefolder = null;
             }
         }
 
