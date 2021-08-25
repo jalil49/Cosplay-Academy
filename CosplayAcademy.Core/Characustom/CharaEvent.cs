@@ -29,6 +29,9 @@ namespace Cosplay_Academy
 
         internal ChaDefault ThisOutfitData;
         private ClothingLoader ClothingLoader => ThisOutfitData.ClothingLoader;
+
+        public static List<SaveData.Heroine> FreeHHeroines { get; internal set; } = new List<SaveData.Heroine>();
+
         internal static int Firstpass = 0;
 #if !KKS
         private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();

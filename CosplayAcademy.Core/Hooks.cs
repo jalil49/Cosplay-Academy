@@ -232,11 +232,13 @@ namespace Cosplay_Academy
             }
             //change NPC's who start at club room to a koi outfit
         }
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSceneProc), nameof(HSceneProc.SetState))]
-        internal static void LoadSethook(int _status)
+        internal static void LoadSethook(HSceneProc __instance)
         {
-            Settings.MakerHstate.Value = (HStates)_status;
+            if (__instance.flags.isFreeH)
+                CharaEvent.FreeHHeroines = __instance.flags.lstHeroine;
         }
     }
 }
