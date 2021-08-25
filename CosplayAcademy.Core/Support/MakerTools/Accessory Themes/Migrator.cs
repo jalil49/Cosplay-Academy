@@ -1,6 +1,7 @@
 ﻿using ExtensibleSaveFormat;
 using MessagePack;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Cosplay_Academy
@@ -14,6 +15,10 @@ namespace Cosplay_Academy
                 if (MyData.data.TryGetValue("Theme_Names", out var ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<string>[]>((byte[])ByteData);
+                    if (temp == null || temp.All(x => x.Count == 0))
+                    {
+                        return;
+                    }
                     for (int i = 0; i < temp.Length; i++)
                     {
                         if (temp[i].Count > 0)
@@ -87,6 +92,11 @@ namespace Cosplay_Academy
                 if (MyData.data.TryGetValue("Theme_Names", out var ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<string>>((byte[])ByteData);
+                    if (temp == null || temp.Count == 0)
+                    {
+                        return data;
+                    }
+
                     if (temp.Count > 0)
                         temp.RemoveAt(0);
                     var themes = data.Themes;
@@ -128,13 +138,13 @@ namespace Cosplay_Academy
                     {
                         themes[j].Isrelative = temp[j];
                     }
-
                 }
 
                 if (MyData.data.TryGetValue("Relative_ACC_Dictionary", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, List<int[]>>>((byte[])ByteData);
                     data.Relative_ACC_Dictionary = temp;
+
                 }
 
                 return data;
