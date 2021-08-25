@@ -62,7 +62,7 @@ namespace Cosplay_Academy
                             find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
                             if (find == null)
                             {
-                                outfitData[sets].Insert(hstate, new List<CardData>(), true);//assign "is" set and store data
+                                outfitData[sets].Insert(hstate, new List<CardData>(), false);//assign "is" set and store data
                                 continue;
                             }
                         }
