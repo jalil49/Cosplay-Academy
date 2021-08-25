@@ -7,7 +7,8 @@ namespace Cosplay_Academy
 {
     public class OutfitData
     {
-        private readonly static CardData Defaultcard = new CardData("Default");
+        const string defaultstring = "Default";
+        private readonly static CardData Defaultcard = new CardData(defaultstring);
 
         private readonly bool[] Part_of_Set = new bool[Enum.GetValues(typeof(HStates)).Length];
         public readonly List<CardData>[] Outfits_Per_State = new List<CardData>[Enum.GetValues(typeof(HStates)).Length];
@@ -70,14 +71,15 @@ namespace Cosplay_Academy
                 CardData Result;
                 do
                 {
-                    applicable = Outfits_Per_State[level].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+                    applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
                     int rand = UnityEngine.Random.Range(0, applicable.Count());
                     Result = applicable.ElementAt(rand);
-                    if (Result == Defaultcard && Settings.EnableDefaults.Value || Result != Defaultcard)
+                    bool isdefault = Result.Filepath == defaultstring;
+                    if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                     {
                         break;
                     }
-                    if (Tries++ >= 3)
+                    if (Tries++ >= 10)
                     {
                         EXP--;
                         Tries = 0;
@@ -127,7 +129,8 @@ namespace Cosplay_Academy
                             }
                             else
                                 Result = Match_Outfit_Paths[EXP];
-                            if (Settings.EnableDefaults.Value && Result == Defaultcard || Result != Defaultcard)
+                            bool isdefault = Result.Filepath == defaultstring;
+                            if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                             {
                                 break;
                             }

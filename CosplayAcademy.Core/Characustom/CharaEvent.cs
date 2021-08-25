@@ -10,7 +10,6 @@ using KKAPI.Maker.UI.Sidebar;
 using MessagePack;
 using System.Collections.Generic;
 using UniRx;
-using Extensions;
 #if TRACE
 using System.Diagnostics;
 #endif
@@ -126,7 +125,10 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            ThisOutfitData = ChaDefaults.Find(x => x.Parameter.Compare(ChaControl.fileParam));
+
+            var heroine = ChaControl.GetHeroine() ?? FreeHHeroines.Find(x => x.chaCtrl == ChaControl);
+
+            ThisOutfitData = ChaDefaults.Find(x => x.heroine == heroine);
             if (ThisOutfitData == null)
             {
                 ThisOutfitData = new ChaDefault(ChaControl)
@@ -135,9 +137,10 @@ namespace Cosplay_Academy
                     Chafile = ChaFileControl,
                     ChaControl = ChaControl,
 #if KK
-                    heroine = ChaControl.GetHeroine()
+                    heroine = heroine
 #endif
                 };
+                Settings.Logger.LogWarning($"Heroine null? {heroine == null}\nInH? {inH}");
                 ChaDefaults.Add(ThisOutfitData);
                 return;
             }
