@@ -6,6 +6,7 @@ using KKAPI.Maker;
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 #if TRACE
 using System.Diagnostics;
@@ -133,7 +134,7 @@ namespace Cosplay_Academy
                 Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms for  Constants.PluginCheck();");
 #endif
 
-                if (!Constants.PluginResults["Additional_Card_Info"]) //provide access to info even if plugin-doesn't exist
+                if (!Constants.PluginResults["Additional_Card_Info"] && !CharacterApi.RegisteredHandlers.Any(x => x.ExtendedDataId == "Additional_Card_Info")) //provide access to info even if plugin-doesn't exist
                 {
                     CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
                 }
