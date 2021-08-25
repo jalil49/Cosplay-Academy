@@ -11,7 +11,7 @@ namespace Cosplay_Academy
     public static class DataStruct
     {
 #if TRACE
-        private static Stopwatch Stopwatch = new Stopwatch();
+        private static readonly Stopwatch Stopwatch = new Stopwatch();
 #endif
         private static string SavePath;
 
