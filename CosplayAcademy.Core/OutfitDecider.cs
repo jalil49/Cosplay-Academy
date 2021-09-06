@@ -111,22 +111,19 @@ namespace Cosplay_Academy
         public static void Decision(string name, ChaDefault cha)
         {
             ThisOutfitData = cha;
-#if !KKS
             var person = ThisOutfitData.heroine;
-
             if (person != null)
             {
+#if KK
                 OutfitData.Anger = person.isAnger;
+#endif
                 HExperience = (int)person.HExperience;
             }
             else
             {
-#endif
-            OutfitData.Anger = false;
-            HExperience = (int)Settings.MakerHstate.Value;
-#if !KKS
+                OutfitData.Anger = false;
+                HExperience = (int)Settings.MakerHstate.Value;
             }
-#endif
             RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
             for (var i = 0; i < Constants.InputStrings.Length; i++)
             {
@@ -134,12 +131,10 @@ namespace Cosplay_Academy
             }
 
             SpecialProcess();
-#if !KKS
             if (person != null)
             {
                 Settings.Logger.LogDebug(name + " is processed.");
             }
-#endif
         }
 
         private static void Setsfunction(FolderData folderData)

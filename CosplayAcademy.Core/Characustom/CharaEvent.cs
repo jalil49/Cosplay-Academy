@@ -143,10 +143,12 @@ namespace Cosplay_Academy
         public void Process(GameMode currentGameMode)
         {
             ThisOutfitDataProcess();
+#if KK
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
+#endif
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.firstpass = true;
@@ -217,8 +219,6 @@ namespace Cosplay_Academy
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
                 #endregion
 
-                var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
-
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
@@ -234,8 +234,7 @@ namespace Cosplay_Academy
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
                     }
                     var acclist = new List<ChaFileAccessory.PartsInfo>();
-                    var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
-                    Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
+                    var Intermediate = ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts.ToList();
 
                     var ME_ACC_Storage = ThisOutfitData.Original_Accessory_Data[outfitnum];
 
