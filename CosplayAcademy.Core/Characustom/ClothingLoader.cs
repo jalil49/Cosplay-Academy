@@ -251,7 +251,6 @@ namespace Cosplay_Academy
             var Import_ME_Data = new MaterialEditorProperties();
             #endregion
             var parts = ThisCoordinate.accessory.parts.ToList();
-            Settings.Logger.LogError($"{outfitnum} Parts count is {parts.Count}");
 
             if (Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
             {
