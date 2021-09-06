@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Cosplay_Academy
+﻿namespace Cosplay_Academy
 {
     /// <summary>
     /// Class that specifies how a setting should be displayed inside the ConfigurationManager settings window.

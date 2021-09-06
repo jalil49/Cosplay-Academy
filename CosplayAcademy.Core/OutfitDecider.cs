@@ -24,7 +24,7 @@ namespace Cosplay_Academy
 
         public static void ResetDecider()
         {
-            foreach (OutfitData data in outfitData)
+            foreach (var data in outfitData)
             {
                 data.Clear();
             }
@@ -45,11 +45,11 @@ namespace Cosplay_Academy
 
         public static void Get_Outfits()
         {
-            int hstatelen = Constants.InputStrings2.Length;
+            var hstatelen = Constants.InputStrings2.Length;
             for (int sets = 0, setslen = Constants.InputStrings.Length; sets < setslen; sets++)
             {
                 FolderData overridefolder = null;
-                for (int hstate = 0; hstate < hstatelen; hstate++)
+                for (var hstate = 0; hstate < hstatelen; hstate++)
                 {
                     var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[hstate];
 
@@ -91,7 +91,7 @@ namespace Cosplay_Academy
 
                         //Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
 
-                        bool isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
+                        var isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
 
                         outfitData[sets].Insert(hstate, selectedfolder.GetAllCards(), isset);
 
@@ -112,7 +112,7 @@ namespace Cosplay_Academy
         {
             ThisOutfitData = cha;
 #if !KKS
-            SaveData.Heroine person = ThisOutfitData.heroine;
+            var person = ThisOutfitData.heroine;
 
             if (person != null)
             {
@@ -122,13 +122,13 @@ namespace Cosplay_Academy
             else
             {
 #endif
-                OutfitData.Anger = false;
-                HExperience = (int)Settings.MakerHstate.Value;
+            OutfitData.Anger = false;
+            HExperience = (int)Settings.MakerHstate.Value;
 #if !KKS
             }
 #endif
             RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
-            for (int i = 0; i < Constants.InputStrings.Length; i++)
+            for (var i = 0; i < Constants.InputStrings.Length; i++)
             {
                 Generalized_Assignment(Settings.MatchGeneric[i].Value, i, i);
             }
@@ -145,10 +145,10 @@ namespace Cosplay_Academy
         private static void Setsfunction(FolderData folderData)
         {
             var sep = Path.DirectorySeparatorChar;
-            string split = sep + folderData.FolderPath.Split(new string[] { sep + "Sets" + sep }, System.StringSplitOptions.RemoveEmptyEntries).Last();
+            var split = sep + folderData.FolderPath.Split(new string[] { sep + "Sets" + sep }, System.StringSplitOptions.RemoveEmptyEntries).Last();
             for (int sets = 0, n = outfitData.Length; sets < n; sets++)
             {
-                for (int hexp = 0; hexp < 4; hexp++)
+                for (var hexp = 0; hexp < 4; hexp++)
                 {
                     if (Settings.FullSet.Value && outfitData[sets].IsSet(hexp) || Settings.ListOverrideBool[sets].Value)
                     {
@@ -159,7 +159,7 @@ namespace Cosplay_Academy
                     {
                         continue;
                     }
-                    List<CardData> temp = find.GetAllCards();
+                    var temp = find.GetAllCards();
                     outfitData[sets].Insert(hexp, find.GetAllCards(), true);
                 }
             }

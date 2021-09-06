@@ -1,5 +1,4 @@
-﻿using Cosplay_Academy.ME;
-using Cosplay_Academy.Support;
+﻿using Cosplay_Academy.Support;
 using ExtensibleSaveFormat;
 using Extensions;
 using HarmonyLib;
@@ -58,7 +57,7 @@ namespace Cosplay_Academy
             var Start = TimeWatch[2].ElapsedMilliseconds;
             TimeWatch[2].Start();
 #endif
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
 
@@ -260,7 +259,7 @@ namespace Cosplay_Academy
             if (ChafileData?.data != null && ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
             {
                 var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
-                for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+                for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
                 {
                     if (!ValidOutfits[i] || !original.ContainsKey(i))
                     {
@@ -282,14 +281,14 @@ namespace Cosplay_Academy
             var SaveData = new PluginData();
             ME_Save.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
 
-            List<int> IDsToPurge = new List<int>();
-            foreach (int texID in ThisOutfitData.ME.TextureDictionary.Keys)
+            var IDsToPurge = new List<int>();
+            foreach (var texID in ThisOutfitData.ME.TextureDictionary.Keys)
                 if (materialTextureProperties.All(x => x.TexID != texID))
                     IDsToPurge.Add(texID);
 
             for (var i = 0; i < IDsToPurge.Count; i++)
             {
-                int texID = IDsToPurge[i];
+                var texID = IDsToPurge[i];
                 ThisOutfitData.ME.TextureDictionary.Remove(texID);
             }
 
@@ -345,7 +344,7 @@ namespace Cosplay_Academy
                 underweardict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(underbyteArr);
             }
 
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 var underwearproccessed = UnderwearProcessed[outfitnum];
                 if (!Clothdict.ContainsKey((CoordinateType)outfitnum))
@@ -367,9 +366,9 @@ namespace Cosplay_Academy
                     }
                 }
 
-                if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear != null && Underwear.GetLastErrorCode() == 0)
+                if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
                 {
-                    for (int i = 2; i < 6; i++)
+                    for (var i = 2; i < 7; i++)
                     {
                         if (!underwearproccessed[i])
                         {
@@ -386,20 +385,20 @@ namespace Cosplay_Academy
                     }
                 }
 
-                for (int i = 0; i < PersonalClothingBools.Length; i++)
+                for (var i = 0; i < PersonalClothingBools.Length; i++)
                 {
                     if (!PersonalClothingBools[i])
                     {
                         continue;
                     }
-                    if (originalclothdict[(CoordinateType)outfitnum].TryGetValue(Constants.KCOX_Cat[i], out var outfitpart))
+
+                    if (originalclothdict[(CoordinateType)outfitnum].TryGetValue(Constants.KCOX_Cat[i], out var outfitpart) && outfitpart != null)
                     {
                         Clothdict[(CoordinateType)outfitnum][Constants.KCOX_Cat[i]] = outfitpart;
+                        continue;
                     }
-                    else
-                    {
-                        Clothdict[(CoordinateType)outfitnum].Remove(Constants.KCOX_Cat[i]);
-                    }
+
+                    Clothdict[(CoordinateType)outfitnum].Remove(Constants.KCOX_Cat[i]);
                 }
 
             }
@@ -410,15 +409,15 @@ namespace Cosplay_Academy
 
         private void ClothingUnlocker_RePack(ChaControl ChaControl)
         {
-            Dictionary<int, bool> FailureBools = new Dictionary<int, bool>();
+            var FailureBools = new Dictionary<int, bool>();
             var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.clothingunlocker");
             if (Original != null)
                 if (Original.data.TryGetValue("ClothingUnlocked", out var loadedClothingUnlocked) && loadedClothingUnlocked != null)
                     FailureBools = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])loadedClothingUnlocked);
             PluginData SavedData;
-            Dictionary<int, bool> Final = new Dictionary<int, bool>();
+            var Final = new Dictionary<int, bool>();
             bool result;
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 result = false;
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
@@ -477,7 +476,7 @@ namespace Cosplay_Academy
             }
 
             PluginData SavedData;
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!ValidOutfits[outfitnum])
                 {
@@ -529,7 +528,7 @@ namespace Cosplay_Academy
         private void KKABM_Repack(ChaControl ChaControl)
         {
             PluginData SavedData;
-            List<ABMX.BoneModifier> Modifiers = new List<ABMX.BoneModifier>();
+            var Modifiers = new List<ABMX.BoneModifier>();
             SavedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KKABMPlugin.ABMData");
             if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes != null)
             {
@@ -566,7 +565,7 @@ namespace Cosplay_Academy
                 //}
                 //Modifiers.AddRange(Modifiers.Where(x => !x.IsCoordinateSpecific()));
             }
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");
                 if (SavedData != null && SavedData.data.TryGetValue("boneData", out bytes) && bytes != null)
@@ -608,7 +607,7 @@ namespace Cosplay_Academy
 
         private void DynamicBone_Repack(ChaControl ChaControl)
         {
-            List<DynamicBonePlugin.DynamicBoneData> Modifiers = new List<DynamicBonePlugin
+            var Modifiers = new List<DynamicBonePlugin
                 .DynamicBoneData>();
 
             var original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.dynamicboneeditor");
@@ -619,7 +618,7 @@ namespace Cosplay_Academy
             }
 
             PluginData SavedData;
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 if (ValidOutfits[i])
                 {
@@ -654,8 +653,8 @@ namespace Cosplay_Academy
 
         private void AccessoryStateSync_Repack(ChaControl ChaControl)
         {
-            List<AccStateSync.TriggerProperty> TriggerPropertyList = new List<AccStateSync.TriggerProperty>();
-            List<AccStateSync.TriggerGroup> TriggerGroupList = new List<AccStateSync.TriggerGroup>();
+            var TriggerPropertyList = new List<AccStateSync.TriggerProperty>();
+            var TriggerGroupList = new List<AccStateSync.TriggerGroup>();
 
             var ExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "madevil.kk.ass");
             if (ExtendedData != null)
@@ -668,15 +667,15 @@ namespace Cosplay_Academy
                 }
                 else
                 {
-                    if (ExtendedData.data.TryGetValue("TriggerPropertyList", out object _loadedTriggerProperty) && _loadedTriggerProperty != null)
+                    if (ExtendedData.data.TryGetValue("TriggerPropertyList", out var _loadedTriggerProperty) && _loadedTriggerProperty != null)
                     {
-                        List<AccStateSync.TriggerProperty> _tempTriggerProperty = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerProperty>>((byte[])_loadedTriggerProperty);
+                        var _tempTriggerProperty = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerProperty>>((byte[])_loadedTriggerProperty);
                         if (_tempTriggerProperty?.Count > 0)
                             TriggerPropertyList.AddRange(_tempTriggerProperty);
 
-                        if (ExtendedData.data.TryGetValue("TriggerGroupList", out object _loadedTriggerGroup) && _loadedTriggerGroup != null)
+                        if (ExtendedData.data.TryGetValue("TriggerGroupList", out var _loadedTriggerGroup) && _loadedTriggerGroup != null)
                         {
-                            List<AccStateSync.TriggerGroup> _tempTriggerGroup = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerGroup>>((byte[])_loadedTriggerGroup);
+                            var _tempTriggerGroup = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerGroup>>((byte[])_loadedTriggerGroup);
                             if (_tempTriggerGroup?.Count > 0)
                             {
                                 foreach (var _group in _tempTriggerGroup)
@@ -694,29 +693,29 @@ namespace Cosplay_Academy
                 if (TriggerGroupList == null) TriggerGroupList = new List<AccStateSync.TriggerGroup>();
             }
 
-            List<AccStateSync.TriggerProperty> UnderwearTrigger = new List<AccStateSync.TriggerProperty>();
-            List<AccStateSync.TriggerGroup> UnderwearGroups = new List<AccStateSync.TriggerGroup>();
+            var UnderwearTrigger = new List<AccStateSync.TriggerProperty>();
+            var UnderwearGroups = new List<AccStateSync.TriggerGroup>();
 
             ExtendedData = ExtendedSave.GetExtendedDataById(Underwear, "madevil.kk.ass");
             if (ExtendedData != null)
             {
                 if (ExtendedData.version == 6)
                 {
-                    if (ExtendedData.data.TryGetValue("TriggerPropertyList", out object _loadedTriggerProperty) && _loadedTriggerProperty != null)
+                    if (ExtendedData.data.TryGetValue("TriggerPropertyList", out var _loadedTriggerProperty) && _loadedTriggerProperty != null)
                     {
-                        List<AccStateSync.TriggerProperty> _tempTriggerProperty = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerProperty>>((byte[])_loadedTriggerProperty);
+                        var _tempTriggerProperty = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerProperty>>((byte[])_loadedTriggerProperty);
                         if (_tempTriggerProperty?.Count > 0)
                         {
                             _tempTriggerProperty.ForEach(x => x.Coordinate = -1);
                             TriggerPropertyList.AddRange(_tempTriggerProperty);
                         }
 
-                        if (ExtendedData.data.TryGetValue("TriggerGroupList", out object _loadedTriggerGroup) && _loadedTriggerGroup != null)
+                        if (ExtendedData.data.TryGetValue("TriggerGroupList", out var _loadedTriggerGroup) && _loadedTriggerGroup != null)
                         {
-                            List<AccStateSync.TriggerGroup> _tempTriggerGroup = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerGroup>>((byte[])_loadedTriggerGroup);
+                            var _tempTriggerGroup = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerGroup>>((byte[])_loadedTriggerGroup);
                             if (_tempTriggerGroup?.Count > 0)
                             {
-                                foreach (AccStateSync.TriggerGroup _group in _tempTriggerGroup)
+                                foreach (var _group in _tempTriggerGroup)
                                 {
                                     _group.Coordinate = -1;
 
@@ -757,7 +756,7 @@ namespace Cosplay_Academy
                     {
                         if (ExtendedData.version == 6)
                         {
-                            if (ExtendedData.data.TryGetValue("TriggerPropertyList", out object _loadedTriggerProperty) && _loadedTriggerProperty != null)
+                            if (ExtendedData.data.TryGetValue("TriggerPropertyList", out var _loadedTriggerProperty) && _loadedTriggerProperty != null)
                             {
                                 tempTriggerPropertyList = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerProperty>>((byte[])_loadedTriggerProperty);
                                 if (tempTriggerPropertyList?.Count > 0)
@@ -766,12 +765,12 @@ namespace Cosplay_Academy
                                     TriggerPropertyList.AddRange(tempTriggerPropertyList);
                                 }
 
-                                if (ExtendedData.data.TryGetValue("TriggerGroupList", out object _loadedTriggerGroup) && _loadedTriggerGroup != null)
+                                if (ExtendedData.data.TryGetValue("TriggerGroupList", out var _loadedTriggerGroup) && _loadedTriggerGroup != null)
                                 {
                                     tempTriggerGroupList = MessagePackSerializer.Deserialize<List<AccStateSync.TriggerGroup>>((byte[])_loadedTriggerGroup);
                                     if (tempTriggerGroupList?.Count > 0)
                                     {
-                                        foreach (AccStateSync.TriggerGroup _group in tempTriggerGroupList)
+                                        foreach (var _group in tempTriggerGroupList)
                                         {
                                             _group.Coordinate = outfitnum;
 
@@ -800,11 +799,11 @@ namespace Cosplay_Academy
 
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
-                    int postion = 0;
-                    int partnum = -1;
-                    int Max = 9;
-                    int Custom_offset = 0;
-                    ChaFileClothes.PartsInfo[] clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
+                    var postion = 0;
+                    var partnum = -1;
+                    var Max = 9;
+                    var Custom_offset = 0;
+                    var clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
                     var SubUnderwearGroups = new List<AccStateSync.TriggerGroup>(UnderwearGroups);
                     SubUnderwearGroups.ForEach(x => x.Coordinate = outfitnum);
                     var SubUnderwearTrigger = new List<AccStateSync.TriggerProperty>(UnderwearTrigger);
@@ -852,8 +851,8 @@ namespace Cosplay_Academy
                         var states = new List<bool> { true, false, false, false };
                         var location = UnderwearAccessoriesLocations[outfitnum][postion++];
                         var inclusionarray = new bool[Constants.Inclusion.Length];
-                        int binder = -1;
-                        bool found = false;
+                        var binder = -1;
+                        var found = false;
 
                         if (UnderwearTrigger.Any(x => x.Slot == partnum))
                         {
@@ -881,7 +880,7 @@ namespace Cosplay_Academy
                             }
                             continue;
                         }
-                        for (int i = 0; i < inclusionarray.Length; i++)
+                        for (var i = 0; i < inclusionarray.Length; i++)
                         {
                             if (!found)
                             {
@@ -940,7 +939,7 @@ namespace Cosplay_Academy
                             continue;
                         }
 
-                        for (int i = 0; i < states.Count; i++)
+                        for (var i = 0; i < states.Count; i++)
                         {
                             SubUnderwearTrigger.Add(new AccStateSync.TriggerProperty(outfitnum, location, binder, i, states[i], 0));
                         }
@@ -949,7 +948,7 @@ namespace Cosplay_Academy
                     TriggerGroupList.AddRange(SubUnderwearGroups);
                 }
             }
-            PluginData SavedData = new PluginData() { version = 6 };
+            var SavedData = new PluginData() { version = 6 };
 
             SavedData.data.Add("TriggerPropertyList", MessagePackSerializer.Serialize(TriggerPropertyList));
             SavedData.data.Add("TriggerGroupList", MessagePackSerializer.Serialize(TriggerGroupList));
@@ -959,9 +958,9 @@ namespace Cosplay_Academy
 
         private void Accessory_Themes_Repack(ChaControl ChaControl)
         {
-            PluginData SavedData = new PluginData() { version = 1 };
+            var SavedData = new PluginData() { version = 1 };
 
-            Accessory_Themes.DataStruct data = new Accessory_Themes.DataStruct();
+            var data = new Accessory_Themes.DataStruct();
 
             var coordinate = data.Coordinate;
 
@@ -1032,7 +1031,7 @@ namespace Cosplay_Academy
                 item.Value.CleanUp();
             }
 
-            bool nulldata = coordinate.All(x => x.Value.Themes.Count == 0);
+            var nulldata = coordinate.All(x => x.Value.Themes.Count == 0);
 
             SavedData.data.Add("CoordinateData", MessagePackSerializer.Serialize(data.Coordinate));
 
@@ -1041,12 +1040,12 @@ namespace Cosplay_Academy
 
         private void Additional_Card_Info_Repack(ChaControl ChaControl)
         {
-            Additional_Card_Info.DataStruct data = new Additional_Card_Info.DataStruct();
+            var data = new Additional_Card_Info.DataStruct();
 
             var CardInfo = data.CardInfo;
             var CoordinateInfo = data.CoordinateInfo;
 
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 if (!CoordinateInfo.ContainsKey(i))
                     data.Createoutfit(i);
@@ -1116,7 +1115,7 @@ namespace Cosplay_Academy
                 coordinforef.HairAcc.AddRange(ThisOutfitData.HairKeepReturn[outfitnum]);
             }
 
-            PluginData SavedData = new PluginData() { version = 1 };
+            var SavedData = new PluginData() { version = 1 };
 
             SavedData.data.Add("CardInfo", MessagePackSerializer.Serialize(CardInfo));
             SavedData.data.Add("CoordinateInfo", MessagePackSerializer.Serialize(CoordinateInfo));
@@ -1128,7 +1127,7 @@ namespace Cosplay_Academy
         {
             var Parent_Data = new Dictionary<int, Accessory_Parents.CoordinateData>();
 
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!Parent_Data.ContainsKey(outfitnum))
                     Parent_Data[outfitnum] = new Accessory_Parents.CoordinateData();
@@ -1154,7 +1153,7 @@ namespace Cosplay_Academy
                 }
             }
 
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!Parent_Data.ContainsKey(outfitnum))
                     Parent_Data[outfitnum] = new Accessory_Parents.CoordinateData();
@@ -1186,13 +1185,13 @@ namespace Cosplay_Academy
                 }
             }
 
-            PluginData SavedData = new PluginData() { version = 1 };
+            var SavedData = new PluginData() { version = 1 };
 
             foreach (var item in Parent_Data)
             {
                 item.Value.CleanUp();
             }
-            bool nulldata = Parent_Data.All(x => x.Value.Parent_Groups.Count == 0);
+            var nulldata = Parent_Data.All(x => x.Value.Parent_Groups.Count == 0);
 
             SavedData.data.Add("Coordinate_Data", MessagePackSerializer.Serialize(Parent_Data));
 
@@ -1201,12 +1200,12 @@ namespace Cosplay_Academy
 
         private void Accessory_States_Repack(ChaControl ChaControl)
         {
-            PluginData SavedData = new PluginData() { version = 1 };
+            var SavedData = new PluginData() { version = 1 };
 
-            Accessory_States.Data data = new Accessory_States.Data();
+            var data = new Accessory_States.Data();
             var Coordinate = data.Coordinate;
 
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!Coordinate.ContainsKey(outfitnum))
                 {
@@ -1254,7 +1253,7 @@ namespace Cosplay_Academy
                 }
             }
 
-            for (int outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
+            for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
                 if (!Coordinate.ContainsKey(outfitnum))
                 {
@@ -1290,10 +1289,10 @@ namespace Cosplay_Academy
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     var clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
-                    int postion = 0;
-                    int local = -1;
-                    int new_key = 10;
-                    int InclusionLength = Constants.Inclusion.Length;
+                    var postion = 0;
+                    var local = -1;
+                    var new_key = 10;
+                    var InclusionLength = Constants.Inclusion.Length;
                     var coordinateinfo = data.Coordinate[outfitnum];
                     var slotinfodict = coordinateinfo.Slotinfo;
                     var namedict2 = coordinateinfo.Names;
@@ -1326,12 +1325,12 @@ namespace Cosplay_Academy
                         //6 pantyhose
                         //7 socks
                         //8 shoes
-                        int binder = -1;
-                        int[] states = new int[] { 0, 3 };
-                        bool ClothFound = false;
+                        var binder = -1;
+                        var states = new int[] { 0, 3 };
+                        var ClothFound = false;
                         var location = UnderwearAccessoriesLocations[outfitnum][postion++];
                         var inclusionarray = new bool[InclusionLength];
-                        bool found = false;
+                        var found = false;
 
                         if (underwear.Slotinfo.TryGetValue(local, out var localslotinfo))
                         {
@@ -1390,7 +1389,7 @@ namespace Cosplay_Academy
                             continue;
                         }
 
-                        for (int i = 0; i < inclusionarray.Length; i++)
+                        for (var i = 0; i < inclusionarray.Length; i++)
                         {
                             if (!found)
                             {
@@ -1468,7 +1467,7 @@ namespace Cosplay_Academy
             {
                 item.Value.CleanUp();
             }
-            bool nulldata = Coordinate.All(x => x.Value.Slotinfo.Count == 0);
+            var nulldata = Coordinate.All(x => x.Value.Slotinfo.Count == 0);
 
 
             SavedData.data.Add("CoordinateData", MessagePackSerializer.Serialize(Coordinate));
@@ -1478,11 +1477,11 @@ namespace Cosplay_Academy
 
         private void ControllerReload_Loop(string Controller_Name, ChaControl ChaControl)
         {
-            Type Controller = Type.GetType(Controller_Name, false);
+            var Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
             {
                 var temp = ChaControl.GetComponent(Controller);
-                object[] Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                var Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
                 Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
             }
             else
@@ -1493,11 +1492,11 @@ namespace Cosplay_Academy
 
         private void ControllerCoordReload_Loop(string Controller_Name, ChaControl ChaControl, ChaFileCoordinate coordinate)
         {
-            Type Controller = Type.GetType(Controller_Name, false);
+            var Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
             {
                 var temp = ChaControl.GetComponent(Controller);
-                object[] Input_Parameter = new object[2] { coordinate, false };
+                var Input_Parameter = new object[2] { coordinate, false };
                 Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
             }
             else

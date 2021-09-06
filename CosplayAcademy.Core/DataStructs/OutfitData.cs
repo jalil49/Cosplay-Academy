@@ -17,7 +17,7 @@ namespace Cosplay_Academy
 
         public OutfitData()
         {
-            for (int i = 0; i < Match_Outfit_Paths.Length; i++)
+            for (var i = 0; i < Match_Outfit_Paths.Length; i++)
             {
                 Match_Outfit_Paths[i] = Defaultcard;
                 Part_of_Set[i] = false;
@@ -27,7 +27,7 @@ namespace Cosplay_Academy
 
         public void Clear()
         {
-            for (int i = 0; i < Match_Outfit_Paths.Length; i++)
+            for (var i = 0; i < Match_Outfit_Paths.Length; i++)
             {
                 Outfits_Per_State[i].Clear();
                 Part_of_Set[i] = false;
@@ -66,15 +66,15 @@ namespace Cosplay_Academy
             IEnumerable<CardData> applicable;
             if (!Anger)
             {
-                int Tries = 0;
-                int EXP = level;
+                var Tries = 0;
+                var EXP = level;
                 CardData Result;
                 do
                 {
                     applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                    int rand = UnityEngine.Random.Range(0, applicable.Count());
+                    var rand = UnityEngine.Random.Range(0, applicable.Count());
                     Result = applicable.ElementAt(rand);
-                    bool isdefault = Result.Filepath == defaultstring;
+                    var isdefault = Result.Filepath == defaultstring;
                     if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                     {
                         break;
@@ -97,14 +97,14 @@ namespace Cosplay_Academy
 
         public CardData RandomSet(int level, bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
         {
-            int Weight = 0;
+            var Weight = 0;
             if (Anger)
             {
                 level = 0;
             }
 
             level++;
-            for (int i = 0; i < level; i++)
+            for (var i = 0; i < level; i++)
             {
                 Weight += Settings.HStateWeights[i].Value;
             }
@@ -112,24 +112,24 @@ namespace Cosplay_Academy
             if (Weight > 0)
             {
                 var RandResult = UnityEngine.Random.Range(0, Weight);
-                for (int i = 0; i < level; i++)
+                for (var i = 0; i < level; i++)
                 {
                     if (RandResult < Settings.HStateWeights[i].Value)
                     {
-                        int EXP = i;
-                        int Tries = 0;
-                        CardData Result = Defaultcard;
+                        var EXP = i;
+                        var Tries = 0;
+                        var Result = Defaultcard;
                         do
                         {
                             if (Part_of_Set[i] || !Match)
                             {
                                 applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                                int rand = UnityEngine.Random.Range(0, applicable.Count());
+                                var rand = UnityEngine.Random.Range(0, applicable.Count());
                                 Result = applicable.ElementAt(rand);
                             }
                             else
                                 Result = Match_Outfit_Paths[EXP];
-                            bool isdefault = Result.Filepath == defaultstring;
+                            var isdefault = Result.Filepath == defaultstring;
                             if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                             {
                                 break;
@@ -150,9 +150,9 @@ namespace Cosplay_Academy
                 }
             }
 
-            List<CardData> temp = new List<CardData>();
+            var temp = new List<CardData>();
 
-            for (int i = 0; i < level; i++)
+            for (var i = 0; i < level; i++)
             {
                 if (Part_of_Set[i] || !Match)
                     temp.AddRange(Outfits_Per_State[i].Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
@@ -160,7 +160,7 @@ namespace Cosplay_Academy
                     temp.Add(Match_Outfit_Paths[i]);
             }
             CardData LastResult;
-            int tries = 0;
+            var tries = 0;
             do
             {
                 LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
@@ -175,7 +175,7 @@ namespace Cosplay_Academy
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-            for (int i = 0; i < Part_of_Set.Length; i++)
+            for (var i = 0; i < Part_of_Set.Length; i++)
             {
                 Match_Outfit_Paths[i] = Random(i, false, true);
             }

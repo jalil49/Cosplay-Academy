@@ -55,7 +55,7 @@ namespace Cosplay_Academy.ME
         //Just need empty Lists
         public ME_List(int size)
         {
-            for (int i = 0; i < size; i++)
+            for (var i = 0; i < size; i++)
             {
                 Coordinates[i] = new ME_Coordinate();
             }
@@ -71,14 +71,14 @@ namespace Cosplay_Academy.ME
         //Full Chafile Accessory Load
         public ME_List(PluginData pluginData, ChaDefault ThisOutfitData)
         {
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 Coordinates[i] = new ME_Coordinate();
             }
 
             if (pluginData?.data != null)
             {
-                Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
+                var importDictionaryList = new Dictionary<int, int>();
 
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
@@ -314,7 +314,7 @@ namespace Cosplay_Academy.ME
             coord.SoftClear();
             if (pluginData?.data != null)
             {
-                Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
+                var importDictionaryList = new Dictionary<int, int>();
 
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
@@ -529,7 +529,7 @@ namespace Cosplay_Academy.ME
                                     continue;
                             }
 
-                            MaterialTextureProperty newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
+                            var newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
                             editorProperties.MaterialTextureProperty.Add(newTextureProperty);
                         }
                     }
@@ -602,7 +602,7 @@ namespace Cosplay_Academy.ME
         {
             if (pluginData?.data != null)
             {
-                Dictionary<int, int> importDictionaryList = new Dictionary<int, int>();
+                var importDictionaryList = new Dictionary<int, int>();
 
                 if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
                 {
@@ -823,7 +823,7 @@ namespace Cosplay_Academy.ME
         internal void SoftClear(bool[] clothingkeep)
         {
             AccessoryProperties.Clear();
-            for (int i = 0; i < clothingkeep.Length; i++)
+            for (var i = 0; i < clothingkeep.Length; i++)
             {
                 if (!clothingkeep[i])
                     ClothingProperties.Remove(i);
@@ -975,7 +975,6 @@ namespace Cosplay_Academy.ME
                     slot.CoordinateIndex = outfitnum;
                 }
             }
-
         }
 
         internal void AllProperties(out List<RendererProperty> rendererProperties, out List<MaterialFloatProperty> materialFloatProperties, out List<MaterialColorProperty> materialColorProperties, out List<MaterialShader> materialShaders, out List<MaterialTextureProperty> materialTextureProperties)
@@ -1027,7 +1026,7 @@ namespace Cosplay_Academy.ME
         public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
         public int SetAndGetTextureID(byte[] textureBytes)
         {
-            int highestID = 0;
+            var highestID = 0;
             foreach (var tex in TextureDictionary)
                 if (tex.Value.Data.SequenceEqual(textureBytes))
                     return tex.Key;

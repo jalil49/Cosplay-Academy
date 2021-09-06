@@ -14,6 +14,10 @@ using System.Diagnostics;
 
 namespace Cosplay_Academy
 {
+    [BepInPlugin(GUID, "Cosplay Academy", Version)]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
+    [BepInDependency("com.joan6694.illusionplugins.moreaccessories")]
+    [BepInDependency(Sideloader.Sideloader.GUID)]
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
@@ -67,7 +71,7 @@ namespace Cosplay_Academy
             Instance = this;
             Logger = base.Logger;
 
-            char sep = Path.DirectorySeparatorChar;
+            var sep = Path.DirectorySeparatorChar;
 
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
             var AdvancedConfig = new ConfigurationManagerAttributes { IsAdvanced = true };
@@ -96,7 +100,7 @@ namespace Cosplay_Academy
 
             //prob
             H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
-            for (int i = 0; i < HStateWeights.Length; i++)
+            for (var i = 0; i < HStateWeights.Length; i++)
             {
                 HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { ShowRangeAsPercent = false, IsAdvanced = true, Order = HStateWeights.Length - i }));
             }
@@ -114,7 +118,7 @@ namespace Cosplay_Academy
             UpdateFolders = Config.Bind("Coordinate Location", "Folder Options", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(FolderUpdateGUI) }));
 
             //Overrides
-            for (int i = 0; i < ListOverride.Length; i++)
+            for (var i = 0; i < ListOverride.Length; i++)
             {
                 ListOverridecreate(i);
             }
@@ -161,7 +165,7 @@ namespace Cosplay_Academy
         private void ListOverridecreate(int index)
         {
             var _manager = GetComponent<ConfigurationManager.ConfigurationManager>();
-            char sep = Path.DirectorySeparatorChar;
+            var sep = Path.DirectorySeparatorChar;
             ListOverrideBool[index] = Config.Bind("Outfit Folder Override", Constants.InputStrings[index].Trim(sep).Replace(sep, ' ') + " Enable override", false, new ConfigDescription("Enables the above folder override", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = (ListOverride.Length - index) * 2, HideDefaultButton = true }));
             ListOverride[index] = Config.Bind("Outfit Folder Override", Constants.InputStrings[index].Trim(sep).Replace(sep, ' '), CoordinatePath.Value + Constants.InputStrings[index], new ConfigDescription("Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = (ListOverride.Length - index) * 2 - 1, Browsable = ListOverrideBool[index].Value }));
             var configattribute = (ConfigurationManagerAttributes)ListOverride[index].Description.Tags[0];

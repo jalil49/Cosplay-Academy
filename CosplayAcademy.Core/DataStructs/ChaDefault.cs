@@ -24,14 +24,14 @@ namespace Cosplay_Academy
         internal ChaFileParameter Parameter;
 
         internal int Hvalue = 0;
-#if KK
+
         internal static int LastClub = -1;
         internal SaveData.Heroine heroine;
         internal string KoiOutfitpath;
         internal string ClubOutfitPath;
         internal bool ChangeKoiToClub;
         internal bool ChangeClubToKoi;
-#endif
+
         internal bool Changestate = false;
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
@@ -105,7 +105,7 @@ namespace Cosplay_Academy
         public void FillOutfitpaths()
         {
             var datanum = 0;
-            for (int i = 0; i < Outfit_Size; i++)
+            for (var i = 0; i < Outfit_Size; i++)
             {
                 if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
                 {
@@ -123,8 +123,8 @@ namespace Cosplay_Academy
                 datanum += count;
             }
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
-            bool simplenull = simpledirectory.IsNullOrEmpty();
-            bool advanced = ClothingLoader.CardInfo.AdvancedDirectory;
+            var simplenull = simpledirectory.IsNullOrEmpty();
+            var advanced = ClothingLoader.CardInfo.AdvancedDirectory;
             if (advanced || !simplenull)
             {
                 var sep = Path.DirectorySeparatorChar;
@@ -145,7 +145,7 @@ namespace Cosplay_Academy
                     }
                 }
                 datanum = 0;
-                for (int i = 0; i < Outfit_Size; i++)
+                for (var i = 0; i < Outfit_Size; i++)
                 {
                     if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
                     {
@@ -203,7 +203,7 @@ namespace Cosplay_Academy
             if (coordinate == 4)
             {
                 var club = 0;
-                bool heroinenull = heroine == null;
+                var heroinenull = heroine == null;
                 if (!heroinenull)
                     club = heroine.clubActivities;
                 else if (heroinenull && LastClub != -1)

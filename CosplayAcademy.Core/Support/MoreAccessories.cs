@@ -14,11 +14,11 @@ namespace Cosplay_Academy.Support
         public static List<ChaFileAccessory.PartsInfo> Coordinate_Accessory_Extract(ChaFileCoordinate file)
         {
             XmlNode node = null;
-            List<ChaFileAccessory.PartsInfo> Accessories = new List<ChaFileAccessory.PartsInfo>();
-            PluginData pluginData = ExtendedSave.GetExtendedDataById(file, "moreAccessories");
-            if (pluginData != null && pluginData.data.TryGetValue("additionalAccessories", out object xmlData))
+            var Accessories = new List<ChaFileAccessory.PartsInfo>();
+            var pluginData = ExtendedSave.GetExtendedDataById(file, "moreAccessories");
+            if (pluginData != null && pluginData.data.TryGetValue("additionalAccessories", out var xmlData))
             {
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml((string)xmlData);
                 node = doc.FirstChild;
             }
@@ -26,7 +26,7 @@ namespace Cosplay_Academy.Support
             {
                 foreach (XmlNode accessoryNode in node.ChildNodes)
                 {
-                    ChaFileAccessory.PartsInfo part = new ChaFileAccessory.PartsInfo
+                    var part = new ChaFileAccessory.PartsInfo
                     {
                         type = XmlConvert.ToInt32(accessoryNode.Attributes["type"].Value)
                     };
@@ -35,9 +35,9 @@ namespace Cosplay_Academy.Support
                         part.id = XmlConvert.ToInt32(accessoryNode.Attributes["id"].Value);
                         part.parentKey = accessoryNode.Attributes["parentKey"].Value;
 
-                        for (int i = 0; i < 2; i++)
+                        for (var i = 0; i < 2; i++)
                         {
-                            for (int j = 0; j < 3; j++)
+                            for (var j = 0; j < 3; j++)
                             {
                                 part.addMove[i, j] = new Vector3
                                 {
@@ -47,7 +47,7 @@ namespace Cosplay_Academy.Support
                                 };
                             }
                         }
-                        for (int i = 0; i < 4; i++)
+                        for (var i = 0; i < 4; i++)
                         {
                             part.color[i] = new Color
                             {
@@ -69,8 +69,8 @@ namespace Cosplay_Academy.Support
 
         private static void SetPrivateProperty(this object self, string name, object value)
         {
-            MemberKey key = new MemberKey(self.GetType(), name);
-            if (!_propertyCache.TryGetValue(key, out PropertyInfo info))
+            var key = new MemberKey(self.GetType(), name);
+            if (!_propertyCache.TryGetValue(key, out var info))
             {
                 info = key.type.GetProperty(key.name, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
                 _propertyCache.Add(key, info);

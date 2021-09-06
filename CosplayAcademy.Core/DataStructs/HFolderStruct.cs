@@ -40,7 +40,7 @@ namespace Cosplay_Academy
 
         public void CleanUp()
         {
-            for (int j = FolderData.Count - 1; j > -1; j--)
+            for (var j = FolderData.Count - 1; j > -1; j--)
             {
                 var folder = FolderData[j];
                 if (!Directory.Exists(folder.FolderPath))
@@ -71,7 +71,7 @@ namespace Cosplay_Academy
             var subdirectories = DirectoryFinder.Grab_Folder_Directories(path, true);
             foreach (var directory in subdirectories)
             {
-                bool endsinsets = directory.EndsWith(sep + "Sets");
+                var endsinsets = directory.EndsWith(sep + "Sets");
                 if (endsinsets)
                 {
                     var setdirectories = DirectoryFinder.Grab_Folder_Directories(directory, false);

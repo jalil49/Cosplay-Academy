@@ -1,18 +1,13 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using KKAPI;
 using KKAPI.MainGame;
 using KKAPI.Studio;
 namespace Cosplay_Academy
 {
-    [BepInPlugin(GUID, "Cosplay Academy", Version)]
     [BepInProcess("Koikatu")]
     [BepInProcess("KoikatuVR")]
     [BepInProcess("Koikatsu Party")]
     [BepInProcess("Koikatsu Party VR")]
-    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
-    [BepInDependency("com.joan6694.illusionplugins.moreaccessories")]
-    [BepInDependency(Sideloader.Sideloader.GUID)]
     public partial class Settings : BaseUnityPlugin
     {
         public static ConfigEntry<bool> TeacherDress { get; private set; }

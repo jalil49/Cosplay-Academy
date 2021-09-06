@@ -13,12 +13,12 @@ namespace Cosplay_Academy
         public static void CheckMissingFiles()
         {
             string[] InputStrings3 = { $"{sep}Sets", "" };
-            string coordinatepath = Settings.CoordinatePath.Value;
-            foreach (string input in Constants.InputStrings)
+            var coordinatepath = Settings.CoordinatePath.Value;
+            foreach (var input in Constants.InputStrings)
             {
-                foreach (string input2 in Constants.InputStrings2)
+                foreach (var input2 in Constants.InputStrings2)
                 {
-                    foreach (string input3 in InputStrings3)
+                    foreach (var input3 in InputStrings3)
                     {
                         var path = coordinatepath + input + input2 + input3;
                         if (!Directory.Exists(path))
@@ -39,7 +39,7 @@ namespace Cosplay_Academy
 
         public static void Organize()
         {
-            string coordinatepath = Settings.CoordinatePath.Value;
+            var coordinatepath = Settings.CoordinatePath.Value;
             var folders = Grab_All_Directories(coordinatepath + $"{sep}Unorganized");
             foreach (var item in folders)
             {
@@ -47,7 +47,7 @@ namespace Cosplay_Academy
 
                 foreach (var Coordinate in files)
                 {
-                    ChaFileCoordinate Organizer = new ChaFileCoordinate();
+                    var Organizer = new ChaFileCoordinate();
                     Organizer.LoadFile(Coordinate);
                     var ACI_Data = ExtendedSave.GetExtendedDataById(Organizer, "Additional_Card_Info");
 
@@ -87,12 +87,12 @@ namespace Cosplay_Academy
                     }
 
                     var CoordinateType = restriction.CoordinateType;
-                    int HstateType_Restriction = restriction.HstateType_Restriction;
-                    string SetNames = coordiante.SetNames;
-                    string SubSetNames = coordiante.SubSetNames;
+                    var HstateType_Restriction = restriction.HstateType_Restriction;
+                    var SetNames = coordiante.SetNames;
+                    var SubSetNames = coordiante.SubSetNames;
                     string Result;
-                    string ClubResult = "";
-                    string SubPath = $"{sep}";
+                    var ClubResult = "";
+                    var SubPath = $"{sep}";
                     if (SetNames.Length > 0)
                     {
                         SubPath += @"Sets{sep}" + SetNames;
@@ -142,14 +142,14 @@ namespace Cosplay_Academy
 
         public static List<string> Grab_All_Directories(string OriginalPath)
         {
-            List<string> FoldersPath = new List<string>();
-            bool originalpathexists = Directory.Exists(OriginalPath);
+            var FoldersPath = new List<string>();
+            var originalpathexists = Directory.Exists(OriginalPath);
             if (originalpathexists)
             {
                 FoldersPath.Add(OriginalPath);
                 FoldersPath.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
             }
-            for (int i = 0; i < FoldersPath.Count; i++)
+            for (var i = 0; i < FoldersPath.Count; i++)
             {
                 if (FoldersPath[i].EndsWith($"{sep}Sets"))
                 {
@@ -166,7 +166,7 @@ namespace Cosplay_Academy
 
         public static List<string> Grab_Folder_Directories(string OriginalPath, bool self)
         {
-            bool originalpathexists = Directory.Exists(OriginalPath);
+            var originalpathexists = Directory.Exists(OriginalPath);
             var list = new List<string>();
             if (originalpathexists)
             {
@@ -179,14 +179,14 @@ namespace Cosplay_Academy
 
         public static List<string> Get_Set_Paths(string Narrow)
         {
-            List<string> Choosen = new List<string>();
-            string coordinatepath = Settings.CoordinatePath.Value;
+            var Choosen = new List<string>();
+            var coordinatepath = Settings.CoordinatePath.Value;
             if (Directory.Exists(coordinatepath))
             {
                 return Choosen;
             }
             var folders = Directory.GetDirectories(coordinatepath, "*", SearchOption.AllDirectories).ToList(); //grab child folders
-            foreach (string folder in folders)
+            foreach (var folder in folders)
             {
                 if (folder.Contains(Narrow))
                 { Choosen.Add(folder); }
@@ -196,24 +196,24 @@ namespace Cosplay_Academy
 
         public static List<string> Get_Outfits_From_Path(string OriginalPath, bool RemoveSets = true)
         {
-            List<string> Choosen = new List<string>();
-            List<string> Paths = new List<string>();
+            var Choosen = new List<string>();
+            var Paths = new List<string>();
             if (Directory.Exists(OriginalPath))
             {
                 Paths.Add(OriginalPath);
                 Paths.AddRange(Directory.GetDirectories(OriginalPath, "*", SearchOption.AllDirectories)); //grab child folders
             }
             //step through each folder and grab files
-            foreach (string path in Paths)
+            foreach (var path in Paths)
             {
                 if (RemoveSets && path.Contains($"{sep}Sets"))
                 {
                     continue;
                 }
-                string[] files = Directory.GetFiles(path, "*.png");
+                var files = Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }
-            bool choosenempty = Choosen.Count == 0;
+            var choosenempty = Choosen.Count == 0;
             if ((choosenempty || Settings.EnableDefaults.Value) && !OriginalPath.Contains($"{sep}Unorganized"))
             {
                 Choosen.Add("Default");

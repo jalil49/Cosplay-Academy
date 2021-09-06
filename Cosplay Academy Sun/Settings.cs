@@ -1,13 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using KKAPI;
 using KKAPI.Studio;
 
 namespace Cosplay_Academy
 {
-    [BepInProcess("KoikatsuSunshineTrial")]
-    [BepInPlugin(GUID, "Cosplay Academy", Version)]
-    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    [BepInProcess("KoikatsuSunshine")]
     public partial class Settings : BaseUnityPlugin
     {
         public void Awake()

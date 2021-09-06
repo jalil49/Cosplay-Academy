@@ -1,7 +1,6 @@
 ﻿using ExtensibleSaveFormat;
 using MessagePack;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Cosplay_Academy
 {
@@ -15,7 +14,7 @@ namespace Cosplay_Academy
                 if (plugindata.data.TryGetValue("ACC_Binding_Dictionary", out var ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
-                    for (int i = 0; i < temp.Length; i++)
+                    for (var i = 0; i < temp.Length; i++)
                     {
                         var sub = temp[i];
                         var slotinfo = data.Coordinate[i].Slotinfo;
@@ -35,7 +34,7 @@ namespace Cosplay_Academy
                 if (plugindata.data.TryGetValue("ACC_State_array", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, int[]>[]>((byte[])ByteData);
-                    for (int i = 0; i < temp.Length; i++)
+                    for (var i = 0; i < temp.Length; i++)
                     {
                         var slotinfo = data.Coordinate[i].Slotinfo;
 
@@ -60,7 +59,7 @@ namespace Cosplay_Academy
                 if (plugindata.data.TryGetValue("ACC_Name_Dictionary", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, string>[]>((byte[])ByteData);
-                    for (int i = 0; i < temp.Length; i++)
+                    for (var i = 0; i < temp.Length; i++)
                     {
                         foreach (var item in temp[i])
                         {
@@ -72,7 +71,7 @@ namespace Cosplay_Academy
                 if (plugindata.data.TryGetValue("ACC_Parented_Dictionary", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, bool>[]>((byte[])ByteData);
-                    for (int i = 0; i < temp.Length; i++)
+                    for (var i = 0; i < temp.Length; i++)
                     {
                         var slotinfo = data.Coordinate[i].Slotinfo;
                         foreach (var item in temp[i])

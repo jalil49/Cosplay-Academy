@@ -39,7 +39,7 @@ namespace Cosplay_Academy
             Subfolderdata = new List<FolderData>();
             Cards = new List<CardData>();
             FolderPath = path;
-            char sep = Path.DirectorySeparatorChar;
+            var sep = Path.DirectorySeparatorChar;
             PartofSet = path.Contains(sep + "Sets" + sep);
             if (Directory.Exists(path))
             {
@@ -128,7 +128,7 @@ namespace Cosplay_Academy
         public void CleanUp()
         {
             var foldercheck = Subfolderdata.Select(x => x.FolderPath).ToArray();
-            for (int i = foldercheck.Length - 1; i > -1; i--)
+            for (var i = foldercheck.Length - 1; i > -1; i--)
             {
                 if (!Directory.Exists(foldercheck[i]))
                 {
@@ -137,7 +137,7 @@ namespace Cosplay_Academy
             }
             var sep = Path.DirectorySeparatorChar;
             var cardscheck = Cards.Select(x => x.Filepath).ToArray();
-            for (int i = cardscheck.Length - 1; i > -1; i--)
+            for (var i = cardscheck.Length - 1; i > -1; i--)
             {
                 if (!File.Exists(FolderPath + sep + cardscheck[i]))
                 {

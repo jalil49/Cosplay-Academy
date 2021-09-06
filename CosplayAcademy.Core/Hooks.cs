@@ -28,12 +28,12 @@ namespace Cosplay_Academy
         //}
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(WaitPoint), "SetWait")]
+        [HarmonyPatch(typeof(WaitPoint), nameof(WaitPoint.SetWait))]
         internal static void ChangeOutfitAtWaitPoint(WaitPoint __instance)
         {
             try
             {
-                Base Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
+                var Chara = (Base)Traverse.Create(__instance).Property("chara").GetValue();
                 if (Chara == null || Chara.chaCtrl == null || Chara.heroine == null || !Settings.StoryModeChange.Value || Chara.heroine.isTeacher)
                 {
                     return;
@@ -67,7 +67,7 @@ namespace Cosplay_Academy
                 {
                     ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
                     ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
-                    int num = heroine.isDresses.Check(false);
+                    var num = heroine.isDresses.Check(false);
                     if (num == -1)
                     {
                         num = 0;
@@ -82,11 +82,11 @@ namespace Cosplay_Academy
                 }
                 else if (ThisOutfitData.ChangeKoiToClub && __instance.MapNo != 22)
                 {
-                    int remainThreshold = (heroine.lewdness / (4 - (int)heroine.HExperience));
+                    var remainThreshold = (heroine.lewdness / (4 - (int)heroine.HExperience));
                     if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
                     {
                         ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
-                        int num = heroine.isDresses.Check(false);
+                        var num = heroine.isDresses.Check(false);
                         if (num == -1)
                         {
                             num = 0;
@@ -121,7 +121,7 @@ namespace Cosplay_Academy
                     {
                         return;
                     }
-                    ActionScene actScene = Singleton<Game>.Instance.actScene;
+                    var actScene = Singleton<Game>.Instance.actScene;
                     if (actScene != null && actScene.actCtrl != null)
                     {
                         //ChaFileParameter ChaPara = _npc.chaCtrl.fileParam;
@@ -194,7 +194,7 @@ namespace Cosplay_Academy
         //}
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(NPC), "ReStart")]
+        [HarmonyPatch(typeof(NPC), nameof(NPC.ReStart))]
         internal static void NPCRestart(NPC __instance)
         {
             try

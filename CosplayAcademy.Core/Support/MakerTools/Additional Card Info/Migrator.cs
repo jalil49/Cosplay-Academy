@@ -13,7 +13,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("HairAcc", out var ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].HairAcc = temp[i];
                     }
@@ -21,7 +21,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("AccKeep", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<List<int>[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].AccKeep = temp[i];
                     }
@@ -29,7 +29,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("MakeUpKeep", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<bool[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         if (temp[i])
                             data.CoordinateInfo[i].MakeUpKeep = true;
@@ -38,7 +38,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("CoordinateSaveBools", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<bool[][]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].CoordinateSaveBools = temp[i];
                     }
@@ -46,7 +46,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("PersonalityType_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.PersonalityType_Restriction = temp[i];
                     }
@@ -54,7 +54,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("Interest_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.Interest_Restriction = temp[i];
                     }
@@ -62,7 +62,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("TraitType_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<Dictionary<int, int>[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.TraitType_Restriction = temp[i];
                     }
@@ -70,7 +70,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("HstateType_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<int[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.HstateType_Restriction = temp[i];
                     }
@@ -78,7 +78,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("ClubType_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<int[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.ClubType_Restriction = temp[i];
                     }
@@ -86,7 +86,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("Height_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<bool[][]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.Height_Restriction = temp[i];
                     }
@@ -94,7 +94,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("Breastsize_Restriction", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<bool[][]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.Breastsize_Restriction = temp[i];
                     }
@@ -102,7 +102,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("CoordinateType", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<int[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.CoordinateType = temp[i] + 1;
                     }
@@ -110,7 +110,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("CoordinateSubType", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<int[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.CoordinateSubType = temp[i] + 1;
                     }
@@ -118,7 +118,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("Creator", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<string[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         var nameref = data.CoordinateInfo[i].CreatorNames = new List<string>();
                         if (temp[i] != "")
@@ -130,7 +130,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("Set_Name", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<string[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].SetNames = temp[i];
                     }
@@ -138,7 +138,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("SubSetNames", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<string[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].SubSetNames = temp[i];
                     }
@@ -146,7 +146,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("ClothNot", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<bool[][]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].ClothNotData = temp[i];
                     }
@@ -154,7 +154,7 @@ namespace Cosplay_Academy
                 if (ACI_Data.data.TryGetValue("GenderType", out ByteData) && ByteData != null)
                 {
                     var temp = MessagePackSerializer.Deserialize<int[]>((byte[])ByteData);
-                    for (int i = 0; i < 7; i++)
+                    for (var i = 0; i < 7; i++)
                     {
                         data.CoordinateInfo[i].RestrictionInfo.GenderType = temp[i];
                     }

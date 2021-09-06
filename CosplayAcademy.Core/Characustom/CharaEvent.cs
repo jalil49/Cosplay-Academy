@@ -1,7 +1,6 @@
 ﻿using Cosplay_Academy.Hair;
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
-using HarmonyLib;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
@@ -14,10 +13,6 @@ using UniRx;
 using System.Diagnostics;
 #endif
 using System.Linq;
-#if !KKS
-using MoreAccessoriesKOI;
-using ToolBox;
-#endif
 
 
 namespace Cosplay_Academy
@@ -32,9 +27,6 @@ namespace Cosplay_Academy
         public static List<SaveData.Heroine> FreeHHeroines { get; internal set; } = new List<SaveData.Heroine>();
 
         internal static int Firstpass = 0;
-#if !KKS
-        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-#endif
 #if TRACE
         private static readonly Stopwatch Time = new Stopwatch();
         private static readonly List<long> Average = new List<long>();
@@ -69,7 +61,7 @@ namespace Cosplay_Academy
             {
                 return;
             }
-            bool IsMaker = currentGameMode == GameMode.Maker;
+            var IsMaker = currentGameMode == GameMode.Maker;
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
             if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
@@ -136,9 +128,7 @@ namespace Cosplay_Academy
                     Parameter = ChaControl.fileParam,
                     Chafile = ChaFileControl,
                     ChaControl = ChaControl,
-#if KK
                     heroine = heroine
-#endif
                 };
 #if DEBUG
                 Settings.Logger.LogWarning($"Heroine null? {heroine == null}\nInH? {inH}");
@@ -153,12 +143,10 @@ namespace Cosplay_Academy
         public void Process(GameMode currentGameMode)
         {
             ThisOutfitDataProcess();
-#if KK
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
                 return;
             }
-#endif
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.firstpass = true;
@@ -173,14 +161,14 @@ namespace Cosplay_Academy
             {
                 ThisOutfitData.Clear_Firstpass();
 
-                Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
+                var CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
 
-                PluginData HairExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+                var HairExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
 
                 if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                     CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
 
-                PluginData MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
+                var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
                 #region ME Acc Import
                 var Chafile_ME_Data = ThisOutfitData.Finished = new ME_List(MaterialEditorData, ThisOutfitData);
@@ -189,14 +177,14 @@ namespace Cosplay_Academy
                 #region Queue accessories to keep
 
                 #region ACI Data
-                Additional_Card_Info.DataStruct ACI_data = new Additional_Card_Info.DataStruct();
+                var ACI_data = new Additional_Card_Info.DataStruct();
 
                 for (int i = 0, n = ThisOutfitData.Outfit_Size; i < n; i++)
                 {
                     ACI_data.Createoutfit(i);
                 }
 
-                bool Cosplay_Academy_Ready = false;
+                var Cosplay_Academy_Ready = false;
                 var Required_Support = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Additional_Card_Info");
                 if (Required_Support != null)
                 {
@@ -231,21 +219,6 @@ namespace Cosplay_Academy
 
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
 
-#if !KKS
-                MoreAccessories.CharAdditionalData SaveAccessory;
-                if (MakerAPI.InsideMaker)
-                {
-                    SaveAccessory = MoreAccessories._self._charaMakerData;
-                }
-                else
-                {
-                    if (_accessoriesByChar.TryGetValue(ThisOutfitData.Chafile, out SaveAccessory) == false)
-                    {
-                        SaveAccessory = new MoreAccessories.CharAdditionalData();
-                        _accessoriesByChar.Add(ThisOutfitData.Chafile, SaveAccessory);
-                    }
-                }
-#endif
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
@@ -256,18 +229,11 @@ namespace Cosplay_Academy
                         HairKeep = CoordinateInfo[outfitnum].HairAcc;
                         ACCKeep = CoordinateInfo[outfitnum].AccKeep;
                     }
-                    if (CharaHair.TryGetValue(outfitnum, out Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo) == false)
+                    if (CharaHair.TryGetValue(outfitnum, out var HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
                     }
-#if !KKS
-                    if (SaveAccessory.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> acclist) == false)
-                    {
-                        acclist = new List<ChaFileAccessory.PartsInfo>();
-                    }
-#else
                     var acclist = new List<ChaFileAccessory.PartsInfo>();
-#endif
                     var Intermediate = new List<ChaFileAccessory.PartsInfo>(ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts);
                     Intermediate.AddRange(new List<ChaFileAccessory.PartsInfo>(acclist));//create intermediate as it seems that acclist is a reference
 
@@ -278,12 +244,12 @@ namespace Cosplay_Academy
                         coord = new ME_Coordinate();
                     }
                     var ME_ACC_Data = coord.AccessoryProperties;
-                    for (int i = 0; i < Intermediate.Count; i++)
+                    for (var i = 0; i < Intermediate.Count; i++)
                     {
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                         if (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep.Contains(i) || ACCKeep.Contains(i))
                         {
-                            if (!HairInfo.TryGetValue(i, out HairSupport.HairAccessoryInfo ACCdata))
+                            if (!HairInfo.TryGetValue(i, out var ACCdata))
                             {
                                 ACCdata = new HairSupport.HairAccessoryInfo
                                 {
@@ -328,10 +294,10 @@ namespace Cosplay_Academy
                     OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
                     ThisOutfitData.processed = true;
                 }
-                int HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
+                var HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                 ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);
                 ChaControl.fileStatus.coordinateType = HoldOutfit;
-                ChaInfo temp = (ChaInfo)ChaControl;
+                var temp = (ChaInfo)ChaControl;
                 ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
             }
         }

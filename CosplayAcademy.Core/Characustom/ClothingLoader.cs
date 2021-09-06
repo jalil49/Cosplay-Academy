@@ -1,16 +1,11 @@
 ﻿using Cosplay_Academy.Hair;
 using Cosplay_Academy.ME;
 using ExtensibleSaveFormat;
-using HarmonyLib;
 using KKAPI.Maker;
 using MessagePack;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-#if !KKS
-using MoreAccessoriesKOI;
-using ToolBox;
-#endif
+using UnityEngine;
 #if TRACE
 using System.Diagnostics;
 #endif
@@ -26,28 +21,6 @@ namespace Cosplay_Academy
         private ChaFile ChaFile;
         private static readonly int underwearindex = Constants.InputStrings.ToList().IndexOf($"{sep}Underwear");
         private static bool InsideMaker = false;
-
-        #region MoreAccessories
-#if !KKS
-        private static readonly WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData> _accessoriesByChar = (WeakKeyDictionary<ChaFile, MoreAccessories.CharAdditionalData>)Traverse.Create(MoreAccessories._self).Field("_accessoriesByChar").GetValue();
-        private MoreAccessories.CharAdditionalData More_Char_Data
-        {
-            get
-            {
-                if (MakerAPI.InsideMaker)
-                {
-                    return MoreAccessories._self._charaMakerData;
-                }
-                if (_accessoriesByChar.TryGetValue(ChaFile, out MoreAccessories.CharAdditionalData data) == false)
-                {
-                    data = new MoreAccessories.CharAdditionalData();
-                }
-                return data;
-            }
-        }
-        private static readonly Traverse InH_Field = Traverse.Create(MoreAccessories._self).Field("_inH");
-#endif
-        #endregion
 
         #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
@@ -105,10 +78,8 @@ namespace Cosplay_Academy
 
             ThisOutfitData.Finished.Clear();
             ThisOutfitData.FillOutfitpaths();
-            int holdoutfitstate = ChaControl.fileStatus.coordinateType;
-#if !KKS
-            bool retain = (bool)InH_Field.GetValue();
-#endif
+            var holdoutfitstate = ChaControl.fileStatus.coordinateType;
+
             Underwear.LoadFile(ThisOutfitData.alloutfitpaths[underwearindex].GetFullPath());
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.alloutfitpaths[underwearindex]);
 
@@ -116,11 +87,8 @@ namespace Cosplay_Academy
 
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
             Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
-#if !KKS
-            InH_Field.SetValue(false);
-#endif
 
-            for (int i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
 
@@ -150,9 +118,6 @@ namespace Cosplay_Academy
             }
 
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
-#if !KKS
-            InH_Field.SetValue(retain);
-#endif
 #if TRACE
             TimeWatch[0].Stop();
             var temp = TimeWatch[0].ElapsedMilliseconds - Start;
@@ -190,7 +155,7 @@ namespace Cosplay_Academy
 
             var ME_Queue = new Queue<MaterialEditorProperties>(ThisOutfitData.Original_Accessory_Data[outfitnum]);
 
-            bool[] UnderClothingKeep = new bool[9];
+            var UnderClothingKeep = new bool[9];
 
             #endregion
             //Load new outfit
@@ -218,7 +183,7 @@ namespace Cosplay_Academy
                 ME_Queue = new Queue<MaterialEditorProperties>(ThisOutfitData.Original_Accessory_Data[outfitnum]);
             }
 
-            int UnderwearAccessoryStart = PartsQueue.Count();
+            var UnderwearAccessoryStart = PartsQueue.Count();
             #region MakeUp
             if (MakeUpKeep[outfitnum])
             {
@@ -226,7 +191,7 @@ namespace Cosplay_Academy
                 ThisCoordinate.makeup = ThisOutfitData.Original_Coordinates[outfitnum].makeup;
             }
             #endregion
-            List<int> HairToColor = new List<int>();
+            var HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
             var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
@@ -266,7 +231,7 @@ namespace Cosplay_Academy
             if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
             if (HairToColor == null) HairToColor = new List<int>();
             if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
-            for (int i = 0; i < 9; i++)
+            for (var i = 0; i < 9; i++)
             {
                 if (PersonalClothingBools[i])
                 {
@@ -274,14 +239,7 @@ namespace Cosplay_Academy
                 }
             }
             this.UnderClothingKeep[outfitnum] = UnderClothingKeep;
-            var underwearbools = Underwearbools[outfitnum];
-#if !KKS
-            var Local_More_Char = More_Char_Data;
-            if (Local_More_Char.rawAccessoriesInfos.TryGetValue(outfitnum, out List<ChaFileAccessory.PartsInfo> NewRAW) == false)
-            {
-                NewRAW = new List<ChaFileAccessory.PartsInfo>();
-            }
-#endif
+
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
@@ -295,13 +253,13 @@ namespace Cosplay_Academy
 
             if (Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
             {
-
-                var UnderwearProcessed = this.UnderwearProcessed[outfitnum];
+                var underwearbools = Underwearbools[outfitnum];
+                var processed = UnderwearProcessed[outfitnum];
                 Underwear_ME_Data.ChangeCoord(outfitnum);
                 var Local_Underwear_ACC_Info = new List<ChaFileAccessory.PartsInfo>(Underwear_PartsInfos);
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
                 if (outfitnum != 3)
-                    for (int i = 0; i < Local_Underwear_ACC_Info.Count; i++)
+                    for (var i = 0; i < Local_Underwear_ACC_Info.Count; i++)
                     {
                         if (Local_Underwear_ACC_Info[i].type > 120)
                         {
@@ -326,7 +284,7 @@ namespace Cosplay_Academy
                             HairQueue.Enqueue(ACCdata);
                         }
                     }
-                bool forceunder = Settings.ForceRandomUnderwear.Value;
+                var forceunder = Settings.ForceRandomUnderwear.Value;
                 //When Top is not empty and bra is not kept
                 var underclothesparts = Underwear.clothes.parts;
                 var clothes_mainsubpart = ThisCoordinate.clothes.subPartsId[0];
@@ -336,7 +294,7 @@ namespace Cosplay_Academy
                 {
                     if (!UnderClothingKeep[2] && !underwearbools[1] && !underwearbools[2] && (clothespart[2].id != 0 || forceunder))
                     {
-                        UnderwearProcessed[2] = true;
+                        processed[2] = true;
                         clothespart[2] = underclothesparts[2];
                         Additional_Clothing_Process(2, outfitnum, Underwear_ME_Data);
                     }
@@ -345,7 +303,7 @@ namespace Cosplay_Academy
                     {
                         if (!UnderClothingKeep[3] && !underwearbools[2] && (clothespart[3].id != 0 || forceunder))
                         {
-                            UnderwearProcessed[3] = true;
+                            processed[3] = true;
                             clothespart[3] = underclothesparts[3];
                             Additional_Clothing_Process(3, outfitnum, Underwear_ME_Data);
                         }
@@ -356,7 +314,7 @@ namespace Cosplay_Academy
                 {
                     if (!UnderClothingKeep[3] && !underwearbools[2] && (clothespart[3].id != 0 || forceunder))
                     {
-                        UnderwearProcessed[3] = true;
+                        processed[3] = true;
                         clothespart[3] = underclothesparts[3];
                         Additional_Clothing_Process(3, outfitnum, Underwear_ME_Data);
                     }
@@ -368,13 +326,13 @@ namespace Cosplay_Academy
                     {
                         if (!UnderClothingKeep[5])
                         {
-                            UnderwearProcessed[5] = true;
+                            processed[5] = true;
                             clothespart[5] = underclothesparts[5];
                             Additional_Clothing_Process(5, outfitnum, Underwear_ME_Data);
                         }
                         if (!UnderClothingKeep[6] && !CharacterClothingKeep_Coordinate[6])
                         {
-                            UnderwearProcessed[6] = true;
+                            processed[6] = true;
                             clothespart[6] = underclothesparts[6];
                             Additional_Clothing_Process(6, outfitnum, Underwear_ME_Data);
                         }
@@ -382,42 +340,33 @@ namespace Cosplay_Academy
 
                     if (!UnderClothingKeep[6] && !CharacterClothingKeep_Coordinate[6] && (clothespart[6].id != 0 || forceunder))
                     {
-                        UnderwearProcessed[6] = true;
+                        processed[6] = true;
                         clothespart[6] = underclothesparts[6];
                         Additional_Clothing_Process(6, outfitnum, Underwear_ME_Data);
                     }
                 }
             }
-            Color[] haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
+            var haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
             {
-#if KKS
-                var emptylist = new List<ChaFileAccessory.PartsInfo>();
-#endif
                 foreach (var item in HairToColor)
                 {
-                    HairMatchProcess(outfitnum, item, haircolor, ref
-#if !KKS
-                        NewRAW
-#else
-                        emptylist
-#endif
-                        );
+                    HairMatchProcess(outfitnum, item, haircolor);
                 }
             }
-            int insert = 0;
-            int ACCpostion = 0;
-            bool Empty;
-#if KK
-            bool print = true;
-#endif
 
+            var insert = 0;
+            var ACCpostion = 0;
+            var Empty = false;
+            var print = true;
             //Don't Skip if inside Maker
+
+            var parts = ThisCoordinate.accessory.parts.ToList();
 
             if (MakerAPI.InsideMaker)
             {
                 //Normal
-                for (int n = ThisCoordinate.accessory.parts.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
+                for (var n = parts.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
                 {
                     Empty = ThisCoordinate.accessory.parts[ACCpostion].type < 121;
                     if (Empty) //120 is empty/default
@@ -449,67 +398,10 @@ namespace Cosplay_Academy
                     }
                     if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
                     {
-#if KKS
-                        var emptylist = new List<ChaFileAccessory.PartsInfo>();
-#endif
                         info.ColorMatch = true;
-                        HairMatchProcess(outfitnum, ACCpostion, haircolor, ref
-#if !KKS
-                            NewRAW
-#else
-                            emptylist
-#endif
-);
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor);
                     }
                 }
-#if KK
-                //MoreAccessories
-                for (int n = NewRAW.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
-                {
-                    Empty = NewRAW[ACCpostion - 20].type < 121;
-                    if (Empty) //120 is empty/default
-                    {
-                        if (insert++ >= UnderwearAccessoryStart)
-                        {
-                            UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
-                        }
-
-                        NewRAW[ACCpostion - 20] = PartsQueue.Dequeue();
-
-                        if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
-                        {
-                            HairAccInfo[ACCpostion] = HairQueue.Dequeue();
-                        }
-                        else
-                        {
-                            HairAccInfo.Remove(ACCpostion);
-                            HairQueue.Dequeue();
-                        }
-
-                        if (HairKeepQueue.Dequeue())
-                        {
-                            ThisOutfitData.HairKeepReturn[outfitnum].Add(ACCpostion);
-                        }
-                        if (ACCKeepqueue.Dequeue())
-                        {
-                            ThisOutfitData.ACCKeepReturn[outfitnum].Add(ACCpostion);
-                        }
-
-                        ME_coord.AddAccessory(outfitnum, ACCpostion, ME_Queue.Dequeue());
-                    }
-                    if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
-                    {
-                        info.ColorMatch = true;
-                        HairMatchProcess(outfitnum, ACCpostion, haircolor, ref NewRAW);
-                    }
-                }
-#endif
-            }
-#if KK
-            else
-            {
-                ACCpostion = 20 + NewRAW.Count;
-                print = false;
             }
 
             //original accessories
@@ -524,14 +416,14 @@ namespace Cosplay_Academy
                 {
                     UnderwearAccessoriesLocations[outfitnum].Add(ACCpostion);
                 }
-                NewRAW.Add(PartsQueue.Dequeue());
+                parts.Add(PartsQueue.Dequeue());
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                 {
                     var HairInfo = HairQueue.Dequeue();
                     if (Settings.HairMatch.Value)
                     {
                         HairInfo.ColorMatch = true;
-                        HairMatchProcess(outfitnum, ACCpostion, haircolor, ref NewRAW);
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor);
                     }
                     HairAccInfo[ACCpostion] = HairInfo;
                 }
@@ -554,22 +446,10 @@ namespace Cosplay_Academy
 
                 ACCpostion++;
             }
-#endif
+
+            ThisCoordinate.accessory.parts = parts.ToArray();
 
             HairAccessories.Add(outfitnum, HairAccInfo);
-#if !KKS
-            while (Local_More_Char.infoAccessory.Count < Local_More_Char.nowAccessories.Count)
-                Local_More_Char.infoAccessory.Add(null);
-            while (Local_More_Char.objAccessory.Count < Local_More_Char.nowAccessories.Count)
-                Local_More_Char.objAccessory.Add(null);
-            while (Local_More_Char.objAcsMove.Count < Local_More_Char.nowAccessories.Count)
-                Local_More_Char.objAcsMove.Add(new GameObject[2]);
-            while (Local_More_Char.cusAcsCmp.Count < Local_More_Char.nowAccessories.Count)
-                Local_More_Char.cusAcsCmp.Add(null);
-            while (Local_More_Char.showAccessories.Count < Local_More_Char.nowAccessories.Count)
-                Local_More_Char.showAccessories.Add(true);
-#endif
-
             #endregion
 
 #if TRACE
@@ -580,22 +460,24 @@ namespace Cosplay_Academy
 #endif
         }
 
-        public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl ChaControl)
+        public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl chacontrol)
         {
-            this.ChaControl = ChaControl;
+            ChaControl = chacontrol;
             ChaFile = ThisOutfitData.Chafile;
             InsideMaker = MakerAPI.InsideMaker;
+
+
             #region Queue accessories to keep
 
-            int outfitnum = ChaControl.fileStatus.coordinateType;
+            var outfitnum = chacontrol.fileStatus.coordinateType;
 
-            Queue<ChaFileAccessory.PartsInfo> PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
-            Queue<HairSupport.HairAccessoryInfo> HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
+            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
+            var HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
 
-            Queue<bool> ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
-            Queue<bool> HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
-            List<int> HairKeepResult = new List<int>();
-            List<int> ACCKeepResult = new List<int>();
+            var ACCKeepQueue = new Queue<bool>(ThisOutfitData.ACCKeepQueue[outfitnum]);
+            var HairKeepQueue = new Queue<bool>(ThisOutfitData.HairKeepQueue[outfitnum]);
+            var HairKeepResult = new List<int>();
+            var ACCKeepResult = new List<int>();
 
             var ME_Queue = new Queue<MaterialEditorProperties>(ThisOutfitData.Original_Accessory_Data[outfitnum]);
 
@@ -608,12 +490,8 @@ namespace Cosplay_Academy
             #endregion
 
             //Apply pre-existing Accessories in any open slot or final slots.
-#if !KKS
-            var Local_More = More_Char_Data;
-            List<ChaFileAccessory.PartsInfo> MoreACCData = Local_More.nowAccessories;
-#endif
 
-            ChaFileAccessory.PartsInfo[] OriginalData = ChaControl.nowCoordinate.accessory.parts;
+            var OriginalData = chacontrol.nowCoordinate.accessory.parts.ToList();
 
             #region Reassign Existing Accessories
 
@@ -623,9 +501,9 @@ namespace Cosplay_Academy
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     HairACCDictionary = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
 
-            int ACCpostion = 0;
+            var ACCpostion = 0;
             bool Empty;
-            for (int n = OriginalData.Length; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
+            for (var n = OriginalData.Count; PartsQueue.Count != 0 && ACCpostion < n; ACCpostion++)
             {
                 Empty = OriginalData[ACCpostion].type == 120;
                 if (Empty) //120 is empty/default
@@ -657,42 +535,8 @@ namespace Cosplay_Academy
                     info.ColorMatch = true;
                 }
             }
-#if !KKS
 
-            for (int n = MoreACCData.Count; PartsQueue.Count != 0 && ACCpostion - 20 < n; ACCpostion++)
-            {
-                Empty = MoreACCData[ACCpostion - 20].type == 120;
-                if (Empty) //120 is empty/default
-                {
-                    MoreACCData[ACCpostion - 20] = PartsQueue.Dequeue();
-                    if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
-                    {
-                        HairACCDictionary[ACCpostion] = HairQueue.Dequeue();
-                    }
-                    else
-                    {
-                        HairACCDictionary.Remove(ACCpostion);
-                        HairQueue.Dequeue();
-                    }
-
-                    Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, ME_Queue.Dequeue());
-
-                    if (HairKeepQueue.Dequeue())
-                    {
-                        HairKeepResult.Add(ACCpostion);
-                    }
-                    if (ACCKeepQueue.Dequeue())
-                    {
-                        ACCKeepResult.Add(ACCpostion);
-                    }
-                }
-                if (Settings.HairMatch.Value && HairACCDictionary.TryGetValue(ACCpostion, out var info))
-                {
-                    info.ColorMatch = true;
-                }
-            }
-
-            bool print = true;
+            var print = true;
 
             while (PartsQueue.Count != 0)
             {
@@ -701,7 +545,7 @@ namespace Cosplay_Academy
                     Settings.Logger.LogDebug($"Ran out of space in new coordiante adding {PartsQueue.Count}");
                     print = false;
                 }
-                MoreACCData.Add(PartsQueue.Dequeue());
+                OriginalData.Add(PartsQueue.Dequeue());
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                 {
                     var HairInfo = HairQueue.Dequeue();
@@ -732,17 +576,7 @@ namespace Cosplay_Academy
                 ACCpostion++;
             }
 
-            while (Local_More.infoAccessory.Count < Local_More.nowAccessories.Count)
-                Local_More.infoAccessory.Add(null);
-            while (Local_More.objAccessory.Count < Local_More.nowAccessories.Count)
-                Local_More.objAccessory.Add(null);
-            while (Local_More.objAcsMove.Count < Local_More.nowAccessories.Count)
-                Local_More.objAcsMove.Add(new GameObject[2]);
-            while (Local_More.cusAcsCmp.Count < Local_More.nowAccessories.Count)
-                Local_More.cusAcsCmp.Add(null);
-            while (Local_More.showAccessories.Count < Local_More.nowAccessories.Count)
-                Local_More.showAccessories.Add(true);
-#endif
+            chacontrol.nowCoordinate.accessory.parts = OriginalData.ToArray();
             #endregion
 
             #region Pack
@@ -860,16 +694,9 @@ namespace Cosplay_Academy
             finishcoord.ClothingProperties.Remove(index);
         }
 
-        private void HairMatchProcess(int outfitnum, int ACCPosition, Color[] haircolor, ref List<ChaFileAccessory.PartsInfo> NewRAW)
+        private void HairMatchProcess(int outfitnum, int ACCPosition, Color[] haircolor)
         {
-            if (ACCPosition < 20)
-            {
-                ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCPosition].color = haircolor;
-            }
-            else
-            {
-                NewRAW[ACCPosition - 20].color = haircolor;
-            }
+            ChaControl.chaFile.coordinate[outfitnum].accessory.parts[ACCPosition].color = haircolor;
             if (!ThisOutfitData.Finished.Coordinates.TryGetValue(outfitnum, out var coord))
             {
                 ThisOutfitData.Finished.Coordinates[outfitnum] = coord = new ME_Coordinate();
@@ -880,7 +707,7 @@ namespace Cosplay_Academy
             }
             var haircomponent = editorProperties.MaterialColorProperty;
             var hairpart = ChaControl.fileHair.parts[1];
-            for (int i = 0; i < haircomponent.Count; i++)
+            for (var i = 0; i < haircomponent.Count; i++)
             {
                 if (haircomponent[i].Property == "Color")
                 {

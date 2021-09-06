@@ -1,10 +1,7 @@
-﻿using BepInEx;
-using Sideloader.AutoResolver;
-using System.Collections.Generic;
+﻿using Sideloader.AutoResolver;
 using System;
-#if KK
+using System.Collections.Generic;
 using System.ComponentModel;
-#endif
 
 namespace Cosplay_Academy
 {
@@ -14,14 +11,14 @@ namespace Cosplay_Academy
 
         internal static void PluginCheck()
         {
-            string[] PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
+            var PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
 
             foreach (var item in PluginList)
             {
                 PluginResults[item] = TryfindPluginInstance(item);
             }
 
-            List<PluginCheckData> PluginVersionList = new List<PluginCheckData>()
+            var PluginVersionList = new List<PluginCheckData>()
             {
                 new PluginCheckData("Additional_Card_Info","Additional Card Info", "1.3"),
                 new PluginCheckData("Accessory_States","Accessory States", "1.3"),
@@ -37,7 +34,7 @@ namespace Cosplay_Academy
 
         internal static void ExpandedOutfit()
         {
-            for (int i = 0; i < InputStrings.Length; i++)
+            for (var i = 0; i < InputStrings.Length; i++)
             {
                 if (OutfitnumPairs.ContainsKey(i))
                 {
@@ -53,7 +50,7 @@ namespace Cosplay_Academy
                 OutfitnumPairs.Add(i, 1);
             }
 
-            Dictionary<int, List<ResolveInfo>> IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
+            var IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
             {
                 [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100), },
                 [2] = new List<ResolveInfo>() { ResolveInfo("nakay.Top jacket", 210, 6), ResolveInfo("yu000.ShirtlessUniform", 210, 100), ResolveInfo("m14.FGO_BBLeotard", 210, 18), ResolveInfo("m14.FGO_QinLiangyuBodysuit", 210, 19), },
@@ -73,7 +70,7 @@ namespace Cosplay_Academy
                 IgnoredTopIDs_A[item.Key] = intlist;
             }
 
-            List<ResolveInfo> IgnoredTops_Mods_Main = new List<ResolveInfo>()
+            var IgnoredTops_Mods_Main = new List<ResolveInfo>()
             {
                ResolveInfo("WaTaFuk.WMO",105,3001),
                ResolveInfo("mat.Tops",105,1214),
@@ -124,7 +121,7 @@ namespace Cosplay_Academy
                 IgnoredTopIDs_Main.Add(main.LocalSlot);
             }
 
-            List<ResolveInfo> IgnoredBots_Mods = new List<ResolveInfo>()
+            var IgnoredBots_Mods = new List<ResolveInfo>()
             {
                 ResolveInfo("xne_fobtms",106,9211),
                 ResolveInfo("xne_fobtms",106,9212),
@@ -273,7 +270,7 @@ namespace Cosplay_Academy
 
         internal static bool TryfindPluginInstance(string pluginName)
         {
-            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out PluginInfo target);
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(pluginName, out var target);
             if (null != target)
             {
                 return true;
@@ -283,7 +280,7 @@ namespace Cosplay_Academy
 
         private static void PluginVersionCheck(PluginCheckData plugin)
         {
-            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(plugin.GUID, out PluginInfo target);
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(plugin.GUID, out var target);
             if (null != target)
             {
                 if (target.Metadata.Version < plugin.version)
@@ -309,8 +306,8 @@ namespace Cosplay_Academy
 
         public static string[] SimplifiedCoordinateTypes = new string[]
         {
-           "School Uniform",
-           "After School",
+            "School Uniform",
+            "After School",
             "Gym",
             "Swimsuit",
             "Club",

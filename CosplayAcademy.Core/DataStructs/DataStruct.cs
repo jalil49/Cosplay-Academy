@@ -106,8 +106,8 @@ namespace Cosplay_Academy
                 list.Add(new FolderStruct());
             }
 
-            int set = 0;
-            foreach (string coordinatetype in Constants.InputStrings)
+            var set = 0;
+            foreach (var coordinatetype in Constants.InputStrings)
             {
                 list[set].Populate(coordinatepath + coordinatetype);
                 set++;
