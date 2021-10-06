@@ -65,8 +65,8 @@ namespace Cosplay_Academy
                             }
                             find = overridefolder;
                         }
-                        var cards = find.GetAllCards();
-                        outfitData[sets].Insert(hstate, cards, cards.Count > 0);//assign "is" set and store data
+                        var Overridecards = find.GetAllCards();
+                        outfitData[sets].Insert(hstate, Overridecards, Overridecards.Count > 0);//assign "is" set and store data
                         continue;
                     }
 
@@ -75,12 +75,12 @@ namespace Cosplay_Academy
                         continue;
                     }
 
-                    if (Settings.EnableSets.Value)
+                    if (Settings.EnableSets.Value && Settings.MatchGeneric[sets].Value)
                     {
                         var AllFolder = hstatefolder.GetAllFolders();
-#if KK
+
                         Grabber(ref AllFolder, sets, hstate);
-#endif
+
                         if (AllFolder.Count == 0)
                         {
                             outfitData[sets].Insert(hstate, new List<CardData>(), false);
@@ -101,11 +101,34 @@ namespace Cosplay_Academy
                         }
                         continue;
                     }
-
-                    outfitData[sets].Insert(hstate, hstatefolder.GetAllCards(), false);
+                    var cards = hstatefolder.GetAllCards();
+                    cards.AddRange(Grabber(sets, hstate));
+                    outfitData[sets].Insert(hstate, cards, false);
                 }
                 overridefolder = null;
             }
+        }
+        private static List<CardData> Grabber(int sets, int hstate)
+        {
+#if KK
+            if (Settings.GrabSwimsuits.Value && sets == 4)
+            {
+                return DataStruct.DefaultFolder[3].FolderData[hstate].GetAllCards();
+            }
+            if (Settings.GrabUniform.Value && sets == 1)
+            {
+                return DataStruct.DefaultFolder[0].FolderData[hstate].GetAllCards();
+            }
+
+#endif
+#if KKS
+            if (Settings.GrabSwimsuits.Value && sets == 1)
+            {
+                return DataStruct.DefaultFolder[8].FolderData[hstate].GetAllCards();
+            }
+#endif
+
+            return new List<CardData>();
         }
 
         public static void Decision(string name, ChaDefault cha)

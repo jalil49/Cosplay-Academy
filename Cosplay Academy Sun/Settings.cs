@@ -16,6 +16,8 @@ namespace Cosplay_Academy
 
             StandardSettings();
 
+            GrabSwimsuits = Config.Bind("Additional Outfits", "Grab Swim club outfits for Swimsuits", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true }));
+
             //match uniforms
             MatchGeneric[0] = Config.Bind("Match Outfit", "Coordinated Casual Outfits", false, new ConfigDescription("It's an option", null, new ConfigurationManagerAttributes { Order = 4, IsAdvanced = true }));
             MatchGeneric[1] = Config.Bind("Match Outfit", "Coordinated Swimsuit outfits", false, new ConfigDescription("Everyone wears the same swimsuit", null, new ConfigurationManagerAttributes { Order = 3 }));

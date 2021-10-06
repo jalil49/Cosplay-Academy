@@ -86,7 +86,7 @@ namespace Cosplay_Academy
             Underwear_ME_Data = new ME_Coordinate(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, 0);
 
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
-            Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
+            //Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
 
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
@@ -224,7 +224,7 @@ namespace Cosplay_Academy
                         }
                         break;
                     default:
-                        Settings.Logger.LogWarning("New version detected please update");
+                        OutdatedMessage("Additional_Card_Info", false);
                         break;
                 }
             }
@@ -243,8 +243,17 @@ namespace Cosplay_Academy
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             if (Inputdata != null)
-                if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                    HairAccInfo = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+            {
+                if (Inputdata.version == 0)
+                {
+                    if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+                        HairAccInfo = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+                }
+                else
+                {
+                    OutdatedMessage("hairaccessorycustomizer", true);
+                }
+            }
             #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
             ThisOutfitData.Finished.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
@@ -579,6 +588,8 @@ namespace Cosplay_Academy
             }
 
             chacontrol.nowCoordinate.accessory.parts = OriginalData.ToArray();
+
+            MoreAccessoriesKOI.MoreAccessories.ArraySync(chacontrol);
             #endregion
 
             #region Pack

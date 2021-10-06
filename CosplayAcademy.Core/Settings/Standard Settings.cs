@@ -15,13 +15,13 @@ using System.Diagnostics;
 namespace Cosplay_Academy
 {
     [BepInPlugin(GUID, "Cosplay Academy", Version)]
-    [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
-    [BepInDependency("com.joan6694.illusionplugins.moreaccessories")]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, "1.26")]
+    [BepInDependency(MoreAccessoriesKOI.MoreAccessories.GUID, "2.06")]
     [BepInDependency(Sideloader.Sideloader.GUID)]
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.9.0";
+        public const string Version = "0.9.1";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -38,6 +38,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> EnableDefaults { get; private set; }
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
+        public static ConfigEntry<bool> GrabSwimsuits { get; private set; }
 
         public static ConfigEntry<bool> HairMatch { get; private set; }
 
@@ -50,6 +51,8 @@ namespace Cosplay_Academy
         public static ConfigEntry<int>[] HStateWeights { get; private set; } = new ConfigEntry<int>[Enum.GetValues(typeof(HStates)).Length];
         public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
+        public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
+        public static ConfigEntry<bool> SundayDate { get; private set; }
 
         public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
@@ -71,10 +74,15 @@ namespace Cosplay_Academy
             Instance = this;
             Logger = base.Logger;
 
+            KKAPI.MainGame.GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
+
             var sep = Path.DirectorySeparatorChar;
 
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
             var AdvancedConfig = new ConfigurationManagerAttributes { IsAdvanced = true };
+
+            UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
+            SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday, not really useful unless Update Frequency is not daily/period ");
 
             //Cache
             UpdateCache = Config.Bind("Cache", "Update Cache Buttons", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(UpdateCacheData) }));

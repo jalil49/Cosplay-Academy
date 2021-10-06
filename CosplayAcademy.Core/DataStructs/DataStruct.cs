@@ -101,13 +101,18 @@ namespace Cosplay_Academy
                 list = FolderStructure[coordinatepath] = new List<FolderStruct>();
             }
 
-            while (list.Count < Constants.InputStrings.Length)
+            while (list.Count < Constants.InputStrings.Length + Constants.ExtraInputStrings.Length)
             {
                 list.Add(new FolderStruct());
             }
 
             var set = 0;
             foreach (var coordinatetype in Constants.InputStrings)
+            {
+                list[set].Populate(coordinatepath + coordinatetype);
+                set++;
+            }
+            foreach (var coordinatetype in Constants.ExtraInputStrings)
             {
                 list[set].Populate(coordinatepath + coordinatetype);
                 set++;

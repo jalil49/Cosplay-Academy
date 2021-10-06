@@ -184,18 +184,36 @@ namespace Cosplay_Academy
 #endif
 };
 
+        public static readonly string[] ExtraInputStrings =
+        {
+        #if KKS
+            $"{sep}School Uniform", //5
+            $"{sep}AfterSchool", //6
+            $"{sep}Gym" ,//7
+            $"{sep}Club{sep}Swim" , //8
+            $"{sep}Club{sep}Manga", //9
+            $"{sep}Club{sep}Cheer", //10
+            $"{sep}Club{sep}Tea", //11
+            $"{sep}Club{sep}Track", //12
+            $"{sep}Club{sep}Koi", //13
+        #elif KK
+            $"{sep}Bathroom", //13
+        #endif
+        };
+
+
         public static readonly string[] AllCoordinatePaths =
-            {
-                    $"{sep}School Uniform", //0
-                    $"{sep}AfterSchool", //1
-                    $"{sep}Gym" ,//2
-                    $"{sep}Swimsuit" , //3
-                    $"{sep}Club" , //4
-                    $"{sep}Casual" , //5
-                    $"{sep}Nightwear", //6
-                    $"{sep}Underwear",//7                 
-                    $"{sep}Bathroom", //8
-};
+        {
+            $"{sep}School Uniform", //0
+            $"{sep}AfterSchool", //1
+            $"{sep}Gym" ,//2
+            $"{sep}Swimsuit" , //3
+            $"{sep}Club" , //4
+            $"{sep}Casual" , //5
+            $"{sep}Nightwear", //6
+            $"{sep}Underwear",//7                 
+            $"{sep}Bathroom", //8
+        };
 
         public static readonly string[] ClubPaths =
         {
@@ -346,7 +364,6 @@ namespace Cosplay_Academy
         Lewd //3
     }
 
-#if !KKS
     public enum OutfitUpdate
     {
         [Description("Update outfits everyday")]
@@ -356,6 +373,7 @@ namespace Cosplay_Academy
         [Description("Update every period")]
         EveryPeriod
     }
+#if !KKS
 
     public enum Club
     {

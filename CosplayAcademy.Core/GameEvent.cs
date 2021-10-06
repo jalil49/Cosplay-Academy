@@ -1,13 +1,18 @@
-﻿#if !KKS
-using ActionGame;
+﻿using ActionGame;
 using KKAPI.MainGame;
+using UnityEngine;
+
 namespace Cosplay_Academy
 {
     public class GameEvent : GameCustomFunctionController
     {
         protected override void OnPeriodChange(Cycle.Type period)
         {
+#if KK
             if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily || Settings.UpdateFrequency.Value == OutfitUpdate.EveryPeriod && (period == Cycle.Type.StaffTime || period == Cycle.Type.AfterSchool || Cycle.Type.MyHouse == period))
+#elif KKS
+            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily || Settings.UpdateFrequency.Value == OutfitUpdate.EveryPeriod)
+#endif
             {
                 OutfitDecider.ResetDecider();
             }
@@ -36,8 +41,11 @@ namespace Cosplay_Academy
             CharaEvent.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }
-
+#if KK
         protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
+#elif KKS
+        protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             if (Settings.EnableSetting.Value)
             {
@@ -51,11 +59,14 @@ namespace Cosplay_Academy
             base.OnStartH(proc, hFlag, vr);
         }
 
+#if KK
         protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
+#elif KKS
+        protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             if (hFlag.isFreeH)
             {
-                //CharaEvent.FreeHHeroines.Clear();
                 CharaEvent.ChaDefaults.Clear();
                 OutfitDecider.ResetDecider();
             }
@@ -65,4 +76,3 @@ namespace Cosplay_Academy
         }
     }
 }
-#endif

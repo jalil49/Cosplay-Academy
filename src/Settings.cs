@@ -13,8 +13,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 
         public static ConfigEntry<bool> GrabUniform { get; private set; }
-        public static ConfigEntry<bool> GrabSwimsuits { get; private set; }
-        public static ConfigEntry<bool> SundayDate { get; private set; }
         public static ConfigEntry<bool> KoiClub { get; private set; }
 
         public static ConfigEntry<int> KoiChance { get; private set; }
@@ -22,8 +20,6 @@ namespace Cosplay_Academy
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
         public static ConfigEntry<bool> ChangeToClubatKoi { get; private set; }
-
-        public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
         public static ConfigEntry<Club> ClubChoice { get; private set; }
 
         public void Awake()
@@ -33,7 +29,6 @@ namespace Cosplay_Academy
                 return;
             }
             Hooks.Init();
-            GameAPI.RegisterExtraBehaviour<GameEvent>(GUID);
 
             StandardSettings();
 
@@ -44,8 +39,6 @@ namespace Cosplay_Academy
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behavior", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
             ChangeToClubatKoi = Config.Bind("Story Mode", "Change at Koikatsu Start", false, "Change Heroine to club outfit when they start in Koikatsu room");
             TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, new ConfigDescription("Teachers probably would like to dress up if everyone does it.", null, AdvancedConfig));
-            UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
-            SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday");
 
             //match uniforms
             MatchGeneric[0] = Config.Bind("Match Outfit", "Coordinated Uniforms", true, new ConfigDescription("Everyone wears same uniform", null, new ConfigurationManagerAttributes { Order = 12 }));

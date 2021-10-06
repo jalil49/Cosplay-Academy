@@ -20,8 +20,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;KKS</DefineConstants>
+    <OutputPath>..\bin\KKS_CosplayAcademy\BepInEx\plugins\</OutputPath>
+    <DefineConstants>DEBUG;KKS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -30,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\KKS_CosplayAcademy\BepInEx\plugins\</OutputPath>
     <DefineConstants>KKS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -66,7 +66,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="KKS_ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\src\packages\ExtensibleSaveFormat.KoikatsuSunshine.16.7.0\lib\net46\KKS_ExtensibleSaveFormat.dll</HintPath>
+      <HintPath>..\src\packages\ExtensibleSaveFormat.KoikatsuSunshine.16.8.1\lib\net46\KKS_ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KKS_Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -80,6 +80,9 @@
     <Reference Include="MonoMod.Utils, Version=21.8.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\src\packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\lib\net35\MonoMod.Utils.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="MoreAccessories">
+      <HintPath>C:\Sunshine\BepInEx\plugins\MoreAccessories.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -200,7 +203,7 @@
   <Import Project="..\src\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets" Condition="Exists('..\src\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets')" />
   <Import Project="..\src\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.targets" Condition="Exists('..\src\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST "F:\Satisfactory\Outfit Selection Expansion\bin\BepInEx\plugins" (
+    <PostBuildEvent>IF EXIST "C:\Sunshine\BepInEx\plugins" (
  xcopy "$(TargetFileName)" "C:\Sunshine\BepInEx\plugins" /S /Y /D
 )
 </PostBuildEvent>

@@ -61,6 +61,9 @@ namespace Cosplay_Academy
             {
                 return;
             }
+#if DEBUG
+            Settings.Logger.LogWarning($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
+#endif
             var IsMaker = currentGameMode == GameMode.Maker;
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
@@ -119,8 +122,13 @@ namespace Cosplay_Academy
             }
 
             var heroine = ChaControl.GetHeroine() ?? FreeHHeroines.Find(x => x.chaCtrl == ChaControl);
+#if DEBUG
+            if (heroine == null)
+                Settings.Logger.LogError($"Heroine Not found for {ChaControl.fileParam.fullname}");
+#endif
 
             ThisOutfitData = ChaDefaults.Find(x => x.heroine == heroine);
+
             if (ThisOutfitData == null)
             {
                 ThisOutfitData = new ChaDefault(ChaControl)

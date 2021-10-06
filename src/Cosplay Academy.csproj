@@ -21,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\KK_CosplayAcademy\BepInEx\plugins\</OutputPath>
     <DefineConstants>TRACE;DEBUG;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,7 +32,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\BepInEx\plugins\</OutputPath>
+    <OutputPath>..\bin\KK_CosplayAcademy\BepInEx\plugins\</OutputPath>
     <DefineConstants>KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -71,7 +71,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\ExtensibleSaveFormat.Koikatu.16.7.0\lib\net35\ExtensibleSaveFormat.dll</HintPath>
+      <HintPath>packages\ExtensibleSaveFormat.Koikatu.16.8.1\lib\net35\ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KKAPI, Version=1.25.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -85,6 +85,9 @@
     <Reference Include="MonoMod.Utils, Version=21.8.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\lib\net35\MonoMod.Utils.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="MoreAccessories">
+      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\MoreAccessories.dll</HintPath>
     </Reference>
     <Reference Include="Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Sideloader.Koikatu.16.7.0\lib\net35\Sideloader.dll</HintPath>
@@ -107,10 +110,9 @@
   <Import Project="..\CosplayAcademy.Core\CosplayAcademy.Core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST "F:\Satisfactory\Outfit Selection Expansion\bin\BepInEx\plugins" (
+    <PostBuildEvent>IF EXIST "F:\Satisfactory\" (
  xcopy "$(TargetFileName)" "F:\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins" /S /Y /D 
 xcopy "$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Koikatsu Party\BepInEx\plugins" /S /Y /D
- xcopy "$(TargetFileName)" "F:\Satisfactory\Outfit Selection Expansion\bin\BepInEx\plugins" /S /Y /D
 )
 </PostBuildEvent>
   </PropertyGroup>

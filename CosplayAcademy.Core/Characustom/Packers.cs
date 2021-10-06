@@ -57,6 +57,9 @@ namespace Cosplay_Academy
             var Start = TimeWatch[2].ElapsedMilliseconds;
             TimeWatch[2].Start();
 #endif
+            Settings.Logger.LogWarning($"Forcing sync on {character.fileParam.fullname}");
+            MoreAccessoriesKOI.MoreAccessories.ArraySync(character);
+
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
                 if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
@@ -256,19 +259,28 @@ namespace Cosplay_Academy
         private void HairACC_Repack(ChaControl ChaControl)
         {
             var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            if (ChafileData?.data != null && ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
+            if (ChafileData != null)
             {
-                var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
-                for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
+                if (ChafileData.version == 0)
                 {
-                    if (!ValidOutfits[i] || !original.ContainsKey(i))
+                    if (ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
                     {
-                        continue;
+                        var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
+                        for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
+                        {
+                            if (!ValidOutfits[i] || !original.ContainsKey(i))
+                            {
+                                continue;
+                            }
+                            HairAccessories[i] = original[i];
+                        }
                     }
-                    HairAccessories[i] = original[i];
+                }
+                else
+                {
+                    OutdatedMessage("hairaccessorycustomizer", true);
                 }
             }
-
             var HairPlugin = new PluginData();
 
             HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
@@ -330,18 +342,38 @@ namespace Cosplay_Academy
             PluginData SavedData;
             var Clothdict = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
             var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KCOX");
-            if (ExtendedCharacterData != null && ExtendedCharacterData.data.TryGetValue("Overlays", out var coordinatedata) && coordinatedata != null)
+            if (ExtendedCharacterData != null)
             {
-                Clothdict = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
+                if (ExtendedCharacterData.version == 1)
+                {
+                    if (ExtendedCharacterData.data.TryGetValue("Overlays", out var coordinatedata) && coordinatedata != null)
+                    {
+                        Clothdict = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
+                    }
+                }
+                else
+                {
+                    OutdatedMessage("Illusion Clothing Overlays", true);
+                }
             }
             var originalclothdict = Clothdict.ToNewDictionary();
 
             var UnderwearSavedData = ExtendedSave.GetExtendedDataById(Underwear, "KCOX");
             var underweardict = new Dictionary<string, ClothesTexData>();
 
-            if (UnderwearSavedData != null && UnderwearSavedData.data.TryGetValue("Overlays", out var underbytes) && underbytes is byte[] underbyteArr)
+            if (UnderwearSavedData != null)
             {
-                underweardict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(underbyteArr);
+                if (UnderwearSavedData.version == 1)
+                {
+                    if (UnderwearSavedData.data.TryGetValue("Overlays", out var underbyteArr) && underbyteArr != null)
+                    {
+                        underweardict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>((byte[])underbyteArr);
+                    }
+                }
+                else
+                {
+                    OutdatedMessage("Illusion Clothing Overlays", true);
+                }
             }
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
@@ -356,12 +388,22 @@ namespace Cosplay_Academy
                 {
                     Clothdict[(CoordinateType)outfitnum].Clear();
                     SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
-                    if (SavedData != null && SavedData.data.TryGetValue("Overlays", out var bytes) && bytes is byte[] byteArr)
+                    if (SavedData != null)
                     {
-                        var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>(byteArr);
-                        if (dict != null)
+                        if (SavedData.version == 1)
                         {
-                            Clothdict[(CoordinateType)outfitnum] = dict;
+                            if (SavedData.data.TryGetValue("Overlays", out var bytes))
+                            {
+                                var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>((byte[])bytes);
+                                if (dict != null)
+                                {
+                                    Clothdict[(CoordinateType)outfitnum] = dict;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            OutdatedMessage("Illusion Clothing Overlays", true);
                         }
                     }
                 }
@@ -400,7 +442,6 @@ namespace Cosplay_Academy
 
                     Clothdict[(CoordinateType)outfitnum].Remove(Constants.KCOX_Cat[i]);
                 }
-
             }
             var data = new PluginData { version = 1 };
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Clothdict));
@@ -412,8 +453,17 @@ namespace Cosplay_Academy
             var FailureBools = new Dictionary<int, bool>();
             var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.clothingunlocker");
             if (Original != null)
-                if (Original.data.TryGetValue("ClothingUnlocked", out var loadedClothingUnlocked) && loadedClothingUnlocked != null)
-                    FailureBools = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])loadedClothingUnlocked);
+            {
+                if (Original.version == 0)
+                {
+                    if (Original.data.TryGetValue("ClothingUnlocked", out var loadedClothingUnlocked) && loadedClothingUnlocked != null)
+                        FailureBools = MessagePackSerializer.Deserialize<Dictionary<int, bool>>((byte[])loadedClothingUnlocked);
+                }
+                else
+                {
+                    OutdatedMessage("clothingunlocker", true);
+                }
+            }
             PluginData SavedData;
             var Final = new Dictionary<int, bool>();
             bool result;
@@ -448,17 +498,24 @@ namespace Cosplay_Academy
             var Extended = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.pushup");
             if (Extended != null)
             {
-                if (Extended.data.TryGetValue("Pushup_BraData", out var bytes) && bytes != null)
+                if (Extended.version == 0)
                 {
-                    Bra = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
+                    if (Extended.data.TryGetValue("Pushup_BraData", out var bytes) && bytes != null)
+                    {
+                        Bra = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
+                    }
+                    if (Extended.data.TryGetValue("Pushup_TopData", out bytes) && bytes != null)
+                    {
+                        Top = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
+                    }
+                    if (Extended.data.TryGetValue("Pushup_BodyData", out bytes) && bytes != null)
+                    {
+                        Body = MessagePackSerializer.Deserialize<Pushup.BodyData>((byte[])bytes);
+                    }
                 }
-                if (Extended.data.TryGetValue("Pushup_TopData", out bytes) && bytes != null)
+                else
                 {
-                    Top = MessagePackSerializer.Deserialize<Dictionary<int, Pushup.ClothData>>((byte[])bytes);
-                }
-                if (Extended.data.TryGetValue("Pushup_BodyData", out bytes) && bytes != null)
-                {
-                    Body = MessagePackSerializer.Deserialize<Pushup.BodyData>((byte[])bytes);
+                    OutdatedMessage("Push Up", true);
                 }
             }
 
@@ -490,13 +547,20 @@ namespace Cosplay_Academy
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "com.deathweasel.bepinex.pushup");
                 if (SavedData != null)
                 {
-                    if (SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
+                    if (SavedData.version == 0)
                     {
-                        Bra[outfitnum] = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
+                        if (SavedData.data.TryGetValue("PushupCoordinate_BraData", out var bytes) && bytes is byte[] byteArr)
+                        {
+                            Bra[outfitnum] = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr);
+                        }
+                        if (SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
+                        {
+                            Top[outfitnum] = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
+                        }
                     }
-                    if (SavedData.data.TryGetValue("PushupCoordinate_TopData", out var bytes2) && bytes2 is byte[] byteArr2)
+                    else
                     {
-                        Top[outfitnum] = MessagePackSerializer.Deserialize<Pushup.ClothData>(byteArr2);
+                        OutdatedMessage("Push Up", true);
                     }
                 }
 
@@ -546,6 +610,7 @@ namespace Cosplay_Academy
                             break;
 
                         default:
+                            OutdatedMessage("AMBX", true);
                             throw new NotSupportedException($"Save version {SavedData.version} is not supported");
                     }
                 }
@@ -574,7 +639,10 @@ namespace Cosplay_Academy
                     try
                     {
                         if (SavedData.version != 2)
+                        {
+                            OutdatedMessage("AMBX", true);
                             throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
+                        }
 
                         import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, ABMX.BoneModifierData>>((byte[])bytes);
                         if (import != null)
@@ -611,10 +679,17 @@ namespace Cosplay_Academy
                 .DynamicBoneData>();
 
             var original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.dynamicboneeditor");
-            if (original?.data != null)
+            if (original != null)
             {
-                if (original.data.TryGetValue("AccessoryDynamicBoneData", out var ByteData) && ByteData != null)
-                    Modifiers = MessagePackSerializer.Deserialize<List<DynamicBonePlugin.DynamicBoneData>>((byte[])ByteData);
+                if (original.version == 0)
+                {
+                    if (original.data.TryGetValue("AccessoryDynamicBoneData", out var ByteData) && ByteData != null)
+                        Modifiers = MessagePackSerializer.Deserialize<List<DynamicBonePlugin.DynamicBoneData>>((byte[])ByteData);
+                }
+                else
+                {
+                    OutdatedMessage("Dynamic Bone Editor", true);
+                }
             }
 
             PluginData SavedData;
@@ -625,18 +700,24 @@ namespace Cosplay_Academy
                     Modifiers.RemoveAll(x => x.CoordinateIndex == i);
                 }
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.dynamicboneeditor");
-                if (SavedData != null && SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes is byte[] byteArr)
+                if (SavedData != null)
                 {
-                    List<DynamicBonePlugin.DynamicBoneData> import;
-
-                    import = MessagePackSerializer.Deserialize<List<DynamicBonePlugin.DynamicBoneData>>(byteArr);
-                    if (import != null)
+                    if (SavedData.version == 0)
                     {
-                        foreach (var dbData in import)
+                        if (SavedData.data.TryGetValue("AccessoryDynamicBoneData", out var bytes) && bytes != null)
                         {
-                            dbData.CoordinateIndex = i;
-                            Modifiers.Add(dbData);
+                            var import = MessagePackSerializer.Deserialize<List<DynamicBonePlugin.DynamicBoneData>>((byte[])bytes);
+
+                            foreach (var dbData in import)
+                            {
+                                dbData.CoordinateIndex = i;
+                                Modifiers.Add(dbData);
+                            }
                         }
+                    }
+                    else
+                    {
+                        OutdatedMessage("Dynamic Bone Editor", true);
                     }
                 }
             }
@@ -660,7 +741,7 @@ namespace Cosplay_Academy
             if (ExtendedData != null)
             {
                 if (ExtendedData.version > 6)
-                    Settings.Logger.LogWarning($"New version of AccessoryStateSync found, accessory states needs update for compatibility");
+                    OutdatedMessage("AccStateSync", true);
                 else if (ExtendedData.version < 6)
                 {
                     AccStateSync.Migration.ConvertCharaPluginData(ExtendedData, ref TriggerPropertyList, ref TriggerGroupList);
@@ -733,7 +814,7 @@ namespace Cosplay_Academy
                 }
                 else
                 {
-                    Settings.Logger.LogWarning("Update Cosplay Academy or if no update is available let dev know that ASS support is outdated");
+                    OutdatedMessage("AccStateSync", true);
                 }
 
                 if (UnderwearTrigger == null) UnderwearTrigger = new List<AccStateSync.TriggerProperty>();
@@ -788,7 +869,7 @@ namespace Cosplay_Academy
                         }
                         else
                         {
-                            Settings.Logger.LogWarning("Update Cosplay Academy or if no update is available let dev know that ASS support is outdated");
+                            OutdatedMessage("AccStateSync", true);
                         }
                         if (tempTriggerPropertyList == null) tempTriggerPropertyList = new List<AccStateSync.TriggerProperty>();
                         if (tempTriggerGroupList == null) tempTriggerGroupList = new List<AccStateSync.TriggerGroup>();
@@ -988,7 +1069,7 @@ namespace Cosplay_Academy
                 }
                 else
                 {
-                    Settings.Logger.LogWarning("New version of plugin detected please update");
+                    OutdatedMessage("Accessory Themes", false);
                 }
             }
 
@@ -1020,7 +1101,7 @@ namespace Cosplay_Academy
                             }
                             break;
                         default:
-                            Settings.Logger.LogWarning("New version detected please update");
+                            OutdatedMessage("Accessory Themes", false);
                             break;
                     }
                 }
@@ -1071,7 +1152,7 @@ namespace Cosplay_Academy
                 }
                 else
                 {
-                    Settings.Logger.LogWarning("New plugin version found on card please update");
+                    OutdatedMessage("Additional_Card_Info", false);
                 }
             }
 
@@ -1105,7 +1186,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
-                        Settings.Logger.LogWarning("New plugin version found on card please update");
+                        OutdatedMessage("Additional_Card_Info", false);
                     }
                 }
 
@@ -1149,7 +1230,7 @@ namespace Cosplay_Academy
                 }
                 else
                 {
-                    Settings.Logger.LogWarning("New version of plugin detected please update");
+                    OutdatedMessage("Accessory_Parents", false);
                 }
             }
 
@@ -1180,7 +1261,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
-                        Settings.Logger.LogWarning("New version of plugin detected please update");
+                        OutdatedMessage("Accessory_Parents", false);
                     }
                 }
             }
@@ -1228,6 +1309,7 @@ namespace Cosplay_Academy
                         }
                         break;
                     default:
+                        OutdatedMessage("Accessory_States", false);
                         break;
                 }
             }
@@ -1249,6 +1331,7 @@ namespace Cosplay_Academy
                         }
                         break;
                     default:
+                        OutdatedMessage("Accessory_States", false);
                         break;
                 }
             }
@@ -1280,7 +1363,7 @@ namespace Cosplay_Academy
                                 }
                                 break;
                             default:
-                                Settings.Logger.LogWarning("New version detected please update");
+                                OutdatedMessage("Accessory_States", false);
                                 break;
                         }
                     }
@@ -1469,7 +1552,6 @@ namespace Cosplay_Academy
             }
             var nulldata = Coordinate.All(x => x.Value.Slotinfo.Count == 0);
 
-
             SavedData.data.Add("CoordinateData", MessagePackSerializer.Serialize(Coordinate));
 
             SetExtendedData("Accessory_States", (nulldata) ? null : SavedData, ChaControl);
@@ -1515,6 +1597,16 @@ namespace Cosplay_Academy
                 ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
             }
 #endif
+        }
+
+        internal static void OutdatedMessage(string pluginname, bool telldev)
+        {
+            var outdatedstring = $"Cosplay Academy: {pluginname} support is outdated. Please check for an update.";
+            if (telldev)
+            {
+                outdatedstring += "if no updates is available, Please tell dev";
+            }
+            Settings.Logger.LogMessage(outdatedstring);
         }
     }
 }
