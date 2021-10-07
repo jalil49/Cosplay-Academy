@@ -15,13 +15,13 @@ using System.Diagnostics;
 namespace Cosplay_Academy
 {
     [BepInPlugin(GUID, "Cosplay Academy", Version)]
-    [BepInDependency(KKAPI.KoikatuAPI.GUID, "1.26")]
-    [BepInDependency(MoreAccessoriesKOI.MoreAccessories.GUID, "2.06")]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
+    [BepInDependency(MoreAccessoriesKOI.MoreAccessories.GUID, MoreAccessoriesKOI.MoreAccessories.versionNum)]
     [BepInDependency(Sideloader.Sideloader.GUID)]
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.9.1";
+        public const string Version = "0.9.2";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 

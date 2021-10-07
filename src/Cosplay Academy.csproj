@@ -35,7 +35,7 @@
     <OutputPath>..\bin\KK_CosplayAcademy\BepInEx\plugins\</OutputPath>
     <DefineConstants>KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
@@ -74,8 +74,8 @@
       <HintPath>packages\ExtensibleSaveFormat.Koikatu.16.8.1\lib\net35\ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKAPI, Version=1.25.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\IllusionModdingAPI.KKAPI.1.25.0\lib\net35\KKAPI.dll</HintPath>
+    <Reference Include="KKAPI, Version=1.26.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\IllusionModdingAPI.KKAPI.1.26.0\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour, Version=21.8.5.1, Culture=neutral, processorArchitecture=MSIL">
