@@ -86,8 +86,9 @@
       <HintPath>packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\lib\net35\MonoMod.Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MoreAccessories">
-      <HintPath>..\..\..\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins\MoreAccessories.dll</HintPath>
+    <Reference Include="MoreAccessories, Version=2.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\IllusionLibs.Koikatu.MoreAccessories.2.0.10\lib\net35\MoreAccessories.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Sideloader.Koikatu.16.7.0\lib\net35\Sideloader.dll</HintPath>
@@ -126,6 +127,7 @@ xcopy "$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Koikats
     <Error Condition="!Exists('packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.UI.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.UI.targets'))" />
     <Error Condition="!Exists('packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets'))" />
     <Error Condition="!Exists('packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets'))" />
+    <Error Condition="!Exists('packages\IllusionLibs.Koikatu.MoreAccessories.2.0.10\build\IllusionLibs.Koikatu.MoreAccessories.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\IllusionLibs.Koikatu.MoreAccessories.2.0.10\build\IllusionLibs.Koikatu.MoreAccessories.targets'))" />
   </Target>
   <Import Project="packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp.targets" Condition="Exists('packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp.targets')" />
   <Import Project="packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets" Condition="Exists('packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.4\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets')" />
@@ -133,4 +135,5 @@ xcopy "$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Koikats
   <Import Project="packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.UI.targets" Condition="Exists('packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.4\build\IllusionLibs.Koikatu.UnityEngine.UI.targets')" />
   <Import Project="packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets" Condition="Exists('packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets')" />
   <Import Project="packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets" Condition="Exists('packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets')" />
+  <Import Project="packages\IllusionLibs.Koikatu.MoreAccessories.2.0.10\build\IllusionLibs.Koikatu.MoreAccessories.targets" Condition="Exists('packages\IllusionLibs.Koikatu.MoreAccessories.2.0.10\build\IllusionLibs.Koikatu.MoreAccessories.targets')" />
 </Project>
