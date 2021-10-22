@@ -27,11 +27,13 @@ namespace Cosplay_Academy
 
         internal static int LastClub = -1;
         internal SaveData.Heroine heroine;
+
+#if KK
         internal string KoiOutfitpath;
         internal string ClubOutfitPath;
         internal bool ChangeKoiToClub;
         internal bool ChangeClubToKoi;
-
+#endif
         internal bool Changestate = false;
         internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
@@ -105,7 +107,7 @@ namespace Cosplay_Academy
         public void FillOutfitpaths()
         {
             var datanum = 0;
-            for (var i = 0; i < Outfit_Size; i++)
+            for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
                 if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
                 {
@@ -129,23 +131,23 @@ namespace Cosplay_Academy
             {
                 var sep = Path.DirectorySeparatorChar;
                 List<FolderStruct> SimpleStruct = null;
-                List<FolderStruct> ADVStruct = null;
+                FolderStruct ADVStruct = null;
                 var defaultpath = Settings.CoordinatePath.Value;
                 var adv = ClothingLoader.CardInfo.AdvancedFolderDirectory;
                 if (!simplenull)
                 {
                     var simplepath = defaultpath + sep + simpledirectory;
-                    if (DataStruct.FolderStructure.Any(x => x.Key.EndsWith(simpledirectory)))
+                    if (DataStruct.FullStructures.Any(x => x.Key.EndsWith(simpledirectory)))
                     {
-                        SimpleStruct = DataStruct.FolderStructure.First(x => x.Key.EndsWith(simpledirectory)).Value;
+                        SimpleStruct = DataStruct.FullStructures.First(x => x.Key.EndsWith(simpledirectory)).Value;
                     }
                     else if (Directory.Exists(simplepath))
                     {
-                        SimpleStruct = DataStruct.Load(simplepath);
+                        SimpleStruct = DataStruct.LoadFullStructure(simplepath);
                     }
                 }
                 datanum = 0;
-                for (var i = 0; i < Outfit_Size; i++)
+                for (var i = 0; i < Constants.GameCoordinateSize; i++)
                 {
                     if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
                     {
@@ -158,7 +160,6 @@ namespace Cosplay_Academy
                             var cards = SimpleStruct[datanum].FolderData[Hvalue].GetAllCards();
                             if (cards.Count > 0)
                             {
-                                Settings.Logger.LogWarning($"grabed {cards.Count} from simple");
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
                             }
                         }
@@ -167,23 +168,24 @@ namespace Cosplay_Academy
                             SpecialCondition(i, outfitpaths, datanum);
                         }
                     }
+
                     if (advanced)
                     {
                         if (adv.TryGetValue(Constants.SimplifiedCoordinateTypes[i], out var advdirectory) && !advdirectory.IsNullOrEmpty())
                         {
                             var advpath = defaultpath + sep + advdirectory;
-                            if (DataStruct.FolderStructure.Any(x => x.Key.EndsWith(advdirectory)))
+
+                            if (!DataStruct.IndividualStructures.TryGetValue(advdirectory, out ADVStruct))
                             {
-                                ADVStruct = DataStruct.FolderStructure.First(x => x.Key.EndsWith(advdirectory)).Value;
-                            }
-                            else if (Directory.Exists(advpath))
-                            {
-                                ADVStruct = DataStruct.Load(advpath);
+                                if (Directory.Exists(advpath))
+                                {
+                                    ADVStruct = DataStruct.LoadSingleStructure(advpath);
+                                }
                             }
 
                             if (ADVStruct != null)
                             {
-                                var cards = ADVStruct[datanum].FolderData[Hvalue].GetAllCards();
+                                var cards = ADVStruct.FolderData[Hvalue].GetAllCards();
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();

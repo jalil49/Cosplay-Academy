@@ -15,34 +15,44 @@ namespace Cosplay_Academy
 #endif
         private static string SavePath;
 
-        public static Dictionary<string, List<FolderStruct>> FolderStructure = new Dictionary<string, List<FolderStruct>>();
+        public static Dictionary<string, List<FolderStruct>> FullStructures = new Dictionary<string, List<FolderStruct>>();
 
-        public static List<FolderStruct> DefaultFolder => FolderStructure.ElementAt(Defaultint).Value;
+        public static Dictionary<string, FolderStruct> IndividualStructures = new Dictionary<string, FolderStruct>();
+        public static List<FolderStruct> DefaultFolder => FullStructures.ElementAt(Defaultint).Value;
 
         internal static int Defaultint = 0;
 
         public static List<CardData> GetAllCards()
         {
             var result = new List<CardData>();
-            foreach (var list in FolderStructure.Values)
+            foreach (var list in FullStructures.Values)
             {
                 foreach (var folder in list)
                 {
                     result.AddRange(folder.GetAllCards());
                 }
             }
+            foreach (var folder in IndividualStructures.Values)
+            {
+                result.AddRange(folder.GetAllCards());
+            }
+
             return result;
         }
 
         public static List<FolderData> GetAllFolders()
         {
             var result = new List<FolderData>();
-            foreach (var list in FolderStructure.Values)
+            foreach (var list in FullStructures.Values)
             {
                 foreach (var folder in list)
                 {
                     result.AddRange(folder.GetAllFolders());
                 }
+            }
+            foreach (var folder in IndividualStructures.Values)
+            {
+                result.AddRange(folder.GetAllFolders());
             }
             return result;
         }
@@ -58,16 +68,19 @@ namespace Cosplay_Academy
             SaveFile();
         }
 
-        public static void Init(string path)
+        public static void SetPath(string path)
+        {
+            SavePath = path;
+        }
+        public static void StartUpLoad()
         {
 #if TRACE
             Settings.Logger.LogWarning($"Starting to load data");
             Stopwatch.Start();
 #endif
-            SavePath = path;
             if (CreateFile())
             {
-                Load(Settings.CoordinatePath.Value);
+                LoadFullStructure(Settings.CoordinatePath.Value);
                 OutfitDecider.ResetDecider();
 #if TRACE
                 Stopwatch.Stop();
@@ -76,6 +89,7 @@ namespace Cosplay_Academy
                 return;
             }
             ReadFile();
+
             OutfitDecider.ResetDecider();
 #if TRACE
             Stopwatch.Stop();
@@ -85,20 +99,24 @@ namespace Cosplay_Academy
 
         public static void CleanUp()
         {
-            foreach (var list in FolderStructure.Values)
+            foreach (var list in FullStructures.Values)
             {
                 foreach (var folder in list)
                 {
                     folder.CleanUp();
                 }
             }
+            foreach (var folder in IndividualStructures.Values)
+            {
+                folder.CleanUp();
+            }
         }
 
-        public static List<FolderStruct> Load(string coordinatepath)
+        public static List<FolderStruct> LoadFullStructure(string coordinatepath)
         {
-            if (!FolderStructure.TryGetValue(coordinatepath, out var list))
+            if (!FullStructures.TryGetValue(coordinatepath, out var list))
             {
-                list = FolderStructure[coordinatepath] = new List<FolderStruct>();
+                list = FullStructures[coordinatepath] = new List<FolderStruct>();
             }
 
             while (list.Count < Constants.InputStrings.Length + Constants.ExtraInputStrings.Length)
@@ -112,6 +130,7 @@ namespace Cosplay_Academy
                 list[set].Populate(coordinatepath + coordinatetype);
                 set++;
             }
+
             foreach (var coordinatetype in Constants.ExtraInputStrings)
             {
                 list[set].Populate(coordinatepath + coordinatetype);
@@ -120,11 +139,23 @@ namespace Cosplay_Academy
             SaveFile();
             return list;
         }
+        public static FolderStruct LoadSingleStructure(string coordinatepath)
+        {
+            if (!IndividualStructures.TryGetValue(coordinatepath, out var folderstruct))
+            {
+                folderstruct = IndividualStructures[coordinatepath] = new FolderStruct();
+            }
+
+            folderstruct.Populate(coordinatepath);
+
+            SaveFile();
+            return folderstruct;
+        }
 
         public static void Update()
         {
             CleanUp();
-            foreach (var list in FolderStructure.Values)
+            foreach (var list in FullStructures.Values)
             {
                 foreach (var folder in list)
                 {
@@ -153,7 +184,10 @@ namespace Cosplay_Academy
             }
             try
             {
-                FolderStructure = MessagePackSerializer.Deserialize<Dictionary<string, List<FolderStruct>>>(data);
+                var serializeddict = MessagePackSerializer.Deserialize<Dictionary<string, byte[]>>(data);
+                FullStructures = MessagePackSerializer.Deserialize<Dictionary<string, List<FolderStruct>>>(serializeddict["FullStruct"]);
+                IndividualStructures = MessagePackSerializer.Deserialize<Dictionary<string, FolderStruct>>(serializeddict["IndividualStructures"]);
+
 #if TRACE
                 Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to deserialize data");
 #endif
@@ -162,20 +196,25 @@ namespace Cosplay_Academy
             }
             catch
             {
-                Load(Settings.CoordinatePath.Value);
+                LoadFullStructure(Settings.CoordinatePath.Value);
             }
         }
 
         private static void SaveFile()
         {
             CleanUp();
-            File.WriteAllBytes(SavePath, MessagePackSerializer.Serialize(FolderStructure));
+            var serializedict = new Dictionary<string, byte[]>
+            {
+                ["FullStruct"] = MessagePackSerializer.Serialize(FullStructures),
+                ["IndividualStructures"] = MessagePackSerializer.Serialize(IndividualStructures)
+            };
+            File.WriteAllBytes(SavePath, MessagePackSerializer.Serialize(serializedict));
         }
 
         public static void Reset()
         {
-            FolderStructure = new Dictionary<string, List<FolderStruct>>();
-            Load(Settings.CoordinatePath.Value);
+            FullStructures = new Dictionary<string, List<FolderStruct>>();
+            LoadFullStructure(Settings.CoordinatePath.Value);
             SaveFile();
         }
     }

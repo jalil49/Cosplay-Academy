@@ -21,7 +21,7 @@ namespace Cosplay_Academy
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.9.2";
+        public const string Version = "0.9.3";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -66,6 +66,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<string>[] ListOverride { get; private set; } = new ConfigEntry<string>[Constants.InputStrings.Length];
         public static ConfigEntry<bool>[] ListOverrideBool { get; private set; } = new ConfigEntry<bool>[Constants.InputStrings.Length];
 
+        private static ConfigEntry<string> Lastversion { get; set; }
+
+
 #if TRACE
         private static Stopwatch Stopwatch = new Stopwatch();
 #endif
@@ -86,6 +89,7 @@ namespace Cosplay_Academy
 
             //Cache
             UpdateCache = Config.Bind("Cache", "Update Cache Buttons", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(UpdateCacheData) }));
+            Lastversion = Config.Bind("Cache", "Check if version changed, clear cache", "0", new ConfigDescription("", null, new ConfigurationManagerAttributes() { Browsable = false }));
 
             //Accessories
             ExtremeAccKeeper = Config.Bind("Accessories", "KEEP ALL ACCESSORIES", false, new ConfigDescription("Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories", null, AdvancedConfig));
@@ -136,6 +140,13 @@ namespace Cosplay_Academy
             IEnumerator Wait()
             {
                 yield return null;
+
+                var startingindex = Manager.Scene.ActiveScene.buildIndex;
+                do
+                {
+                    yield return null;
+
+                } while (startingindex == Manager.Scene.ActiveScene.buildIndex);
 #if TRACE
                 Stopwatch = Stopwatch.StartNew();
 #endif
@@ -150,10 +161,26 @@ namespace Cosplay_Academy
                 {
                     CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
                 }
+
                 yield return null;
 
+                Logger.LogMessage($"Following warnings/errors are related to coordinates Cosplay Academy has cached");
+
                 DirectoryFinder.Organize();
-                DataStruct.Init(Paths.CachePath + sep + GUID + ".data");
+
+                DataStruct.SetPath(Paths.CachePath + sep + GUID + ".data");
+
+                if (Version != Lastversion.Value)
+                {
+                    DataStruct.Reset();
+                    Lastversion.Value = Version;
+                }
+                else
+                {
+                    DataStruct.StartUpLoad();
+                }
+                yield return null;
+                Logger.LogMessage($"End of Cache process");
             }
 #if TRACE
             Stopwatch = Stopwatch.StartNew();

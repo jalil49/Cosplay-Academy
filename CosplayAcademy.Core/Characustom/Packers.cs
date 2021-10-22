@@ -57,7 +57,6 @@ namespace Cosplay_Academy
             var Start = TimeWatch[2].ElapsedMilliseconds;
             TimeWatch[2].Start();
 #endif
-            Settings.Logger.LogWarning($"Forcing sync on {character.fileParam.fullname}");
             MoreAccessoriesKOI.MoreAccessories.ArraySync(character);
 
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)

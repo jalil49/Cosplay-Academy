@@ -87,6 +87,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -129,6 +130,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -171,6 +173,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -213,6 +216,8 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
+
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -255,6 +260,8 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
+
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -329,6 +336,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -370,6 +378,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -411,6 +420,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -452,6 +462,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];
@@ -493,6 +504,7 @@ namespace Cosplay_Academy.ME
                     if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
                     {
                         var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
+                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
                         for (var i = 0; i < properties.Count; i++)
                         {
                             var loadedProperty = properties[i];

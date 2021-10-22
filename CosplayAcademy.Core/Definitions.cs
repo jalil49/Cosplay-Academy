@@ -160,29 +160,29 @@ namespace Cosplay_Academy
         //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
         //I'd imagine it's possible to scale clubs easily
         public static readonly string[] InputStrings =
-            {
+        {
 #if KK
-                    $"{sep}School Uniform", //0
-                    $"{sep}AfterSchool", //1
-                    $"{sep}Gym" ,//2
-                    $"{sep}Swimsuit" , //3
-                    $"{sep}Club{sep}Swim" , //4
-                    $"{sep}Club{sep}Manga", //5
-                    $"{sep}Club{sep}Cheer", //6
-                    $"{sep}Club{sep}Tea", //7
-                    $"{sep}Club{sep}Track", //8
-                    $"{sep}Club{sep}Koi", //9
-                    $"{sep}Casual" , //10
-                    $"{sep}Nightwear", //11
-                    $"{sep}Underwear"//12                 
+            $"{sep}School Uniform", //0
+            $"{sep}AfterSchool", //1
+            $"{sep}Gym" ,//2
+            $"{sep}Swimsuit" , //3
+            $"{sep}Club{sep}Swim" , //4
+            $"{sep}Club{sep}Manga", //5
+            $"{sep}Club{sep}Cheer", //6
+            $"{sep}Club{sep}Tea", //7
+            $"{sep}Club{sep}Track", //8
+            $"{sep}Club{sep}Koi", //9
+            $"{sep}Casual" , //10
+            $"{sep}Nightwear", //11
+            $"{sep}Underwear"//12                 
 #elif KKS
-                    $"{sep}Casual", //0
-                    $"{sep}Swimsuit", //1
-                    $"{sep}Nightwear", //2
-                    $"{sep}Bathroom", //3
-                    $"{sep}Underwear"//4
+            $"{sep}Casual", //0
+            $"{sep}Swimsuit", //1
+            $"{sep}Nightwear", //2
+            $"{sep}Bathroom", //3
+            $"{sep}Underwear"//4
 #endif
-};
+        };
 
         public static readonly string[] ExtraInputStrings =
         {
@@ -200,7 +200,6 @@ namespace Cosplay_Academy
             $"{sep}Bathroom", //13
         #endif
         };
-
 
         public static readonly string[] AllCoordinatePaths =
         {
@@ -322,18 +321,31 @@ namespace Cosplay_Academy
             return new ResolveInfo() { GUID = guid, Slot = slot, CategoryNo = (ChaListDefine.CategoryNo)category, Property = property };
         }
 
+#if KK
+        public const int GameCoordinateSize = 7;
+#elif KKS
+        public const int GameCoordinateSize = 4;
+#endif
+
         public static string[] SimplifiedCoordinateTypes = new string[]
+#if KK
         {
             "School Uniform",
-            "After School",
+            "AfterSchool",
             "Gym",
             "Swimsuit",
             "Club",
             "Casual",
             "Nightwear",
+        };
+#elif KKS
+        {
+            "Casual",
+            "Swimsuit",
+            "Nightwear",
             "Bathroom"
         };
-
+#endif
         private class PluginCheckData
         {
             public string GUID;

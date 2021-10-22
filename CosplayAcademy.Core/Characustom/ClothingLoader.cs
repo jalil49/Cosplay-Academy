@@ -88,7 +88,7 @@ namespace Cosplay_Academy
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
             //Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
 
-            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
                 if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
 
