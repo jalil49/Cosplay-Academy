@@ -72,6 +72,15 @@ namespace Cosplay_Academy
                 if (!UnderClothingKeep.ContainsKey(i)) UnderClothingKeep[i] = new bool[9];
             }
 
+            if (ValidOutfits.All(x => x.Value == false))//don't do anything if there is nothing to repack
+            {
+#if TRACE
+                TimeWatch[2].Stop();
+                var temp = TimeWatch[2].ElapsedMilliseconds - Start;
+                Average[2].Add(temp);
+#endif
+                return;
+            }
 
 #if TRACE
             int j = 0;
@@ -208,7 +217,7 @@ namespace Cosplay_Academy
             var Start = TimeWatch[3].ElapsedMilliseconds;
             TimeWatch[3].Start();
 #endif
-            if (!ForceALL)
+            if (!ForceALL || ValidOutfits.All(x => x.Value == false))//don't do anything if there is nothing to repack
             {
 #if TRACE
                 TimeWatch[3].Stop();
