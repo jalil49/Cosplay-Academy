@@ -101,7 +101,7 @@ namespace Cosplay_Academy
                 CoordinatePartsQueue.Remove(i);
             }
             ME.TextureDictionary.Clear();
-            Finished.Clear();
+            Finished.SoftClear();
         }
 
         public void FillOutfitpaths()

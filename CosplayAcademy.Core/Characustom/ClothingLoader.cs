@@ -76,7 +76,6 @@ namespace Cosplay_Academy
             ChaControl = character;
             ChaFile = file;
 
-            ThisOutfitData.Finished.Clear();
             ThisOutfitData.FillOutfitpaths();
             var holdoutfitstate = ChaControl.fileStatus.coordinateType;
 

@@ -558,9 +558,12 @@ namespace Cosplay_Academy.ME
             }
         }
 
-        public void Clear()
+        public void SoftClear()
         {
-            Coordinates.Clear();
+            foreach (var item in Coordinates.Values)
+            {
+                item.SoftClear();
+            }
         }
 
         public void AllProperties(out List<RendererProperty> rendererProperties, out List<MaterialFloatProperty> materialFloatProperties, out List<MaterialColorProperty> materialColorProperties, out List<MaterialShader> materialShaders, out List<MaterialTextureProperty> materialTextureProperties)
@@ -607,7 +610,6 @@ namespace Cosplay_Academy.ME
                 }
             }
         }
-
     }
 
     public class ME_Coordinate
