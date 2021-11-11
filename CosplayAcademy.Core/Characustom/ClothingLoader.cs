@@ -80,7 +80,7 @@ namespace Cosplay_Academy
             var holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
             Underwear.LoadFile(ThisOutfitData.alloutfitpaths[underwearindex].GetFullPath());
-            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.alloutfitpaths[underwearindex]);
+            Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.alloutfitpaths[underwearindex].GetFullPath());
 
             Underwear_ME_Data = new ME_Coordinate(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, 0);
 
